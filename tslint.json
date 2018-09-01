@@ -1,0 +1,43 @@
+{
+    "extends": ["tslint:latest", "tslint-config-prettier", "tslint-eslint-rules"],
+    "rules": {
+      "no-constant-condition": true,
+      "no-control-regex": true,
+      "no-duplicate-case": true,
+      "no-empty-character-class": true,
+      "no-ex-assign": true,
+      "no-extra-boolean-cast": true,
+      "no-extra-semi": true,
+      "no-inner-declarations": true,
+      "no-invalid-regexp": true,
+      "no-irregular-whitespace": true,
+      "no-regex-spaces": true,
+      "no-sparse-arrays": true,
+      "no-unexpected-multiline": true,
+      "valid-typeof": true,
+      "no-multi-spaces": true,
+  
+      "adjacent-overload-signatures": true,
+      "no-any": true,
+      "no-empty-interface": true,
+      "no-import-side-effect": true,
+      "no-magic-numbers": true,
+      "await-promise": true,
+      "ban-comma-operator": true,
+      "curly": true,
+      "no-arg": true,
+      "no-console": true,
+      "no-construct": true,
+      "no-dynamic-delete": true,
+      "no-eval": true,
+      "no-invalid-this": true,
+      "no-unused-expression": true,
+      "no-unsafe-finally": true,
+      "no-var-keyword": true,
+      "prefer-object-spread": true,
+      "triple-equals": true,
+  
+      "prefer-const": true,
+      "prefer-readonly": true
+    }
+  }

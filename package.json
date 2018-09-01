@@ -1,0 +1,20 @@
+{
+  "name": "clutchlang",
+  "version": "0.1.0",
+  "description": "An experimental compile-to-JS language.",
+  "engines": {
+    "node": ">=10.0.0",
+    "yarn": ">=1.9.4 <2.0.0"
+  },
+  "repository": "git@github.com:clutchlang/clutchlang.git",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "clutchc": "ts-node src/clutchc.ts"
+  },
+  "devDependencies": {
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  }
+}
