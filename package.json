@@ -10,11 +10,19 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clutchc": "ts-node src/clutchc.ts"
+    "clutchc": "ts-node src/clutchc.ts",
+    "format": "prettier --config .prettierrc.json --write \"{,!(node_modules|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
+    "format:check": "prettier-check --list-different \"{,!(node_modules|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
+    "lint": "tslint --project ."
   },
   "devDependencies": {
+    "chalk": "^2.4.1",
+    "prettier": "^1.14.2",
+    "prettier-check": "^2.0.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.0.3"
   }
 }
