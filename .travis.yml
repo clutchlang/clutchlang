@@ -5,7 +5,7 @@ branches:
     - master
 
 install:
-  - yarn install
+  - yarn install --ignore-engines
 
 cache:
   yarn: true
