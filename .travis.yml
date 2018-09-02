@@ -1,0 +1,24 @@
+language: node_js  
+
+node_js:
+  - node
+
+branches:
+  only:
+    - master
+
+cache:
+  yarn: true
+  directories:
+     - ./node_modules
+
+# Build stages: https://docs.travis-ci.com/user/build-stages/.
+stages:
+  - presubmit
+
+jobs:
+  include:
+    - stage: presubmit
+      script: npm run lint
+    - stage: presubmit
+      script: npm run format:check
