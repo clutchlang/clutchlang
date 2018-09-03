@@ -10,6 +10,8 @@
     "noUnusedParameters": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+
+    "target": "esnext"
   }
 }
