@@ -5,8 +5,12 @@
 import { compile } from 'moo';
 
 export const lexer = compile({
+  // Keywords:
+  keyword: ['let', 'return'],
+
   // Basics:
   whitespace: /[ \t]+/,
+  linebreak: { match: /\n/, lineBreaks: true },
   comment: /\/\/.*?$/,
   identifier: {
     match: /[a-zA-Z_][a-zA-Z0-9]*/,
@@ -14,7 +18,7 @@ export const lexer = compile({
 
   // Literals:
   number: /0|[1-9][0-9]*/,
-  string: /"(?:\\["\\]|[^\n"\\])*"/,
+  string: /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/,
   boolean: /true|false/,
 
   // Punctuation:
@@ -23,4 +27,11 @@ export const lexer = compile({
   lcurly: '{',
   rcurly: '}',
   arrow: '=>',
+  dot: '.',
+  colon: ':',
+
+  // Operators:
+  assign: /(?<!=)=(?!=)/,
+  equals: /(?<!=)==(?!=)/,
+  identical: /(?<!=)===(?!=)/,
 });
