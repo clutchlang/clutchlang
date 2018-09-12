@@ -8,6 +8,11 @@ export const lexer = compile({
   // Keywords:
   keyword: ['let', 'return'],
 
+  // Literals:
+  number: /0|[1-9][0-9]*/,
+  string: /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/,
+  boolean: /true|false/,
+
   // Basics:
   whitespace: /[ \t]+/,
   linebreak: { match: /\n/, lineBreaks: true },
@@ -15,11 +20,6 @@ export const lexer = compile({
   identifier: {
     match: /[a-zA-Z_][a-zA-Z0-9]*/,
   },
-
-  // Literals:
-  number: /0|[1-9][0-9]*/,
-  string: /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/,
-  boolean: /true|false/,
 
   // Punctuation:
   lparen: '(',
