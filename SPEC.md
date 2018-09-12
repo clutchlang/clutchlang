@@ -1,5 +1,44 @@
 _This in a work-in-progress._
 
+# Grammar
+
+`COMPILATION_UNIT` ::=
+  * `FUNCTION`+ <sup>Optional</sup>
+
+`FUNCTION` ::=
+  * `IDENTIFIER`
+  * `PARAMETERS` <sup>Optional</sup>
+  * `=>`
+  * `EXPRESSION` | `BLOCK`
+
+`IDENTIFIER` ::= **TODO:** Fill in.
+
+`PARAMETERS` ::=
+  * `(`
+  * `PARAMETER`+
+  * `)`
+
+`PARAMETER` ::=
+  * `IDENTIFIER`
+  * `:` `IDENTIFIER` <sup>Optional</sub>
+  * `,` <sup>Optional for last<sup>
+
+`EXPRESSION` ::=
+  * `LITERAL`
+
+`LITERAL` ::=
+  * `NUMBER` | `BOOLEAN` | `STRING`
+
+`BLOCK` ::=
+  * `{`
+  * `STATEMENT`+
+  * `}`
+
+`STATEMENT` ::=
+  * `EXPRESSION`
+
+# Examples
+
 ## Variables
 
 ```
