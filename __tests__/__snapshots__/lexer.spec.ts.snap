@@ -114,7 +114,7 @@ Array [
     "offset": 9,
     "text": "true",
     "toString": [Function],
-    "type": "identifier",
+    "type": "boolean",
     "value": "true",
   },
 ]

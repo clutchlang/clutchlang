@@ -1,11 +1,11 @@
-import { Token } from 'moo';
 import { lexer } from '../src/parser';
+import { IToken } from '../src/parser/scanner';
 
-function tokenize(program: string): Token[] {
+function tokenize(program: string): IToken[] {
   lexer.reset(program);
-  const results: Token[] = [];
+  const results: IToken[] = [];
   for (const token of lexer) {
-    results.push(token);
+    results.push(token as IToken);
   }
   return results;
 }
