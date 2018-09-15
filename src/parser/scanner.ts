@@ -59,6 +59,7 @@ export class Scanner {
         this.position += pattern.length;
         return true;
       }
+      return false;
     }
     if (this.peek() === pattern) {
       this.position++;
