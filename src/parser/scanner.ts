@@ -8,7 +8,7 @@ import { outOfRange } from './errors/range';
  * _stateful_.
  */
 export class Scanner {
-  private mLastMatch?: {[key: string]: string};
+  private mLastMatch?: RegExpMatchArray;
   private mPosition = 0;
 
   /**
@@ -32,7 +32,7 @@ export class Scanner {
   /**
    * Returns the last match as a result of @member scan.
    */
-  public get lastMatch(): {[key: string]: string} | undefined {
+  public get lastMatch(): RegExpMatchArray | undefined {
     return this.mLastMatch;
   }
 

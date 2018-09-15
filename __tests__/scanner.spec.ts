@@ -50,11 +50,11 @@ describe(`${Scanner}`, () => {
   });
 
   it('should update lastMatch during scanning', () => {
-    scanner.scan('A');
+    expect(scanner.scan('A')).toBe(true);
     expect(scanner.lastMatch![0]).toBe('A');
-    scanner.scan(/B/);
+    expect(scanner.scan(/B/)).toBe(true);
     expect(scanner.lastMatch![0]).toBe('B');
-    scanner.scan($C);
+    expect(scanner.scan($C)).toBe(true);
     expect(scanner.lastMatch).toBeUndefined();
   });
 });
