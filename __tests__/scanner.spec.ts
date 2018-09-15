@@ -43,4 +43,18 @@ describe(`${Scanner}`, () => {
     expect(scanner.scan('AB')).toBe(true);
     expect(scanner.peek()).toBe($C);
   });
+
+  it('should scan regular expressions', () => {
+    expect(scanner.scan(/(C|B)/)).toBe(false);
+    expect(scanner.scan(/(A|B)/)).toBe(true);
+  });
+
+  it('should update lastMatch during scanning', () => {
+    expect(scanner.scan('A')).toBe(true);
+    expect(scanner.lastMatch![0]).toBe('A');
+    expect(scanner.scan(/B/)).toBe(true);
+    expect(scanner.lastMatch![0]).toBe('B');
+    expect(scanner.scan($C)).toBe(true);
+    expect(scanner.lastMatch).toBeUndefined();
+  });
 });
