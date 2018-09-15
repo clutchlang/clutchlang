@@ -8,6 +8,7 @@ import { outOfRange } from './errors/range';
  * _stateful_.
  */
 export class Scanner {
+  private mLastMatch?: RegExpMatchArray;
   private mPosition = 0;
 
   /**
@@ -29,6 +30,13 @@ export class Scanner {
   }
 
   /**
+   * Returns the last match as a result of @member scan.
+   */
+  public get lastMatch(): RegExpMatchArray | undefined {
+    return this.mLastMatch;
+  }
+
+  /**
    * Returns the character code of the character at an offset.
    *
    * @param offset Offset from @member position.
@@ -46,23 +54,37 @@ export class Scanner {
    * Returns and consumes the character code at the current @member position.
    */
   public read(): number {
-    return this.contents.codePointAt(this.position++)!;
+    const result = this.contents.codePointAt(this.position++)!;
+    this.mLastMatch = undefined;
+    return result;
   }
 
   /**
    * If the scanner matches a @param pattern, returns true, and consumes it.
    */
-  public scan(pattern: number | string): boolean {
-    if (typeof pattern === 'string') {
-      const substring = this.contents.substring(this.position);
-      if (substring.startsWith(pattern)) {
-        this.position += pattern.length;
+  public scan(pattern: number | string | RegExp): boolean {
+    if (typeof pattern === 'number') {
+      if (this.peek() === pattern) {
+        this.position++;
+        this.mLastMatch = undefined;
         return true;
       }
       return false;
     }
-    if (this.peek() === pattern) {
-      this.position++;
+    const substring = this.contents.substring(this.position);
+    if (typeof pattern === 'string') {
+      if (substring.startsWith(pattern)) {
+        this.position += pattern.length;
+        this.mLastMatch = [pattern];
+        return true;
+      }
+      return false;
+    }
+    const regexp = new RegExp(`^${pattern.source}`);
+    const matches = substring.match(regexp);
+    if (matches) {
+      this.position += matches[0].length;
+      this.mLastMatch = matches;
       return true;
     }
     return false;
