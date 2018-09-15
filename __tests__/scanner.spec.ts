@@ -54,7 +54,7 @@ describe(`${Scanner}`, () => {
     scanner.scan('A');
     expect(scanner.lastMatch![0]).toBe('A');
     scanner.scan(/B/);
-    expect(scanner.lastMatch![0]).toBe('B')
+    expect(scanner.lastMatch![0]).toBe('B');
     scanner.scan($C);
     expect(scanner.lastMatch).toBeUndefined();
   });
