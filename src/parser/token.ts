@@ -1,3 +1,5 @@
+import { Tokens } from '../parser';
+
 export class Token {
-  constructor(public readonly value: string) {}
+  constructor(public readonly type: Tokens, public readonly value: string) {}
 }
