@@ -1,6 +1,5 @@
 // tslint:disable:no-magic-numbers
 import { Scanner } from '../src/parser';
-import { equal } from 'assert';
 
 describe(`${Scanner}`, () => {
   let scanner: Scanner;
