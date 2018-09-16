@@ -3,4 +3,10 @@ export enum Tokens {
   Arrow,
   LCurly,
   RCurly,
+  LParen,
+  RParen,
+
+  Boolean,
+  Number,
+  String,
 }
