@@ -8,10 +8,25 @@
   "private": true,
   "scripts": {
     "clutchc": "ts-node src/clutchc.ts",
+    "coverage": "cat ./coverage/lcov.info | coveralls",
     "format": "prettier --config .prettierrc.json --write \"{,!(node_modules|coverage|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
     "format:check": "prettier-check --list-different \"{,!(node_modules||coverage|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
     "lint": "tslint --project .",
-    "test": "jest"
+    "test": "jest --coverage --no-cache"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "collectCoverage": true
   },
   "devDependencies": {
     "@types/jest": "^23.3.1",
@@ -24,5 +39,8 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "coveralls": "^3.0.2"
   }
 }
