@@ -1,3 +1,5 @@
+![Clutch Logo](https://user-images.githubusercontent.com/168174/45592313-6d608680-b91e-11e8-8edd-f12ee6e74824.png)
+
 [![Build Status](https://travis-ci.org/clutchlang/clutchlang.svg?branch=master)][1]
 [![Coverage Status](https://coveralls.io/repos/github/clutchlang/clutchlang/badge.svg?branch=master)][2]
 [![License is MIT](https://img.shields.io/github/license/mashape/apistatus.svg)][3]
