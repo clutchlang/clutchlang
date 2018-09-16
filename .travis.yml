@@ -12,15 +12,15 @@ cache:
   directories:
      - ./node_modules
 
-# Build stages: https://docs.travis-ci.com/user/build-stages/.
-stages:
-  - presubmit
-
-jobs:
+matrix:
+  fast_finish: true
   include:
-    - stage: presubmit
+    - name: "Lint"
       script: npm run lint
-    - stage: presubmit
+    - name: "Format"
       script: npm run format:check
-    - stage: presubmit
+    - name: "Test"
       script: npm run test
+
+after_success:
+  - npm run coverage
