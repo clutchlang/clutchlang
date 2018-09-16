@@ -7,8 +7,20 @@ import { Codes, Scanner, Token, Tokens } from '../parser';
  */
 export class Lexer implements Iterable<Token> {
   private static readonly matchIdentifier = /[_a-zA-Z][_a-zA-Z0-9]{0,30}/;
+  private static readonly matchLiteralBool = /true|false/;
+  private static readonly matchLiteralNumber = /-?\d+\.?\d*/;
+  private static readonly matchLiteralString = /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/;
 
   constructor(private readonly scanner: Scanner) {}
+
+  private get substring() {
+    let substring = this.scanner.contents.substring(this.scanner.position);
+    const newLine = substring.indexOf('\n');
+    if (newLine !== -1) {
+      substring = substring.substring(0, newLine);
+    }
+    return substring;
+  }
 
   public *[Symbol.iterator](): Iterator<Token> {
     this.consumeWhitespace();
@@ -31,19 +43,23 @@ export class Lexer implements Iterable<Token> {
     throw new SyntaxError(`${this.scanner.position}: ${message}`);
   }
 
-  protected scanOrFailExpecting(
+  protected scanOptional(
+    token: Tokens,
+    pattern: number | string | RegExp
+  ): Token | undefined {
+    this.consumeWhitespace();
+    const result = this.scanner.scan(pattern);
+    return result ? new Token(token, this.scanner.lastMatch![0]) : undefined;
+  }
+
+  protected scanRequired(
     token: Tokens,
     pattern: number | string | RegExp
   ): Token {
     this.consumeWhitespace();
     const result = this.scanner.scan(pattern);
     if (!result) {
-      let substring = this.scanner.contents.substring(this.scanner.position);
-      const newLine = substring.indexOf('\n');
-      if (newLine !== -1) {
-        substring = substring.substring(0, newLine);
-      }
-      this.fail(`Expected ${pattern}, got "${substring}"`);
+      this.fail(`Expected ${pattern}, got "${this.substring}"`);
     }
     return new Token(token, this.scanner.lastMatch![0]);
   }
@@ -52,36 +68,58 @@ export class Lexer implements Iterable<Token> {
     return this.scanFunction();
   }
 
-  protected *scanExpression(): Iterable<Token> {
-    return [];
+  protected scanExpression(): Iterable<Token> {
+    const expression =
+      this.scanLiteral() ||
+      this.scanOptional(Tokens.Identifier, Lexer.matchIdentifier);
+    if (!expression) {
+      if (this.scanner.peek() === Codes.LParen) {
+        return this.scanParantheses();
+      }
+      return this.fail(`Expected expression, got "${this.substring}"`);
+    }
+    return [expression];
   }
 
   protected *scanExpressionOrBlock(): Iterable<Token> {
     this.consumeWhitespace();
     if (this.scanner.peek() === Codes.LCurly) {
-      yield this.scanOrFailExpecting(Tokens.LCurly, '{');
-      // Then 0 to N expressions (until we hit a '}').
+      yield this.scanRequired(Tokens.LCurly, '{');
       while (!this.scanner.isDone && this.scanner.peek() !== Codes.RCurly) {
-        const before = this.scanner.position;
         this.consumeWhitespace();
-        yield* this.scanExpression();
-        if (before === this.scanner.position) {
-          return this.scanOrFailExpecting(Tokens.RCurly, '}');
+        const endedBlock = this.scanOptional(Tokens.RCurly, '}');
+        if (endedBlock) {
+          yield endedBlock;
+          break;
         }
+        yield* this.scanExpression();
       }
-      yield this.scanOrFailExpecting(Tokens.RCurly, '}');
     } else {
-      return this.scanExpression();
+      yield* this.scanExpression();
     }
   }
 
   protected *scanFunction(): Iterable<Token> {
     yield this.scanIdentifier();
-    yield this.scanOrFailExpecting(Tokens.Arrow, '=>');
+    yield this.scanRequired(Tokens.Arrow, '=>');
     yield* this.scanExpressionOrBlock();
   }
 
   protected scanIdentifier(): Token {
-    return this.scanOrFailExpecting(Tokens.Identifier, Lexer.matchIdentifier);
+    return this.scanRequired(Tokens.Identifier, Lexer.matchIdentifier);
+  }
+
+  protected scanLiteral(): Token | undefined {
+    return (
+      this.scanOptional(Tokens.Boolean, Lexer.matchLiteralBool) ||
+      this.scanOptional(Tokens.Number, Lexer.matchLiteralNumber) ||
+      this.scanOptional(Tokens.String, Lexer.matchLiteralString)
+    );
+  }
+
+  protected *scanParantheses(): Iterable<Token> {
+    yield this.scanRequired(Tokens.LParen, '(');
+    yield* this.scanExpression();
+    yield this.scanRequired(Tokens.RParen, ')');
   }
 }
