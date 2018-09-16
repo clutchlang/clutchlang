@@ -28,13 +28,13 @@ _Clutch_'s goals:
 
 ### `COMPILATION_UNIT`
 
-::= [`FUNCTION`](#FUNCTION)+
+::= [`FUNCTION`](#function)+
 
 ### `FUNCTION`
 
 ::= 
- [`IDENTIFIER`](#IDENTIFIER) `=>`
- [`EXPRESSION`](#EXPRESSION) | `{` [`EXPRESSION`](#EXPRESSION)+ `}`
+ [`IDENTIFIER`](#identifier) `=>`
+ [`EXPRESSION`](#expression) | `{` [`EXPRESSION`](#expression)+ `}`
 
 ### `IDENTIFIER`
 
@@ -43,15 +43,15 @@ _Clutch_'s goals:
 ### `EXPERSSION`
 
 ::= 
- [`LITERAL`](#LITERAL) |
- `(` [`EXPRESSION`](#EXPRESSION) `)`
+ [`LITERAL`](#literal) |
+ `(` [`EXPRESSION`](#expression) `)`
 
 #### `LITERAL`
 
 ::=
-[`NUMBER`](#NUMBER) |
- [`BOOLEAN`](#BOOLEAN) |
- [`STRING`](#STRING)
+[`NUMBER`](#number) |
+ [`BOOLEAN`](#boolean) |
+ [`STRING`](#string)
 
 ##### `NUMBER`
 
