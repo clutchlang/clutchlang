@@ -1,5 +1,3 @@
-_Clutch_ is an experimental compile-to-JS language.
-
 [![Build Status](https://travis-ci.org/clutchlang/clutchlang.svg?branch=master)][1]
 [![Coverage Status](https://coveralls.io/repos/github/clutchlang/clutchlang/badge.svg?branch=master)][2]
 [![License is MIT](https://img.shields.io/github/license/mashape/apistatus.svg)][3]
@@ -8,11 +6,9 @@ _Clutch_ is an experimental compile-to-JS language.
 [2]: https://coveralls.io/github/clutchlang/clutchlang?branch=master
 [3]: https://choosealicense.com/licenses/mit/
 
-## Overview
+# Clutch
 
-_Clutch_ is an expression-oriented and object-oriented modern programming
-language that compiles to idiomatic _JavaScript_ for execution within a browser
-or NodeJS.
+_Clutch_ is a compile-to-JS expression-oriented and object-oriented modern programming.
 
 ```
 main => print('Hello World)
@@ -28,13 +24,13 @@ _Clutch_'s goals:
 
 ### `COMPILATION_UNIT`
 
-::= [`FUNCTION`](#FUNCTION)+
+::= [`FUNCTION`](#function)+
 
 ### `FUNCTION`
 
 ::= 
- [`IDENTIFIER`](#IDENTIFIER) `=>`
- [`EXPRESSION`](#EXPRESSION) | `{` [`EXPRESSION`](#EXPRESSION)+ `}`
+ [`IDENTIFIER`](#identifier) `=>`
+ [`EXPRESSION`](#expression) | `{` [`EXPRESSION`](#expression)+ `}`
 
 ### `IDENTIFIER`
 
@@ -43,15 +39,15 @@ _Clutch_'s goals:
 ### `EXPERSSION`
 
 ::= 
- [`LITERAL`](#LITERAL) |
- `(` [`EXPRESSION`](#EXPRESSION) `)`
+ [`LITERAL`](#literal) |
+ `(` [`EXPRESSION`](#expression) `)`
 
 #### `LITERAL`
 
 ::=
-[`NUMBER`](#NUMBER) |
- [`BOOLEAN`](#BOOLEAN) |
- [`STRING`](#STRING)
+[`NUMBER`](#number) |
+ [`BOOLEAN`](#boolean) |
+ [`STRING`](#string)
 
 ##### `NUMBER`
 
