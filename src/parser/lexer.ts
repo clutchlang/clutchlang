@@ -9,6 +9,7 @@ export class Lexer implements Iterable<Token> {
   private static readonly matchIdentifier = /[_a-zA-Z][_a-zA-Z0-9]{0,30}/;
   private static readonly matchLiteralBool = /true|false/;
   private static readonly matchLiteralNumber = /-?\d+\.?\d*/;
+  private static readonly matchHexNumber = /0[xX][0-9a-fA-F]+/;
   private static readonly matchLiteralString = /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/;
 
   constructor(private readonly scanner: Scanner) {}
@@ -112,6 +113,7 @@ export class Lexer implements Iterable<Token> {
   protected scanLiteral(): Token | undefined {
     return (
       this.scanOptional(Tokens.Boolean, Lexer.matchLiteralBool) ||
+      this.scanOptional(Tokens.Number, Lexer.matchHexNumber) ||
       this.scanOptional(Tokens.Number, Lexer.matchLiteralNumber) ||
       this.scanOptional(Tokens.String, Lexer.matchLiteralString)
     );

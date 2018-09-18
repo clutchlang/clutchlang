@@ -94,6 +94,18 @@ describe('should lex a function returning a literal', () => {
         new Token(Tokens.Number, '-1.0'),
       ]);
     });
+
+    it('0xDEADBEEF', () => {
+      const scanner = new Scanner(`
+        returnsDeadBeef => 0xDEADBEEF
+      `);
+      const lexer = new Lexer(scanner);
+      expect(Array.from(lexer)).toMatchObject([
+        new Token(Tokens.Identifier, 'returnsDeadBeef'),
+        new Token(Tokens.Arrow, '=>'),
+        new Token(Tokens.Number, '0xDEADBEEF'),
+      ]);
+    });
   });
 
   it('string', () => {
