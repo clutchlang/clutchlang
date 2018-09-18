@@ -38,22 +38,22 @@ _Clutch_'s goals:
 
 ::= `/[_a-zA-Z][_a-zA-Z0-9]{0,30}/`
 
-### `EXPERSSION`
+### `EXPRESSION`
 
 ::= 
- [`LITERAL`](#literal) |
+  [`LITERAL`](#literal) |
  `(` [`EXPRESSION`](#expression) `)`
 
 #### `LITERAL`
 
 ::=
-[`NUMBER`](#number) |
+ [`NUMBER`](#number) |
  [`BOOLEAN`](#boolean) |
  [`STRING`](#string)
 
 ##### `NUMBER`
 
-::= `/-?\d+\.?\d*/`
+::= `/-?\d+\.?\d*/` | `/0[xX][0-9a-fA-F]+/`
 
 ##### `BOOLEAN`
 
