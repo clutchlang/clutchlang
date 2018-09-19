@@ -1,7 +1,8 @@
-import { Lexer, Scanner, Token, Tokens } from '../src/parser';
+import { Lexer, Token, Tokens } from '../src/parser';
+import { SourceScanner } from '../src/parser/source/scanner';
 
 it('should lex a simple program', () => {
-  const scanner = new Scanner(`
+  const scanner = new SourceScanner(`
     main => {
       print('Hello World')
     }
@@ -22,7 +23,7 @@ it('should lex a simple program', () => {
 describe('should lex a function returning a literal', () => {
   describe('boolean', () => {
     it('false', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returnsFalse => false
       `);
       const lexer = new Lexer(scanner);
@@ -34,7 +35,7 @@ describe('should lex a function returning a literal', () => {
     });
 
     it('true', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returnsTrue => true
       `);
       const lexer = new Lexer(scanner);
@@ -48,7 +49,7 @@ describe('should lex a function returning a literal', () => {
 
   describe('number', () => {
     it('1', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returns1 => 1
       `);
       const lexer = new Lexer(scanner);
@@ -60,7 +61,7 @@ describe('should lex a function returning a literal', () => {
     });
 
     it('-1', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returnsN1 => -1
       `);
       const lexer = new Lexer(scanner);
@@ -72,7 +73,7 @@ describe('should lex a function returning a literal', () => {
     });
 
     it('1.0', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returns1DotO => 1.0
       `);
       const lexer = new Lexer(scanner);
@@ -84,7 +85,7 @@ describe('should lex a function returning a literal', () => {
     });
 
     it('-1.0', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returnsN1DotO => -1.0
       `);
       const lexer = new Lexer(scanner);
@@ -96,7 +97,7 @@ describe('should lex a function returning a literal', () => {
     });
 
     it('0xDEADBEEF', () => {
-      const scanner = new Scanner(`
+      const scanner = new SourceScanner(`
         returnsDeadBeef => 0xDEADBEEF
       `);
       const lexer = new Lexer(scanner);
@@ -109,7 +110,7 @@ describe('should lex a function returning a literal', () => {
   });
 
   it('string', () => {
-    const scanner = new Scanner(`
+    const scanner = new SourceScanner(`
       returnsHello => 'Hello'
     `);
     const lexer = new Lexer(scanner);
@@ -122,7 +123,7 @@ describe('should lex a function returning a literal', () => {
 });
 
 it('should lex a function returning an identifier', () => {
-  const scanner = new Scanner(`
+  const scanner = new SourceScanner(`
     returnsName => name
   `);
   const lexer = new Lexer(scanner);
@@ -134,7 +135,7 @@ it('should lex a function returning an identifier', () => {
 });
 
 it('should lex a function returning a paranethesized expression', () => {
-  const scanner = new Scanner(`
+  const scanner = new SourceScanner(`
     returns1P => (1)
   `);
   const lexer = new Lexer(scanner);
@@ -148,7 +149,7 @@ it('should lex a function returning a paranethesized expression', () => {
 });
 
 it('should lex a function with an expression block', () => {
-  const scanner = new Scanner(`
+  const scanner = new SourceScanner(`
     expressionBlock => {
       true
       false
@@ -177,31 +178,31 @@ it('should lex a function with an expression block', () => {
 
 describe('should catch lexing errors', () => {
   it('expected identifier', () => {
-    const scanner = new Scanner('$ => {}');
+    const scanner = new SourceScanner('$ => {}');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });
 
   it('expected =>', () => {
-    const scanner = new Scanner('main $ {}');
+    const scanner = new SourceScanner('main $ {}');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });
 
   it('expected {', () => {
-    const scanner = new Scanner('main => $}');
+    const scanner = new SourceScanner('main => $}');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });
 
   it('expected }', () => {
-    const scanner = new Scanner('main => {$');
+    const scanner = new SourceScanner('main => {$');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });
 
   it('expected } after new line', () => {
-    const scanner = new Scanner('main => {\n$\n$');
+    const scanner = new SourceScanner('main => {\n$\n$');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });

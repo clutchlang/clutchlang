@@ -1,14 +1,14 @@
 // tslint:disable:no-magic-numbers
-import { Scanner } from '../src/parser';
+import { SourceFile, SourceScanner } from '../../../src/parser/source/scanner';
 
-describe(`${Scanner}`, () => {
-  let scanner: Scanner;
+describe(`${SourceScanner}`, () => {
+  let scanner: SourceScanner;
   const contents = 'ABC';
   const $A = contents.codePointAt(0)!;
   const $B = contents.codePointAt(1)!;
   const $C = contents.codePointAt(2)!;
 
-  beforeEach(() => (scanner = new Scanner(contents)));
+  beforeEach(() => (scanner = new SourceScanner(contents)));
 
   it('should reflect the position state via isDone', () => {
     expect(scanner.isDone).toBe(false);
@@ -56,5 +56,14 @@ describe(`${Scanner}`, () => {
     expect(scanner.lastMatch![0]).toBe('B');
     expect(scanner.scan($C)).toBe(true);
     expect(scanner.lastMatch).toBeUndefined();
+  });
+});
+
+describe(`${SourceFile}`, () => {
+  it('should calculate lines', () => {
+    const file = new SourceFile('aaa\nbbbbb\r\nccc\n\r');
+    const lines = file.lines;
+    expect(lines).toBe(4);
+    expect(lines).toEqual(file.lines);
   });
 });
