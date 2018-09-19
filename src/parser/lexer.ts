@@ -1,4 +1,5 @@
-import { Codes, Scanner, Token, Tokens } from '../parser';
+import { Codes, Token, Tokens } from '../parser';
+import { SourceScanner } from './source/scanner';
 
 /**
  * Produces a stream of tokens from the @member scanner.
@@ -12,10 +13,10 @@ export class Lexer implements Iterable<Token> {
   private static readonly matchHexNumber = /0[xX][0-9a-fA-F]+/;
   private static readonly matchLiteralString = /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/;
 
-  constructor(private readonly scanner: Scanner) {}
+  constructor(private readonly scanner: SourceScanner) {}
 
   private get substring() {
-    let substring = this.scanner.contents.substring(this.scanner.position);
+    let substring = this.scanner.substring;
     const newLine = substring.indexOf('\n');
     if (newLine !== -1) {
       substring = substring.substring(0, newLine);
