@@ -1,8 +1,8 @@
 // tslint:disable:no-magic-numbers
 import {
   SourceFile,
-  SourceScanner,
   SourceLocation,
+  SourceScanner,
 } from '../../../src/parser/source/scanner';
 
 describe(`${SourceScanner}`, () => {
