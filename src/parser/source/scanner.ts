@@ -34,8 +34,8 @@ export class SourceScanner {
    * Returns and consumes the character code at the current @member position.
    */
   public read(): number {
-    this.mLastMatch = undefined;
     const codeUnit = this.peek();
+    this.mLastMatch = [String.fromCharCode(codeUnit)];
     this.position++;
     return codeUnit;
   }
@@ -68,6 +68,16 @@ export class SourceScanner {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Returns a @see {SourceSpan} representing the latest scanned positions.
+   */
+  public get span(): SourceSpan {
+    const match = this.mLastMatch![0];
+    const start = this.mSourceFile.location(this.position - match.length);
+    const end = this.mSourceFile.location(this.position);
+    return new SourceSpan(start, end, match);
   }
 
   public get substring(): string {
@@ -256,6 +266,33 @@ export class SourceLocation {
     this.source = options.source;
     this.line = options.line || 0;
     this.column = options.column || offset;
+  }
+}
+
+export class SourceSpan {
+  constructor(
+    public readonly start: SourceLocation,
+    public readonly end: SourceLocation,
+    public readonly text: string
+  ) {
+    if (start.offset < 0) {
+      throw new RangeError(`Invalid start offset: ${start.offset}`);
+    }
+    if (end.offset <= start.offset) {
+      throw new RangeError(
+        `Invalid end offset: ${end.offset} for start ${start.offset}`
+      );
+    }
+    if (start.source !== end.source) {
+      throw new Error('Source URLs must be the same');
+    }
+    if (text.length !== end.offset - start.offset) {
+      throw new RangeError(
+        `Invalid length of text ${text.length} for offset ${start.offset} -> ${
+          end.offset
+        }`
+      );
+    }
   }
 }
 

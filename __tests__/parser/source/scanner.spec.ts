@@ -3,6 +3,7 @@ import {
   SourceFile,
   SourceLocation,
   SourceScanner,
+  SourceSpan,
 } from '../../../src/parser/source/scanner';
 
 describe(`${SourceScanner}`, () => {
@@ -59,7 +60,27 @@ describe(`${SourceScanner}`, () => {
     expect(scanner.scan(/B/)).toBe(true);
     expect(scanner.lastMatch![0]).toBe('B');
     expect(scanner.scan($C)).toBe(true);
-    expect(scanner.lastMatch).toBeUndefined();
+    expect(scanner.lastMatch![0]).toBe('C');
+  });
+
+  it('should update span during scanning', () => {
+    scanner.scan('A');
+    let span = scanner.span;
+    expect(span.start.offset).toBe(0);
+    expect(span.end.offset).toBe(1);
+    expect(span.text).toBe('A');
+
+    scanner.scan(/B/);
+    span = scanner.span;
+    expect(span.start.offset).toBe(1);
+    expect(span.end.offset).toBe(2);
+    expect(span.text).toBe('B');
+
+    scanner.scan($C);
+    span = scanner.span;
+    expect(span.start.offset).toBe(2);
+    expect(span.end.offset).toBe(3);
+    expect(span.text).toBe('C');
   });
 });
 
@@ -168,4 +189,42 @@ it(`${SourceLocation} should have sensible defaults`, () => {
   expect(b.column).toBe(6);
   expect(b.line).toBe(0);
   expect(b.source).toBeUndefined();
+});
+
+describe(`${SourceSpan}`, () => {
+  it('should disallow a negative start', () => {
+    expect(() => {
+      return new SourceSpan(
+        new SourceLocation(-1),
+        new SourceLocation(1),
+        'ab'
+      );
+    }).toThrowError(RangeError);
+  });
+
+  it('should disallow an end not greater than start', () => {
+    expect(() => {
+      return new SourceSpan(new SourceLocation(1), new SourceLocation(0), 'a');
+    }).toThrowError(RangeError);
+  });
+
+  it('should disallow text of an invalid size', () => {
+    expect(() => {
+      return new SourceSpan(
+        new SourceLocation(0),
+        new SourceLocation(4),
+        'abcde'
+      );
+    }).toThrowError(RangeError);
+  });
+
+  it('should disallow different source URLs', () => {
+    expect(() => {
+      return new SourceSpan(
+        new SourceLocation(0, { source: 'foo.txt' }),
+        new SourceLocation(4, { source: 'foo.dat' }),
+        'abcd'
+      );
+    }).toThrowError();
+  });
 });
