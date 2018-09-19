@@ -125,7 +125,41 @@ export class SourceFile {
   private readonly mLineStarts: number[] = [];
   private mLineStartsComputed = false;
 
-  constructor(public readonly contents: string) {}
+  constructor(
+    public readonly contents: string,
+    public readonly source?: string
+  ) {}
+
+  /**
+   * Returns the line number given @param offset.
+   */
+  public computeLine(offset: number): number {
+    this.assertValidOffset(offset);
+    if (offset < this.lineStarts[0]) {
+      return 0;
+    }
+    if (offset >= this.lineStarts[this.lineStarts.length - 1]) {
+      return this.lineStarts.length;
+    }
+    return this.binarySearch(offset);
+  }
+
+  /**
+   * Returns the column number given @param offset.
+   */
+  public computeColumn(offset: number): number {
+    this.assertValidOffset(offset);
+    const line = this.computeLine(offset) - 1;
+    const start = this.lineStarts[line] || 0;
+    return offset - start;
+  }
+
+  /**
+   * Returns a pointer to the provided @param offset in this file.
+   */
+  public location(offset: number): SourceLocation {
+    return new FileLocation(this, offset);
+  }
 
   /**
    * Length of the file in characters.
@@ -139,6 +173,35 @@ export class SourceFile {
    */
   public get lines(): number {
     return this.lineStarts.length;
+  }
+
+  private assertValidOffset(offset: number): void {
+    if (offset < 0) {
+      throw new RangeError(`Offset may not be negative, was ${offset}.`);
+    }
+    if (offset > this.length) {
+      throw new RangeError(
+        `Offset ${offset} must not be greater than the length ${this.length}`
+      );
+    }
+  }
+
+  /**
+   * Binary search of @member lineStarts to find cooresponding @param offset.
+   */
+  private binarySearch(offset: number): number {
+    let min = 0;
+    let max = this.lineStarts.length - 1;
+    while (min < max) {
+      // tslint:disable-next-line:no-magic-numbers
+      const half = Math.floor(min + (max - min) / 2);
+      if (this.lineStarts[half] > offset) {
+        max = half;
+      } else {
+        min = half + 1;
+      }
+    }
+    return max;
   }
 
   private computeLineStarts(): void {
@@ -163,5 +226,57 @@ export class SourceFile {
   private get lineStarts(): number[] {
     this.computeLineStarts();
     return this.mLineStarts;
+  }
+}
+
+export class SourceLocation {
+  /**
+   * Source containing this location.
+   */
+  public readonly source: string | undefined;
+
+  /**
+   * 0-based line of this location in @member source.
+   */
+  public readonly line: number;
+
+  /**
+   * 0-based column of this location in @member source.
+   */
+  public readonly column: number;
+
+  constructor(
+    public readonly offset: number,
+    options: {
+      source?: string;
+      line?: number;
+      column?: number;
+    } = {}
+  ) {
+    this.source = options.source;
+    this.line = options.line || 0;
+    this.column = options.column || offset;
+  }
+}
+
+/**
+ * An internal @see {SourceLocation} that computes line/column lazily.
+ */
+export class FileLocation implements SourceLocation {
+  constructor(
+    private readonly file: SourceFile,
+    public readonly offset: number
+  ) {}
+
+  public get column(): number {
+    return this.file.computeColumn(this.offset);
+  }
+
+  public get line(): number {
+    return this.file.computeLine(this.offset);
+  }
+
+  public get source(): string | undefined {
+    return this.file.source;
   }
 }
