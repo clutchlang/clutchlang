@@ -104,6 +104,13 @@ export class SourceScanner {
   }
 
   /**
+   * Returns the last position before a match.
+   */
+  public get lastPosition(): number {
+    return this.mPosition - this.mLastMatch![0].length;
+  }
+
+  /**
    * Position of the scanner within @member contents.
    */
   public get position(): number {
