@@ -42,7 +42,7 @@ export class Lexer implements Iterable<Token> {
    * @param message
    */
   protected fail(message: string): never {
-    throw new SyntaxError(`${this.scanner.position}: ${message}`);
+    throw new SyntaxError(this.scanner.span.message(message));
   }
 
   protected scanOptional(
