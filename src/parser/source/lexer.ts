@@ -16,11 +16,9 @@ import {
 export class Lexer implements Iterable<Token> {
   /**
    * Invalid identifiers.
-   */  
-  private static readonly keywords = new Set([
-    'true',
-    'false',
-  ]);
+   */
+
+  private static readonly keywords = new Set(['true', 'false']);
 
   constructor(private readonly scanner: SourceScanner) {}
 
