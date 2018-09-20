@@ -1,5 +1,12 @@
-import { Codes, Token, Tokens } from '../parser';
+import { Characters } from './source/characters';
 import { SourceScanner } from './source/scanner';
+import {
+  RegExpToken,
+  StringToken,
+  SymbolToken,
+  Token,
+  TokenKind,
+} from './source/tokens';
 
 /**
  * Produces a stream of tokens from the @member scanner.
@@ -7,12 +14,6 @@ import { SourceScanner } from './source/scanner';
  * Implements @type {Iterable<Token>}.
  */
 export class Lexer implements Iterable<Token> {
-  private static readonly matchIdentifier = /[_a-zA-Z][_a-zA-Z0-9]{0,30}/;
-  private static readonly matchLiteralBool = /true|false/;
-  private static readonly matchLiteralNumber = /-?\d+\.?\d*/;
-  private static readonly matchHexNumber = /0[xX][0-9a-fA-F]+/;
-  private static readonly matchLiteralString = /(?=["'])(?:"[^"\\]*(?:\\[\s\S][^"\\]*)*"|'[^'\\]*(?:\\[\s\S][^'\\]*)*')/;
-
   constructor(private readonly scanner: SourceScanner) {}
 
   private get substring() {
@@ -45,25 +46,25 @@ export class Lexer implements Iterable<Token> {
     throw new SyntaxError(this.scanner.span.message(message));
   }
 
-  protected scanOptional(
-    token: Tokens,
-    pattern: number | string | RegExp
-  ): Token | undefined {
+  protected scanOptional(kind: TokenKind): Token | undefined {
     this.consumeWhitespace();
-    const result = this.scanner.scan(pattern);
-    return result ? new Token(token, this.scanner.lastMatch![0]) : undefined;
+    const result = this.scanner.scan(kind.pattern);
+    return result
+      ? new Token(kind, this.scanner.lastPosition, this.scanner.lastMatch![0])
+      : undefined;
   }
 
-  protected scanRequired(
-    token: Tokens,
-    pattern: number | string | RegExp
-  ): Token {
+  protected scanRequired(kind: TokenKind): Token {
     this.consumeWhitespace();
-    const result = this.scanner.scan(pattern);
+    const result = this.scanner.scan(kind.pattern);
     if (!result) {
-      this.fail(`Expected ${pattern}, got "${this.substring}"`);
+      this.fail(`Expected ${kind.pattern}, got "${this.substring}"`);
     }
-    return new Token(token, this.scanner.lastMatch![0]);
+    return new Token(
+      kind,
+      this.scanner.lastPosition,
+      this.scanner.lastMatch![0]
+    );
   }
 
   protected scanCompilationUnit(): Iterable<Token> {
@@ -72,10 +73,9 @@ export class Lexer implements Iterable<Token> {
 
   protected scanExpression(): Iterable<Token> {
     const expression =
-      this.scanLiteral() ||
-      this.scanOptional(Tokens.Identifier, Lexer.matchIdentifier);
+      this.scanLiteral() || this.scanOptional(RegExpToken.Identifier);
     if (!expression) {
-      if (this.scanner.peek() === Codes.LParen) {
+      if (this.scanner.peek() === Characters.LParen) {
         return this.scanParantheses();
       }
       return this.fail(`Expected expression, got "${this.substring}"`);
@@ -85,11 +85,14 @@ export class Lexer implements Iterable<Token> {
 
   protected *scanExpressionOrBlock(): Iterable<Token> {
     this.consumeWhitespace();
-    if (this.scanner.peek() === Codes.LCurly) {
-      yield this.scanRequired(Tokens.LCurly, '{');
-      while (!this.scanner.isDone && this.scanner.peek() !== Codes.RCurly) {
+    if (this.scanner.peek() === Characters.LCurly) {
+      yield this.scanRequired(SymbolToken.LCurly);
+      while (
+        !this.scanner.isDone &&
+        this.scanner.peek() !== Characters.RCurly
+      ) {
         this.consumeWhitespace();
-        const endedBlock = this.scanOptional(Tokens.RCurly, '}');
+        const endedBlock = this.scanOptional(SymbolToken.RCurly);
         if (endedBlock) {
           yield endedBlock;
           break;
@@ -103,26 +106,25 @@ export class Lexer implements Iterable<Token> {
 
   protected *scanFunction(): Iterable<Token> {
     yield this.scanIdentifier();
-    yield this.scanRequired(Tokens.Arrow, '=>');
+    yield this.scanRequired(StringToken.Arrow);
     yield* this.scanExpressionOrBlock();
   }
 
   protected scanIdentifier(): Token {
-    return this.scanRequired(Tokens.Identifier, Lexer.matchIdentifier);
+    return this.scanRequired(RegExpToken.Identifier);
   }
 
   protected scanLiteral(): Token | undefined {
     return (
-      this.scanOptional(Tokens.Boolean, Lexer.matchLiteralBool) ||
-      this.scanOptional(Tokens.Number, Lexer.matchHexNumber) ||
-      this.scanOptional(Tokens.Number, Lexer.matchLiteralNumber) ||
-      this.scanOptional(Tokens.String, Lexer.matchLiteralString)
+      this.scanOptional(RegExpToken.LiteralBoolean) ||
+      this.scanOptional(RegExpToken.LiteralNumber) ||
+      this.scanOptional(RegExpToken.LiteralString)
     );
   }
 
   protected *scanParantheses(): Iterable<Token> {
-    yield this.scanRequired(Tokens.LParen, '(');
+    yield this.scanRequired(SymbolToken.LParen);
     yield* this.scanExpression();
-    yield this.scanRequired(Tokens.RParen, ')');
+    yield this.scanRequired(SymbolToken.RParen);
   }
 }

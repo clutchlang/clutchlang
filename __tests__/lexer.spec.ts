@@ -1,5 +1,37 @@
-import { Lexer, Token, Tokens } from '../src/parser';
+import { Lexer } from '../src/parser/lexer';
 import { SourceScanner } from '../src/parser/source/scanner';
+import {
+  RegExpToken,
+  StringToken,
+  SymbolToken,
+  TokenKind,
+} from '../src/parser/source/tokens';
+
+function token(
+  kind: SymbolToken | StringToken
+): {
+  kind: TokenKind;
+  value: string;
+};
+function token(
+  kind: RegExpToken,
+  value: string
+): {
+  kind: TokenKind;
+  value: string;
+};
+function token(
+  kind: TokenKind,
+  value?: string
+): {
+  kind: TokenKind;
+  value: string;
+} {
+  return {
+    kind,
+    value: value || kind.name,
+  };
+}
 
 it('should lex a simple program', () => {
   const scanner = new SourceScanner(`
@@ -9,14 +41,14 @@ it('should lex a simple program', () => {
   `);
   const lexer = new Lexer(scanner);
   expect(Array.from(lexer)).toMatchObject([
-    new Token(Tokens.Identifier, 'main'),
-    new Token(Tokens.Arrow, '=>'),
-    new Token(Tokens.LCurly, '{'),
-    new Token(Tokens.Identifier, 'print'),
-    new Token(Tokens.LParen, '('),
-    new Token(Tokens.String, "'Hello World'"),
-    new Token(Tokens.RParen, ')'),
-    new Token(Tokens.RCurly, '}'),
+    token(RegExpToken.Identifier, 'main'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(RegExpToken.Identifier, 'print'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralString, "'Hello World'"),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RCurly),
   ]);
 });
 
@@ -28,9 +60,9 @@ describe('should lex a function returning a literal', () => {
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returnsFalse'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Boolean, 'false'),
+        token(RegExpToken.Identifier, 'returnsFalse'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralBoolean, 'false'),
       ]);
     });
 
@@ -40,9 +72,9 @@ describe('should lex a function returning a literal', () => {
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returnsTrue'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Boolean, 'true'),
+        token(RegExpToken.Identifier, 'returnsTrue'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralBoolean, 'true'),
       ]);
     });
   });
@@ -54,9 +86,9 @@ describe('should lex a function returning a literal', () => {
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returns1'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Number, '1'),
+        token(RegExpToken.Identifier, 'returns1'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralNumber, '1'),
       ]);
     });
 
@@ -66,33 +98,33 @@ describe('should lex a function returning a literal', () => {
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returnsN1'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Number, '-1'),
+        token(RegExpToken.Identifier, 'returnsN1'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralNumber, '-1'),
       ]);
     });
 
     it('1.0', () => {
       const scanner = new SourceScanner(`
-        returns1DotO => 1.0
+        returns1Dot0 => 1.0
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returns1DotO'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Number, '1.0'),
+        token(RegExpToken.Identifier, 'returns1Dot0'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralNumber, '1.0'),
       ]);
     });
 
     it('-1.0', () => {
       const scanner = new SourceScanner(`
-        returnsN1DotO => -1.0
+        returnsN1Dot0 => -1.0
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returnsN1DotO'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Number, '-1.0'),
+        token(RegExpToken.Identifier, 'returnsN1Dot0'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralNumber, '-1.0'),
       ]);
     });
 
@@ -102,9 +134,9 @@ describe('should lex a function returning a literal', () => {
       `);
       const lexer = new Lexer(scanner);
       expect(Array.from(lexer)).toMatchObject([
-        new Token(Tokens.Identifier, 'returnsDeadBeef'),
-        new Token(Tokens.Arrow, '=>'),
-        new Token(Tokens.Number, '0xDEADBEEF'),
+        token(RegExpToken.Identifier, 'returnsDeadBeef'),
+        token(StringToken.Arrow),
+        token(RegExpToken.LiteralNumber, '0xDEADBEEF'),
       ]);
     });
   });
@@ -115,9 +147,9 @@ describe('should lex a function returning a literal', () => {
     `);
     const lexer = new Lexer(scanner);
     expect(Array.from(lexer)).toMatchObject([
-      new Token(Tokens.Identifier, 'returnsHello'),
-      new Token(Tokens.Arrow, '=>'),
-      new Token(Tokens.String, "'Hello'"),
+      token(RegExpToken.Identifier, 'returnsHello'),
+      token(StringToken.Arrow),
+      token(RegExpToken.LiteralString, "'Hello'"),
     ]);
   });
 });
@@ -128,9 +160,9 @@ it('should lex a function returning an identifier', () => {
   `);
   const lexer = new Lexer(scanner);
   expect(Array.from(lexer)).toMatchObject([
-    new Token(Tokens.Identifier, 'returnsName'),
-    new Token(Tokens.Arrow, '=>'),
-    new Token(Tokens.Identifier, 'name'),
+    token(RegExpToken.Identifier, 'returnsName'),
+    token(StringToken.Arrow),
+    token(RegExpToken.Identifier, 'name'),
   ]);
 });
 
@@ -140,11 +172,11 @@ it('should lex a function returning a paranethesized expression', () => {
   `);
   const lexer = new Lexer(scanner);
   expect(Array.from(lexer)).toMatchObject([
-    new Token(Tokens.Identifier, 'returns1P'),
-    new Token(Tokens.Arrow, '=>'),
-    new Token(Tokens.LParen, '('),
-    new Token(Tokens.Number, '1'),
-    new Token(Tokens.RParen, ')'),
+    token(RegExpToken.Identifier, 'returns1P'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '1'),
+    token(SymbolToken.RParen),
   ]);
 });
 
@@ -157,22 +189,24 @@ it('should lex a function with an expression block', () => {
       1.0
       -1
       -1.0
+      0xAABBCC
       'Hello'
     }
   `);
   const lexer = new Lexer(scanner);
   expect(Array.from(lexer)).toMatchObject([
-    new Token(Tokens.Identifier, 'expressionBlock'),
-    new Token(Tokens.Arrow, '=>'),
-    new Token(Tokens.LCurly, '{'),
-    new Token(Tokens.Boolean, 'true'),
-    new Token(Tokens.Boolean, 'false'),
-    new Token(Tokens.Number, '1'),
-    new Token(Tokens.Number, '1.0'),
-    new Token(Tokens.Number, '-1'),
-    new Token(Tokens.Number, '-1.0'),
-    new Token(Tokens.String, "'Hello'"),
-    new Token(Tokens.RCurly, '}'),
+    token(RegExpToken.Identifier, 'expressionBlock'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(RegExpToken.LiteralBoolean, 'true'),
+    token(RegExpToken.LiteralBoolean, 'false'),
+    token(RegExpToken.LiteralNumber, '1'),
+    token(RegExpToken.LiteralNumber, '1.0'),
+    token(RegExpToken.LiteralNumber, '-1'),
+    token(RegExpToken.LiteralNumber, '-1.0'),
+    token(RegExpToken.LiteralNumber, '0xAABBCC'),
+    token(RegExpToken.LiteralString, "'Hello'"),
+    token(SymbolToken.RCurly),
   ]);
 });
 
