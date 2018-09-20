@@ -1,11 +1,11 @@
-import { Lexer } from '../src/parser/lexer';
-import { SourceScanner } from '../src/parser/source/scanner';
+import { Lexer } from '../../../src/parser/source/lexer';
+import { SourceScanner } from '../../../src/parser/source/scanner';
 import {
   RegExpToken,
   StringToken,
   SymbolToken,
   TokenKind,
-} from '../src/parser/source/tokens';
+} from '../../../src/parser/source/tokens';
 
 function token(
   kind: SymbolToken | StringToken

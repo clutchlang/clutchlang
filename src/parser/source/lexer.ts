@@ -1,12 +1,12 @@
-import { Characters } from './source/characters';
-import { SourceScanner } from './source/scanner';
+import { Characters } from './characters';
+import { SourceScanner } from './scanner';
 import {
   RegExpToken,
   StringToken,
   SymbolToken,
   Token,
   TokenKind,
-} from './source/tokens';
+} from './tokens';
 
 /**
  * Produces a stream of tokens from the @member scanner.
