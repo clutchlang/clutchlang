@@ -14,20 +14,6 @@
     "lint": "tslint --project .",
     "test": "jest --coverage --no-cache"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/test/"
-    ],
-    "collectCoverage": true
-  },
   "devDependencies": {
     "@types/jest": "^23.3.1",
     "jest": "^23.5.0",
