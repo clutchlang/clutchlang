@@ -74,7 +74,7 @@ export class SourceScanner {
    * Returns a @see {SourceSpan} representing the latest scanned positions.
    */
   public get span(): SourceSpan {
-    const match = this.mLastMatch![0];
+    const match = (this.mLastMatch || [''])[0];
     const start = this.mSourceFile.location(this.position - match.length);
     const end = this.mSourceFile.location(this.position);
     return new SourceSpan(start, end, match);
@@ -278,7 +278,7 @@ export class SourceSpan {
     if (start.offset < 0) {
       throw new RangeError(`Invalid start offset: ${start.offset}`);
     }
-    if (end.offset <= start.offset) {
+    if (end.offset < start.offset) {
       throw new RangeError(
         `Invalid end offset: ${end.offset} for start ${start.offset}`
       );
@@ -293,6 +293,26 @@ export class SourceSpan {
         }`
       );
     }
+  }
+
+  /**
+   * Source URL of the span.
+   */
+  public get source(): string | undefined {
+    return this.start.source;
+  }
+
+  /**
+   * Returns a message associating @param message with this source span.
+   */
+  public message(message: string): string {
+    let buffer = `line ${this.start.line + 1}, column ${this.start.column + 1}`;
+    const source = this.source;
+    if (source) {
+      buffer += ` of ${source}`;
+    }
+    buffer += `: ${message}`;
+    return buffer;
   }
 }
 

@@ -227,4 +227,17 @@ describe(`${SourceSpan}`, () => {
       );
     }).toThrowError();
   });
+
+  it('should return a formatted message', () => {
+    const span = new SourceSpan(
+      new SourceLocation(12, { source: 'names.json' }),
+      new SourceLocation(15, { source: 'names.json' }),
+      // {"names": ["Abe", "George"]}
+      //             ^^^
+      'Abe'
+    );
+    expect(span.message('Invalid name')).toBe(
+      'line 1, column 13 of names.json: Invalid name'
+    );
+  });
 });
