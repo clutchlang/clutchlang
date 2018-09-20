@@ -33,6 +33,19 @@ function token(
   };
 }
 
+it('should lex an empty program', () => {
+  const scanner = new SourceScanner(`
+    main => {}
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'main'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(SymbolToken.RCurly),
+  ]);
+});
+
 it('should lex a simple program', () => {
   const scanner = new SourceScanner(`
     main => {
@@ -213,6 +226,18 @@ it('should lex a function with an expression block', () => {
 describe('should catch lexing errors', () => {
   it('expected identifier', () => {
     const scanner = new SourceScanner('$ => {}');
+    const lexer = new Lexer(scanner);
+    expect(() => Array.from(lexer)).toThrowError(SyntaxError);
+  });
+
+  it('invalid identifier (keyword: true)', () => {
+    const scanner = new SourceScanner('true => true');
+    const lexer = new Lexer(scanner);
+    expect(() => Array.from(lexer)).toThrowError(SyntaxError);
+  });
+
+  it('invalid identifier (keyword: false)', () => {
+    const scanner = new SourceScanner('false => false');
     const lexer = new Lexer(scanner);
     expect(() => Array.from(lexer)).toThrowError(SyntaxError);
   });

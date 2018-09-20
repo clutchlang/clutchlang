@@ -14,6 +14,12 @@ import {
  * Implements @type {Iterable<Token>}.
  */
 export class Lexer implements Iterable<Token> {
+  /**
+   * Invalid identifiers.
+   */
+
+  private static readonly keywords = new Set(['true', 'false']);
+
   constructor(private readonly scanner: SourceScanner) {}
 
   private get substring() {
@@ -87,6 +93,7 @@ export class Lexer implements Iterable<Token> {
     this.consumeWhitespace();
     if (this.scanner.peek() === Characters.LCurly) {
       yield this.scanRequired(SymbolToken.LCurly);
+      let checkRCurly = true;
       while (
         !this.scanner.isDone &&
         this.scanner.peek() !== Characters.RCurly
@@ -95,9 +102,13 @@ export class Lexer implements Iterable<Token> {
         const endedBlock = this.scanOptional(SymbolToken.RCurly);
         if (endedBlock) {
           yield endedBlock;
+          checkRCurly = false;
           break;
         }
         yield* this.scanExpression();
+      }
+      if (checkRCurly) {
+        yield this.scanRequired(SymbolToken.RCurly);
       }
     } else {
       yield* this.scanExpression();
@@ -111,7 +122,11 @@ export class Lexer implements Iterable<Token> {
   }
 
   protected scanIdentifier(): Token {
-    return this.scanRequired(RegExpToken.Identifier);
+    const identifier = this.scanRequired(RegExpToken.Identifier);
+    if (Lexer.keywords.has(identifier.value)) {
+      return this.fail(`Invalid identifier: ${identifier.value} (Keyword)`);
+    }
+    return identifier;
   }
 
   protected scanLiteral(): Token | undefined {
