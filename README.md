@@ -65,7 +65,13 @@ $ npm run clc -- -w
 
 ::= 
   [`LITERAL`](#literal) |
- `(` [`EXPRESSION`](#expression) `)`
+ `(` [`EXPRESSION`](#expression) `)` |
+ `INVOCATION`
+
+#### `INVOCATION`
+
+::=
+ `EXPRESSION` `(` `EXPRESSION` `)`
 
 #### `LITERAL`
 
