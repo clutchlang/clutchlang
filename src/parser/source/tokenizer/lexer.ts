@@ -64,7 +64,16 @@ export class Lexer implements Iterable<Token> {
     this.consumeWhitespace();
     const result = this.scanner.scan(kind.pattern);
     if (!result) {
-      this.fail(`Expected ${kind.pattern}, got "${this.substring}"`);
+      let pattern = kind.pattern;
+      /* istanbul ignore next */
+      if (typeof pattern === 'number') {
+        /* istanbul ignore next */
+        pattern = String.fromCharCode(pattern);
+      } else if (pattern instanceof RegExp) {
+        /* istanbul ignore next */
+        pattern = pattern.source;
+      }
+      this.fail(`Expected ${pattern}, got "${this.substring}"`);
     }
     return new Token(
       kind,
@@ -139,7 +148,9 @@ export class Lexer implements Iterable<Token> {
 
   protected *scanParantheses(): Iterable<Token> {
     yield this.scanRequired(SymbolToken.LParen);
-    yield* this.scanExpression();
-    yield this.scanRequired(SymbolToken.RParen);
+    while (!this.scanOptional(SymbolToken.RParen)) {
+      yield* this.scanExpression();
+    }
+    yield new Token(SymbolToken.RParen, this.scanner.lastPosition, ')');
   }
 }

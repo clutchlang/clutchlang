@@ -38,6 +38,26 @@ it('should lex a simple program', () => {
   ]);
 });
 
+it('should lex an invocation with multiple args', () => {
+  const scanner = new SourceScanner(`
+    main => {
+      f(1 2)
+    }
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'main'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(RegExpToken.Identifier, 'f'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '1'),
+    token(RegExpToken.LiteralNumber, '2'),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RCurly),
+  ]);
+});
+
 describe('should lex a function returning a literal', () => {
   describe('boolean', () => {
     it('false', () => {
