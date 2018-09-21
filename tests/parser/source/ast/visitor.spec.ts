@@ -11,6 +11,8 @@ describe('PrintTreeVisitor', () => {
         1
         2
         3
+        (true false)
+        (false true)
       }
       hasInvocationBody => {
         print('Hello World')

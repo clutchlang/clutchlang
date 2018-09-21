@@ -41,6 +41,12 @@ exports[`PrintTreeVisitor should emit a readable structure for a program 1`] = `
     LiteralNumber: 1
     LiteralNumber: 2
     LiteralNumber: 3
+    ParenthesizedExpression:
+      LiteralBoolean: true
+      LiteralBoolean: false
+    ParenthesizedExpression:
+      LiteralBoolean: false
+      LiteralBoolean: true
   FunctionDeclaration (name = hasInvocationBody)
     InvocationExpression:
       Target:

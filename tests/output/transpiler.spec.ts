@@ -26,4 +26,15 @@ describe('JsOutputTranspiler', () => {
     const visitor = new JsOutputTranspiler();
     expect(program.visit(visitor)).toMatchSnapshot();
   });
+
+  it('should support parenthesized ast nodes', () => {
+    const program = parse(`
+      example => {
+        (true false)
+        (false true)
+      }
+    `);
+    const visitor = new JsOutputTranspiler();
+    expect(program.visit(visitor)).toMatchSnapshot();
+  });
 });

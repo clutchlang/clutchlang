@@ -20,7 +20,8 @@ export type AstExpression =
   | AstLiteralNumber
   | AstLiteralString
   | AstLiteralIdentifier
-  | AstInvocationExpression;
+  | AstInvocationExpression
+  | AstParenthesizedExpression;
 
 export class AstLiteralIdentifier extends AstNode {
   constructor(private readonly token: Token) {
@@ -46,6 +47,16 @@ export class AstInvocationExpression extends AstNode {
 
   public visit(visitor: AstVisitor): void {
     return visitor.visitInvocationExpression(this);
+  }
+}
+
+export class AstParenthesizedExpression extends AstNode {
+  constructor(public readonly body: AstExpression[]) {
+    super();
+  }
+
+  public visit(visitor: AstVisitor): void {
+    return visitor.visitParenthesizedExpression(this);
   }
 }
 

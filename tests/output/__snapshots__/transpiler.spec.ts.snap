@@ -22,3 +22,13 @@ f(1, 2);
       
     "
 `;
+
+exports[`JsOutputTranspiler should support parenthesized ast nodes 1`] = `
+"
+      function example() {
+        (true, false);
+(false, true);
+      }
+      
+    "
+`;
