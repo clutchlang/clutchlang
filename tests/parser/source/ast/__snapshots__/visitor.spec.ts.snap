@@ -47,5 +47,7 @@ exports[`PrintTreeVisitor should emit a readable structure for a program 1`] = `
         LiteralIdentifier: print
       Args:
         LiteralString: Hello World
+    FunctionDeclaration (name = hasParensReturnV)
+      LiteralNumber: 1
 "
 `;

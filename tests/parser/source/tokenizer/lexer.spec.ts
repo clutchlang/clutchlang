@@ -58,6 +58,55 @@ it('should lex an invocation with multiple args', () => {
   ]);
 });
 
+it('should lex a paranthesized expression', () => {
+  const scanner = new SourceScanner(`
+    a => ((1 (fn(2))))
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'a'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LParen),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '1'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.Identifier, 'fn'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '2'),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+  ]);
+});
+
+it('should lex a paranthesized expression in the body', () => {
+  const scanner = new SourceScanner(`
+    a => {
+      (1)
+      (b((2)))
+    }
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'a'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '1'),
+    token(SymbolToken.RParen),
+    token(SymbolToken.LParen),
+    token(RegExpToken.Identifier, 'b'),
+    token(SymbolToken.LParen),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralNumber, '2'),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+    token(SymbolToken.RCurly),
+  ]);
+});
+
 describe('should lex a function returning a literal', () => {
   describe('boolean', () => {
     it('false', () => {

@@ -98,7 +98,7 @@ export class AstParser {
       /* istanbul ignore next */
       const next = this.scanner.peek().kind;
       /* istanbul ignore next */
-      throw new SyntaxError(`Expected ${token.name} got ${next}.`);
+      throw new SyntaxError(`Expected ${token.name} got ${next.name}.`);
     }
   }
 }
