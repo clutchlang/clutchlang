@@ -4,7 +4,7 @@ import {
   SourceLocation,
   SourceScanner,
   SourceSpan,
-} from '../../../src/parser/source/scanner';
+} from '../../../../src/parser/source/tokenizer/scanner';
 
 describe(`${SourceScanner}`, () => {
   let scanner: SourceScanner;
