@@ -105,6 +105,7 @@ export class AstLiteralString extends AstNode {
 export class AstFunctionDeclaration extends AstNode {
   constructor(
     private readonly token: Token,
+    public readonly parameters: AstLiteralIdentifier[],
     public readonly body: AstExpression[]
   ) {
     super();

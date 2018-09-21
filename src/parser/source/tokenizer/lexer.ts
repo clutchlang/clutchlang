@@ -131,6 +131,18 @@ export class Lexer implements Iterable<Token> {
 
   protected *scanFunction(): Iterable<Token> {
     yield this.scanIdentifier();
+    this.consumeWhitespace();
+    const lparen = this.scanOptional(SymbolToken.LParen);
+    if (lparen) {
+      yield lparen;
+      let param = this.scanOptional(RegExpToken.Identifier);
+      while (param) {
+        yield param;
+        param = this.scanOptional(RegExpToken.Identifier);
+      }
+      yield this.scanRequired(SymbolToken.RParen);
+    }
+    this.consumeWhitespace();
     yield this.scanRequired(StringToken.Arrow);
     yield* this.scanExpressionOrBlock();
   }

@@ -37,4 +37,15 @@ describe('JsOutputTranspiler', () => {
     const visitor = new JsOutputTranspiler();
     expect(program.visit(visitor)).toMatchSnapshot();
   });
+
+  it('should support functions with parameters', () => {
+    const program = parse(`
+      print2(a b) => {
+        print(a)
+        print(b)
+      }
+    `);
+    const visitor = new JsOutputTranspiler();
+    expect(program.visit(visitor)).toMatchSnapshot();
+  });
 });

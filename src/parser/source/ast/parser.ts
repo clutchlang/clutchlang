@@ -67,17 +67,27 @@ export class AstParser {
 
   private parseFunctionDeclaration(): AstFunctionDeclaration {
     const identifier = this.scanner.lastMatch[0];
+    const parameters: AstLiteralIdentifier[] = [];
+    if (this.scanOptional(SymbolToken.LParen)) {
+      let param = this.scanOptional(RegExpToken.Identifier);
+      while (param) {
+        parameters.push(new AstLiteralIdentifier(param));
+        param = this.scanOptional(RegExpToken.Identifier);
+      }
+      this.scanRequired(SymbolToken.RParen);
+    }
     this.scanRequired(StringToken.Arrow);
     if (this.scanOptional(SymbolToken.LCurly)) {
       const fn = new AstFunctionDeclaration(
         identifier,
+        parameters,
         this.parseExpressions()
       );
       this.scanRequired(SymbolToken.RCurly);
       return fn;
     }
     const expression = this.parseExpression()!;
-    return new AstFunctionDeclaration(identifier, [expression]);
+    return new AstFunctionDeclaration(identifier, parameters, [expression]);
   }
 
   private parseExpressions(): AstExpression[] {

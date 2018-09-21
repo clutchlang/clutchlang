@@ -275,6 +275,37 @@ it('should lex a function with an expression block', () => {
   ]);
 });
 
+it('should lex a function with one parameter', () => {
+  const scanner = new SourceScanner(`
+    f(a) => 1
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'f'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.Identifier, 'a'),
+    token(SymbolToken.RParen),
+    token(StringToken.Arrow),
+    token(RegExpToken.LiteralNumber, '1'),
+  ]);
+});
+
+it('should lex a function with two parameters', () => {
+  const scanner = new SourceScanner(`
+    f(a b) => 2
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'f'),
+    token(SymbolToken.LParen),
+    token(RegExpToken.Identifier, 'a'),
+    token(RegExpToken.Identifier, 'b'),
+    token(SymbolToken.RParen),
+    token(StringToken.Arrow),
+    token(RegExpToken.LiteralNumber, '2'),
+  ]);
+});
+
 describe('should catch lexing errors', () => {
   it('expected identifier', () => {
     const scanner = new SourceScanner('$ => {}');

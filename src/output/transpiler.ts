@@ -26,7 +26,7 @@ export class JsOutputTranspiler extends AstVisitor {
 
   public visitFunctionDeclaration(node: AstFunctionDeclaration): string {
     return `
-      function ${node.name}() {
+      function ${node.name}(${node.parameters.map(e => e.name).join(', ')}) {
         ${node.body.map(e => `${e.visit(this)};`).join('\n')}
       }
       ${node.name === 'main' ? 'main();' : ''}
