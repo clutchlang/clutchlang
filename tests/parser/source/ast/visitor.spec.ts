@@ -16,9 +16,7 @@ function parse(program: string): AstCompilationUnit {
 describe(`${PrintTreeVisitor}`, () => {
   it('should emit a readable structure for a program', () => {
     const visitor = new PrintTreeVisitor();
-    expect(
-      visitor.visitCompilationUnit(
-        parse(`
+    const program = parse(`
       emptyFunction => {}
       returnsLiteral => true
       hasExpressionBody => {
@@ -29,8 +27,7 @@ describe(`${PrintTreeVisitor}`, () => {
       hasInvocationBody => {
         print('Hello World')
       }
-    `)
-      )
-    ).toMatchSnapshot();
+    `);
+    expect(program.visit(visitor)).toMatchSnapshot();
   });
 });

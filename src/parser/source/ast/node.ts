@@ -11,7 +11,7 @@ export class AstCompilationUnit extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitCompilationUnit(this);
+    return visitor.visitCompilationUnit(this);
   }
 }
 
