@@ -9,9 +9,9 @@ import {
   AstCompilationUnit,
   AstExpression,
   AstFunctionDeclaration,
-  AstIdentifier,
-  AstInvocation,
+  AstInvocationExpression,
   AstLiteralBoolean,
+  AstLiteralIdentifier,
   AstLiteralNumber,
   AstLiteralString,
 } from './node';
@@ -40,14 +40,14 @@ export class AstParser {
         if (this.scanner.peek(1).kind === SymbolToken.LParen) {
           const identifier = this.scanner.read();
           this.scanRequired(SymbolToken.LParen);
-          const invocation = new AstInvocation(
-            new AstIdentifier(identifier),
+          const invocation = new AstInvocationExpression(
+            new AstLiteralIdentifier(identifier),
             this.parseExpressions()
           );
           this.scanRequired(SymbolToken.RParen);
           return invocation;
         }
-        return new AstIdentifier(this.scanner.read());
+        return new AstLiteralIdentifier(this.scanner.read());
       case RegExpToken.LiteralBoolean:
         return new AstLiteralBoolean(this.scanner.read());
       case RegExpToken.LiteralNumber:

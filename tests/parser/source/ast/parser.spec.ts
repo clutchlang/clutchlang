@@ -2,8 +2,8 @@
 
 import {
   AstCompilationUnit,
-  AstIdentifier,
-  AstInvocation,
+  AstInvocationExpression,
+  AstLiteralIdentifier,
 } from '../../../../src/parser/source/ast/node';
 import { AstParser } from '../../../../src/parser/source/ast/parser';
 import { TokenScanner } from '../../../../src/parser/source/ast/scanner';
@@ -18,7 +18,7 @@ function parse(program: string): AstCompilationUnit {
   return parser.parseCompilationUnit();
 }
 
-describe(`${AstParser}`, () => {
+describe('AstParser', () => {
   it('should parse a blank program with two functions', () => {
     const unit = parse(`
       one => {}
@@ -56,10 +56,10 @@ describe(`${AstParser}`, () => {
     // TODO: Remove and replace with a visitor/humanizer.
     expect(
       unit.functions[0].body.map(e => {
-        if (e instanceof AstIdentifier) {
+        if (e instanceof AstLiteralIdentifier) {
           return e.name;
         }
-        if (e instanceof AstInvocation) {
+        if (e instanceof AstInvocationExpression) {
           return `${e.target}(...)`;
         }
         return e.value;

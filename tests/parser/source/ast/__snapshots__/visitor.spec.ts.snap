@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PrintTreeVisitor should emit a readable structure for a program 1`] = `
+"CompilationUnit
+  FunctionDeclaration (name = emptyFunction)
+  FunctionDeclaration (name = returnsLiteral)
+    LiteralBoolean: true
+  FunctionDeclaration (name = hasExpressionBody)
+    LiteralNumber: 1
+    LiteralNumber: 2
+    LiteralNumber: 3
+  FunctionDeclaration (name = hasInvocationBody)
+    InvocationExpression:
+      Target:
+        LiteralIdentifier: print
+      Args:
+        LiteralString: Hello World
+"
+`;
