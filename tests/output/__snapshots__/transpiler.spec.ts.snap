@@ -9,6 +9,16 @@ exports[`JsOutputTranspiler should support "Hello World" 1`] = `
     "
 `;
 
+exports[`JsOutputTranspiler should support functions with parameters 1`] = `
+"
+      function print2(a, b) {
+        console.log(a);
+console.log(b);
+      }
+      
+    "
+`;
+
 exports[`JsOutputTranspiler should support most ast nodes 1`] = `
 "
       function example() {

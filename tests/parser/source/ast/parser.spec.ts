@@ -4,6 +4,7 @@ import { parse } from '../../../../src/parser/parse';
 import {
   AstInvocationExpression,
   AstLiteralIdentifier,
+  AstParenthesizedExpression,
 } from '../../../../src/parser/source/ast/node';
 
 describe('AstParser', () => {
@@ -50,6 +51,9 @@ describe('AstParser', () => {
         if (e instanceof AstInvocationExpression) {
           return `${e.target}(...)`;
         }
+        if (e instanceof AstParenthesizedExpression) {
+          return `(...)`;
+        }
         return e.value;
       })
     ).toEqual([1, 1.5, -1, -1.5, 'Hello', true, false, 'foobar']);
@@ -62,5 +66,15 @@ describe('AstParser', () => {
       }
     `);
     expect(unit.functions).toHaveLength(1);
+  });
+
+  it('should parse a function with parameters', () => {
+    const unit = parse(`
+      two(a b) => {
+        print(a)
+        print(b)
+      }
+    `);
+    expect(unit.functions[0].parameters.map(e => e.name)).toEqual(['a', 'b']);
   });
 });
