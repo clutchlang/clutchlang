@@ -47,7 +47,7 @@ export class RegExpToken {
     'Identifier'
   );
   public static readonly LiteralBoolean = new RegExpToken(
-    /true|false/,
+    /(true|false)/,
     'Boolean'
   );
   public static readonly LiteralNumber = new RegExpToken(
