@@ -1,38 +1,11 @@
-import { Lexer } from '../../../src/parser/source/lexer';
-import { SourceScanner } from '../../../src/parser/source/scanner';
+import { Lexer } from '../../../../src/parser/source/tokenizer/lexer';
+import { SourceScanner } from '../../../../src/parser/source/tokenizer/scanner';
 import {
   RegExpToken,
   StringToken,
   SymbolToken,
-  TokenKind,
-} from '../../../src/parser/source/tokens';
-
-function token(
-  kind: SymbolToken | StringToken
-): {
-  kind: TokenKind;
-  value: string;
-};
-function token(
-  kind: RegExpToken,
-  value: string
-): {
-  kind: TokenKind;
-  value: string;
-};
-function token(
-  kind: TokenKind,
-  value?: string
-): {
-  kind: TokenKind;
-  value: string;
-} {
-  return {
-    kind,
-    value: value || kind.name,
-  };
-}
-
+} from '../../../../src/parser/source/tokenizer/tokens';
+import { token } from '../common';
 it('should lex an empty program', () => {
   const scanner = new SourceScanner(`
     main => {}
