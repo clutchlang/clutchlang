@@ -100,6 +100,10 @@
   version "23.3.1"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.1.tgz#a4319aedb071d478e6f407d1c4578ec8156829cf"
 
+"@types/node@^10.10.2":
+  version "10.10.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.10.2.tgz#2a55b8d66f6945efc5da38489774e551248aa169"
+
 abab@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.0.tgz#aba0ab4c5eee2d4c79d3487d85450fb2376ebb0f"
