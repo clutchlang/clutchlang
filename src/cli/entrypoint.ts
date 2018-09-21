@@ -53,7 +53,7 @@ export function parseOptions(args: string[]): IOptions {
  */
 export function run(options: IOptions): void {
   const visitor =
-    options.output === 'parse' ? PrintTreeVisitor : JsOutputTranspiler;
+    options.format === 'parse' ? PrintTreeVisitor : JsOutputTranspiler;
   if (options.worker) {
     process.stdin.setEncoding('utf8');
     let buffer = '';
@@ -79,6 +79,10 @@ export function run(options: IOptions): void {
     const input = fs.readFileSync(options.input!, 'utf8');
     // tslint:disable-next-line:no-any
     const output = parse(input).visit(new visitor()) as any;
+    if (options.format === 'parse') {
+      process.stdout.write(`${output}\n`);
+      return;
+    }
     fs.writeFileSync(options.output!, output);
     process.stdout.write(
       `Wrote ${output.length} bytes to ${options.output}.\n`

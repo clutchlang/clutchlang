@@ -22,6 +22,29 @@ _Clutch_'s goals:
 * Defaults that prefer immutability and optimizations
 * Low overhead compilation and interpoability to and with JavaScript
 
+## Running
+
+There is a simple script, `npm run clc`, which supports an experimental CLI:
+
+```bash
+# Compiles and outputs path/to/file.cl.js
+$ npm run clc -- path/to/file.cl
+```
+
+To print the debug AST tree instead of JavaScript, add `--parse` or `-p`:
+
+```bash
+# Prints to stdout
+$ npm run clc -- path/to/file.cl -p
+```
+
+To run in _worker-mode_, i.e. run the CLI and continously receive input:
+
+```bash
+# Write on stdin. Two newline characters triggers a compile
+$ npm run clc -- -w
+```
+
 ## Grammar
 
 ### `COMPILATION_UNIT`
