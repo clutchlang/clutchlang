@@ -86,16 +86,21 @@ export class Lexer implements Iterable<Token> {
     return this.scanFunction();
   }
 
-  protected scanExpression(): Iterable<Token> {
-    const expression =
-      this.scanLiteral() || this.scanOptional(RegExpToken.Identifier);
-    if (!expression) {
-      if (this.scanner.peek() === Characters.LParen) {
-        return this.scanParantheses();
-      }
+  protected *scanExpression(): Iterable<Token> {
+    const literal = this.scanLiteral();
+    if (literal) {
+      yield literal;
+      return;
+    }
+    const identifier = this.scanOptional(RegExpToken.Identifier);
+    if (identifier) {
+      yield identifier;
+    }
+    if (this.scanner.peek() === Characters.LParen) {
+      yield* this.scanParantheses();
+    } else if (!identifier) {
       return this.fail(`Expected expression, got "${this.substring}"`);
     }
-    return [expression];
   }
 
   protected *scanExpressionOrBlock(): Iterable<Token> {

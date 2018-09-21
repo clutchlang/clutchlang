@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PrintTreeVisitor should emit a few more functions 1`] = `
+"CompilationUnit
+  FunctionDeclaration (name = returnsA)
+    LiteralIdentifier: a
+  FunctionDeclaration (name = returnsF0)
+    InvocationExpression:
+      Target:
+        LiteralIdentifier: f
+      Args:
+    FunctionDeclaration (name = returnsF1)
+      InvocationExpression:
+        Target:
+          LiteralIdentifier: f
+        Args:
+          LiteralNumber: 1
+      FunctionDeclaration (name = returnsF2)
+        InvocationExpression:
+          Target:
+            LiteralIdentifier: f
+          Args:
+            LiteralNumber: 1
+            LiteralNumber: 2
+        FunctionDeclaration (name = returnsPF)
+          LiteralIdentifier: f
+        FunctionDeclaration (name = returnsPF0)
+          InvocationExpression:
+            Target:
+              LiteralIdentifier: f
+            Args:
+"
+`;
+
 exports[`PrintTreeVisitor should emit a readable structure for a program 1`] = `
 "CompilationUnit
   FunctionDeclaration (name = emptyFunction)
