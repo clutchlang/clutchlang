@@ -6,7 +6,7 @@ import {
   SourceSpan,
 } from '../../../../src/parser/source/tokenizer/scanner';
 
-describe(`${SourceScanner}`, () => {
+describe('SourceScanner', () => {
   let scanner: SourceScanner;
   const contents = 'ABC';
   const $A = contents.codePointAt(0)!;

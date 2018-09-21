@@ -18,7 +18,7 @@ function parse(program: string): AstCompilationUnit {
   return parser.parseCompilationUnit();
 }
 
-describe(`${AstParser}`, () => {
+describe('AstParser', () => {
   it('should parse a blank program with two functions', () => {
     const unit = parse(`
       one => {}

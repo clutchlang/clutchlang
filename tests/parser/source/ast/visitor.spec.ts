@@ -13,7 +13,7 @@ function parse(program: string): AstCompilationUnit {
   return parser.parseCompilationUnit();
 }
 
-describe(`${PrintTreeVisitor}`, () => {
+describe('PrintTreeVisitor', () => {
   it('should emit a readable structure for a program', () => {
     const visitor = new PrintTreeVisitor();
     const program = parse(`

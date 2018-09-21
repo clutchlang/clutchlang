@@ -9,7 +9,7 @@ import {
 } from '../../../../src/parser/source/tokenizer/tokens';
 import { token } from '../common';
 
-describe(`${TokenScanner}`, () => {
+describe('TokenScanner', () => {
   it('should peek a token', () => {
     const scanner = new TokenScanner([
       new Token(RegExpToken.Identifier, 0, 'main'),
