@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clutchc": "ts-node src/clutchc.ts",
+    "clc": "ts-node src/cli/entrypoint.ts",
     "coverage": "cat ./coverage/lcov.info | coveralls",
     "format": "prettier --config .prettierrc.json --write \"{,!(node_modules|coverage|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
     "format:check": "prettier-check --list-different \"{,!(node_modules||coverage|dist)/**/}{,!(package-lock)}.{js,json,jsx,ts}\"",
@@ -16,6 +16,8 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.1",
+    "@types/node": "^10.10.2",
+    "coveralls": "^3.0.2",
     "jest": "^23.5.0",
     "prettier": "^1.14.2",
     "prettier-check": "^2.0.0",
@@ -25,8 +27,5 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.0.3"
-  },
-  "dependencies": {
-    "coveralls": "^3.0.2"
   }
 }
