@@ -17,6 +17,7 @@ exports[`JsOutputTranspiler should support most ast nodes 1`] = `
 'Hello';
 foobar;
 method(false);
+f(1, 2);
       }
       
     "

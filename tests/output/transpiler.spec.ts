@@ -20,6 +20,7 @@ describe('JsOutputTranspiler', () => {
         'Hello'
         foobar
         method(false)
+        f(1 2)
       }
     `);
     const visitor = new JsOutputTranspiler();
