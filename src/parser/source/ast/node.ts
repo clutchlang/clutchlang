@@ -32,7 +32,7 @@ export class AstLiteralIdentifier extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitLiteralIdentifier(this);
+    return visitor.visitLiteralIdentifier(this);
   }
 }
 
@@ -45,7 +45,7 @@ export class AstInvocationExpression extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitInvocationExpression(this);
+    return visitor.visitInvocationExpression(this);
   }
 }
 
@@ -59,7 +59,7 @@ export class AstLiteralBoolean extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitLiteralBoolean(this);
+    return visitor.visitLiteralBoolean(this);
   }
 }
 
@@ -73,7 +73,7 @@ export class AstLiteralNumber extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitLiteralNumber(this);
+    return visitor.visitLiteralNumber(this);
   }
 }
 
@@ -87,7 +87,7 @@ export class AstLiteralString extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitLiteralString(this);
+    return visitor.visitLiteralString(this);
   }
 }
 
@@ -104,6 +104,6 @@ export class AstFunctionDeclaration extends AstNode {
   }
 
   public visit(visitor: AstVisitor): void {
-    visitor.visitFunctionDeclaration(this);
+    return visitor.visitFunctionDeclaration(this);
   }
 }
