@@ -1,11 +1,11 @@
 import {
+  AstCompilationUnit,
   AstFunctionDeclaration,
   AstInvocationExpression,
   AstLiteralBoolean,
   AstLiteralIdentifier,
   AstLiteralNumber,
   AstLiteralString,
-  AstCompilationUnit,
 } from '../parser/source/ast/node';
 import { AstVisitor } from '../parser/source/ast/visitor';
 
@@ -26,7 +26,7 @@ export class JsOutputTranspiler extends AstVisitor {
   public visitFunctionDeclaration(node: AstFunctionDeclaration): string {
     return `
       function ${node.name}() {
-        ${node.body.map(e => `${e.visit(this)};\n`)}
+        ${node.body.map(e => `${e.visit(this)};`).join('\n')}
       }
       ${node.name === 'main' ? 'main();' : ''}
     `;
@@ -50,6 +50,7 @@ export class JsOutputTranspiler extends AstVisitor {
 
   public visitInvocationExpression(node: AstInvocationExpression): string {
     const target = node.target;
+    // Special cased for now.
     if (target instanceof AstLiteralIdentifier && target.name === 'print') {
       return `console.log(${node.args[0].visit(this)})`;
     }
