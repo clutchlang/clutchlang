@@ -1,22 +1,10 @@
 // tslint:disable:no-magic-numbers
 
+import { parse } from '../../../../src/parser/parse';
 import {
-  AstCompilationUnit,
   AstInvocationExpression,
   AstLiteralIdentifier,
 } from '../../../../src/parser/source/ast/node';
-import { AstParser } from '../../../../src/parser/source/ast/parser';
-import { TokenScanner } from '../../../../src/parser/source/ast/scanner';
-import { Lexer } from '../../../../src/parser/source/tokenizer/lexer';
-import { SourceScanner } from '../../../../src/parser/source/tokenizer/scanner';
-
-function parse(program: string): AstCompilationUnit {
-  const scanner = new SourceScanner(program);
-  const lexer = new Lexer(scanner);
-  const tokens = Array.from(lexer);
-  const parser = new AstParser(new TokenScanner(tokens));
-  return parser.parseCompilationUnit();
-}
 
 describe('AstParser', () => {
   it('should parse a blank program with two functions', () => {

@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JsOutputTranspiler should support "Hello World" 1`] = `
+"
+      function main() {
+        console.log('Hello World');
+
+      }
+      main();
+    "
+`;
+
+exports[`JsOutputTranspiler should support most ast nodes 1`] = `
+"
+      function example() {
+        true;
+,1;
+,'Hello';
+,foobar;
+,method(false);
+
+      }
+      
+    "
+`;
