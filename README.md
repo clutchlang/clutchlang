@@ -71,7 +71,7 @@ $ npm run clc -- -w
 #### `INVOCATION`
 
 ::=
- `EXPRESSION` `(` `EXPRESSION` `)`
+ [`EXPRESSION`](#expression) `(` [`EXPRESSION`](#expression)+ `)`
 
 #### `LITERAL`
 
