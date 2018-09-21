@@ -46,6 +46,7 @@ describe(`${TokenScanner}`, () => {
     expect(scanner.lastMatch).toMatchObject([
       token(RegExpToken.Identifier, 'main'),
     ]);
+    expect(scanner.isDone).toBe(false);
   });
 
   it('should scan 2 tokens', () => {
@@ -60,6 +61,7 @@ describe(`${TokenScanner}`, () => {
       token(RegExpToken.Identifier, 'main'),
       token(StringToken.Arrow),
     ]);
+    expect(scanner.isDone).toBe(true);
   });
 
   it('should not scan 2 tokens', () => {
@@ -72,6 +74,7 @@ describe(`${TokenScanner}`, () => {
       false
     );
     expect(scanner.position).toBe(0);
-    expect(scanner.lastMatch).toBe([]);
+    expect(scanner.lastMatch).toHaveLength(0);
+    expect(scanner.isDone).toBe(false);
   });
 });
