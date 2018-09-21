@@ -66,7 +66,7 @@ $ npm run clc -- -w
 ::= 
   [`LITERAL`](#literal) |
   [`PARENTHESIZED`](#parenthesized) |
- `INVOCATION`
+  [`INVOCATION`](#invocation)
 
 #### `PARENTHESIZED`
 
