@@ -6,6 +6,7 @@ import {
   AstLiteralIdentifier,
   AstLiteralNumber,
   AstLiteralString,
+  AstParenthesizedExpression,
 } from '../parser/source/ast/node';
 import { AstVisitor } from '../parser/source/ast/visitor';
 
@@ -57,5 +58,11 @@ export class JsOutputTranspiler extends AstVisitor {
     return `${target.visit(this)}(${node.args
       .map(e => e.visit(this))
       .join(', ')})`;
+  }
+
+  public visitParenthesizedExpression(
+    node: AstParenthesizedExpression
+  ): string {
+    return `(${node.body.map(e => e.visit(this)).join(', ')})`;
   }
 }

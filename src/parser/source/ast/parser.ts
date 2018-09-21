@@ -14,6 +14,7 @@ import {
   AstLiteralIdentifier,
   AstLiteralNumber,
   AstLiteralString,
+  AstParenthesizedExpression,
 } from './node';
 import { TokenScanner } from './scanner';
 
@@ -36,6 +37,11 @@ export class AstParser {
   private parseExpression(): AstExpression | undefined {
     const token = this.scanner.peek();
     switch (token.kind) {
+      case SymbolToken.LParen:
+        this.scanRequired(SymbolToken.LParen);
+        const expressions = this.parseExpressions();
+        this.scanRequired(SymbolToken.RParen);
+        return new AstParenthesizedExpression(expressions);
       case RegExpToken.Identifier:
         if (this.scanner.peek(1).kind === SymbolToken.LParen) {
           const identifier = this.scanner.read();

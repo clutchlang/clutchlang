@@ -11,15 +11,12 @@ describe('PrintTreeVisitor', () => {
         1
         2
         3
-        (1)
-        (1 fn(2))
-        (1 2 (fn(3)))
+        (true false)
+        (false true)
       }
       hasInvocationBody => {
         print('Hello World')
       }
-      hasParensReturnV => (1)
-      havParensReturnP => ((2))
     `);
     expect(program.visit(visitor)).toMatchSnapshot();
   });

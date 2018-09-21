@@ -85,6 +85,8 @@ it('should lex a paranthesized expression in the body', () => {
     a => {
       (1)
       (b((2)))
+      (true false)
+      (false true)
     }
   `);
   const lexer = new Lexer(scanner);
@@ -102,6 +104,14 @@ it('should lex a paranthesized expression in the body', () => {
     token(RegExpToken.LiteralNumber, '2'),
     token(SymbolToken.RParen),
     token(SymbolToken.RParen),
+    token(SymbolToken.RParen),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralBoolean, 'true'),
+    token(RegExpToken.LiteralBoolean, 'false'),
+    token(SymbolToken.RParen),
+    token(SymbolToken.LParen),
+    token(RegExpToken.LiteralBoolean, 'false'),
+    token(RegExpToken.LiteralBoolean, 'true'),
     token(SymbolToken.RParen),
     token(SymbolToken.RCurly),
   ]);
