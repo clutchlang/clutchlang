@@ -9,10 +9,6 @@ export class TokenScanner {
 
   constructor(private readonly tokens: Token[]) {}
 
-  private get length(): number {
-    return this.tokens.length;
-  }
-
   /**
    * Returns the next token at an offset.
    *
@@ -32,6 +28,9 @@ export class TokenScanner {
     return token;
   }
 
+  /**
+   * Returns true if @param tokens was matched, in order.
+   */
   public scan(...tokens: TokenKind[]): boolean {
     let offset = 0;
     for (const token of tokens) {
@@ -40,10 +39,7 @@ export class TokenScanner {
         return false;
       }
     }
-    this.mLastMatch = this.tokens.slice(
-      this.position,
-      (this.position += tokens.length)
-    );
+    this.mLastMatch = this.sliceMatches(tokens.length);
     return true;
   }
 
@@ -62,5 +58,13 @@ export class TokenScanner {
   public set position(position: number) {
     // TODO: Add bounds check.
     this.mPosition = position;
+  }
+
+  private sliceMatches(count: number): Token[] {
+    return this.tokens.slice(this.position, (this.position += count));
+  }
+
+  private get length(): number {
+    return this.tokens.length;
   }
 }

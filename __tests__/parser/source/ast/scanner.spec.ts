@@ -77,4 +77,11 @@ describe(`${TokenScanner}`, () => {
     expect(scanner.lastMatch).toHaveLength(0);
     expect(scanner.isDone).toBe(false);
   });
+
+  it('should scan no repeated tokens', () => {
+    const scanner = new TokenScanner([
+      new Token(RegExpToken.Identifier, 0, 'main'),
+      new Token(StringToken.Arrow, 0, '=>'),
+    ]);
+  });
 });
