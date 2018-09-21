@@ -86,7 +86,7 @@ export class Lexer implements Iterable<Token> {
     return this.scanFunction();
   }
 
-  protected* scanExpression(): Iterable<Token> {
+  protected *scanExpression(): Iterable<Token> {
     const literal = this.scanLiteral();
     if (literal) {
       yield literal;
