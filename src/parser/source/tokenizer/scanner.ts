@@ -376,28 +376,22 @@ export class SourceSpan {
     const endLine = this.end.line;
     let buffer = '';
     if (startLine === endLine) {
-      if (this.start instanceof FileLocation) {
-        buffer += `Line ${startLine + 1 + 1}${
-          this.source ? ` in <${this.source}> ` : ''
-        }:\n`;
-        const substring = this.start.file.readLine(startLine);
-        buffer += `  ${substring}\n`;
-        buffer += `  ${' '.repeat(this.start.column)}${'^'.repeat(
-          this.text.length
-        )}`;
-      } else {
-        return this.message(message);
-      }
+      const start = this.start as FileLocation;
+      buffer += `Line ${startLine + 1 + 1}${
+        this.source ? ` in <${this.source}>` : ''
+      }:\n`;
+      const substring = start.file.readLine(startLine);
+      buffer += `  ${substring}\n`;
+      buffer += `  ${' '.repeat(this.start.column)}${'^'.repeat(
+        this.text.length
+      )}`;
     } else {
-      if (this.start instanceof FileLocation) {
-        if (this.source) {
-          buffer += `<${this.source}>:\n`;
-        }
-        for (let l = startLine; l < endLine + 1; l++) {
-          buffer += `${l + 1}: ${this.start.file.readLine(l)}\n`;
-        }
-      } else {
-        return this.message(message);
+      if (this.source) {
+        buffer += `<${this.source}>:\n`;
+      }
+      for (let l = startLine; l < endLine + 1; l++) {
+        const start = this.start as FileLocation;
+        buffer += `${l + 1}: ${start.file.readLine(l)}\n`;
       }
     }
     buffer += `\n${message}`;

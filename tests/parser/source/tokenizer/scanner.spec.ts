@@ -240,8 +240,6 @@ describe('SourceSpan', () => {
     const span = new SourceSpan(
       new SourceLocation(12, { source: 'names.json' }),
       new SourceLocation(15, { source: 'names.json' }),
-      // {"names": ["Abe", "George"]}
-      //             ^^^
       'Abe'
     );
     expect(span.message('Invalid name')).toBe(
@@ -249,13 +247,24 @@ describe('SourceSpan', () => {
     );
   });
 
+  it('should return a formatted message without a source URL', () => {
+    const span = new SourceSpan(
+      new SourceLocation(12),
+      new SourceLocation(15),
+      'Abe'
+    );
+    expect(span.message('Invalid name')).toBe(
+      'line 1, column 13: Invalid name'
+    );
+  });
+
   it('should return a highlighted message from 1 line', () => {
-    const file = new SourceFile('{"names": ["Abe", "George"]}');
+    const file = new SourceFile('{"names": ["Abe", "George"]}', 'names.json');
     const span = file.span(12, 15);
     // {"names": ["Abe", "George"]}
     //             ^^^
     expect(span.highlight('Invalid name')).toBe(
-      'Line 1:\n' +
+      'Line 1 in <names.json>:\n' +
         '  {"names": ["Abe", "George"]}\n' +
         '              ^^^\n' +
         'Invalid name'
@@ -263,10 +272,16 @@ describe('SourceSpan', () => {
   });
 
   it('should return a highlighted message from >1 line', () => {
-    const file = new SourceFile('[\n  1,\n  2,\n]');
+    const file = new SourceFile('[\n  1,\n  2,\n]', 'numbers.json');
     const span = file.span(0, file.contents.length);
     expect(span.highlight('Bad data')).toBe(
-      '1: [\n' + '2:   1,\n' + '3:   2,\n' + '4: ]\n' + '\n' + 'Bad data'
+      '<numbers.json>:\n' +
+        '1: [\n' +
+        '2:   1,\n' +
+        '3:   2,\n' +
+        '4: ]\n' +
+        '\n' +
+        'Bad data'
     );
   });
 });
