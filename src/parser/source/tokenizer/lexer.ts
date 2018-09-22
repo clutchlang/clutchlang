@@ -95,7 +95,10 @@ export class Lexer implements Iterable<Token> {
     if (this.scanner.peek() === Characters.LParen) {
       yield* this.scanParantheses();
     } else if (!identifier) {
-      return this.fail(`Expected expression, got "${this.substring}"`);
+      const substring = this.substring;
+      this.scanner.read();
+      this.consumeWhitespace();
+      return this.fail(`Expected expression, got "${substring}"`);
     }
   }
 
