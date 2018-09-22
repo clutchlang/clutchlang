@@ -6,6 +6,7 @@ import {
   SymbolToken,
 } from '../../../../src/parser/source/tokenizer/tokens';
 import { token } from '../common';
+
 it('should lex an empty program', () => {
   const scanner = new SourceScanner(`
     main => {}

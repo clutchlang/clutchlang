@@ -1,0 +1,306 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AstNode.beginToken/endToken should be set 1`] = `
+Array [
+  Object {
+    "kind": "Identifier",
+    "offset": "5 -> 9",
+    "value": "main",
+  },
+  Object {
+    "kind": "}",
+    "offset": "315 -> 316",
+    "value": "}",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "5 -> 9",
+    "value": "main",
+  },
+  Object {
+    "kind": "}",
+    "offset": "59 -> 60",
+    "value": "}",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "21 -> 24",
+    "value": "rfn",
+  },
+  Object {
+    "kind": ")",
+    "offset": "25 -> 26",
+    "value": ")",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "33 -> 36",
+    "value": "fn1",
+  },
+  Object {
+    "kind": ")",
+    "offset": "38 -> 39",
+    "value": ")",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "37 -> 38",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "37 -> 38",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "46 -> 49",
+    "value": "fn2",
+  },
+  Object {
+    "kind": ")",
+    "offset": "53 -> 54",
+    "value": ")",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "50 -> 51",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "50 -> 51",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "52 -> 53",
+    "value": "b",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "52 -> 53",
+    "value": "b",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "66 -> 69",
+    "value": "rfn",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "73 -> 77",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "73 -> 77",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "73 -> 77",
+    "value": "true",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "83 -> 86",
+    "value": "fn1",
+  },
+  Object {
+    "kind": "}",
+    "offset": "274 -> 275",
+    "value": "}",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "101 -> 105",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "101 -> 105",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "112 -> 117",
+    "value": "false",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "112 -> 117",
+    "value": "false",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "124 -> 128",
+    "value": "-1.5",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "124 -> 128",
+    "value": "-1.5",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "135 -> 137",
+    "value": "-1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "135 -> 137",
+    "value": "-1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "144 -> 145",
+    "value": "0",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "144 -> 145",
+    "value": "0",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "152 -> 153",
+    "value": "1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "152 -> 153",
+    "value": "1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "160 -> 163",
+    "value": "1.5",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "160 -> 163",
+    "value": "1.5",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "170 -> 178",
+    "value": "0xAABBCC",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "170 -> 178",
+    "value": "0xAABBCC",
+  },
+  Object {
+    "kind": "String",
+    "offset": "185 -> 198",
+    "value": "'Hello World'",
+  },
+  Object {
+    "kind": "String",
+    "offset": "185 -> 198",
+    "value": "'Hello World'",
+  },
+  Object {
+    "kind": "String",
+    "offset": "205 -> 218",
+    "value": "\\"Hello World\\"",
+  },
+  Object {
+    "kind": "String",
+    "offset": "205 -> 218",
+    "value": "\\"Hello World\\"",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "225 -> 231",
+    "value": "fooBar",
+  },
+  Object {
+    "kind": ")",
+    "offset": "249 -> 250",
+    "value": ")",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "239 -> 244",
+    "value": "false",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "239 -> 244",
+    "value": "false",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "245 -> 249",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "245 -> 249",
+    "value": "true",
+  },
+  Object {
+    "kind": "(",
+    "offset": "257 -> 258",
+    "value": "(",
+  },
+  Object {
+    "kind": ")",
+    "offset": "268 -> 269",
+    "value": ")",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "258 -> 262",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "258 -> 262",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "263 -> 268",
+    "value": "false",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "263 -> 268",
+    "value": "false",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "281 -> 284",
+    "value": "fn2",
+  },
+  Object {
+    "kind": "}",
+    "offset": "315 -> 316",
+    "value": "}",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "301 -> 302",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "301 -> 302",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "309 -> 310",
+    "value": "b",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "309 -> 310",
+    "value": "b",
+  },
+]
+`;

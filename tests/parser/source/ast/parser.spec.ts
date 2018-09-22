@@ -2,10 +2,18 @@
 
 import { parse } from '../../../../src/parser/parse';
 import {
+  AstCompilationUnit,
+  AstFunctionDeclaration,
   AstInvocationExpression,
+  AstLiteralBoolean,
   AstLiteralIdentifier,
+  AstLiteralNumber,
+  AstLiteralString,
+  AstNode,
   AstParenthesizedExpression,
 } from '../../../../src/parser/source/ast/node';
+import { AstVisitor } from '../../../../src/parser/source/ast/visitor';
+import { Token } from '../../../../src/parser/source/tokenizer/tokens';
 
 describe('AstParser', () => {
   it('should parse a blank program with two functions', () => {
@@ -78,3 +86,99 @@ describe('AstParser', () => {
     expect(unit.functions[0].parameters.map(e => e.name)).toEqual(['a', 'b']);
   });
 });
+
+it('AstNode.beginToken/endToken should be set', () => {
+  const unit = parse(`
+    main => {
+      rfn()
+      fn1(a)
+      fn2(a b)
+    }
+
+    rfn => true
+
+    fn1(a) => {
+      true
+      false
+      -1.5
+      -1
+      0
+      1
+      1.5
+      0xAABBCC
+      'Hello World'
+      "Hello World"
+      fooBar
+      (false true)
+      (true false)
+    }
+
+    fn2(a b) => {
+      a
+      b
+    }
+  `);
+  const tokens: Token[] = [];
+  unit.visit(new WalkTokensVisitor(tokens));
+  expect(
+    Array.from(
+      tokens.map(t => {
+        return {
+          kind: t.kind.name,
+          offset: `${t.span.start.offset} -> ${t.span.end.offset}`,
+          value: t.value,
+        };
+      })
+    )
+  ).toMatchSnapshot();
+});
+
+/**
+ * A custom visitor that invokes beginToken/endToken.
+ */
+class WalkTokensVisitor extends AstVisitor {
+  constructor(public readonly tokens: Token[]) {
+    super();
+  }
+
+  public visitCompilationUnit(node: AstCompilationUnit): void {
+    this.visitTokens(node);
+    super.visitCompilationUnit(node);
+  }
+
+  public visitFunctionDeclaration(node: AstFunctionDeclaration): void {
+    this.visitTokens(node);
+    super.visitFunctionDeclaration(node);
+  }
+
+  public visitLiteralBoolean(node: AstLiteralBoolean): void {
+    this.visitTokens(node);
+  }
+
+  public visitLiteralNumber(node: AstLiteralNumber): void {
+    this.visitTokens(node);
+  }
+
+  public visitLiteralString(node: AstLiteralString): void {
+    this.visitTokens(node);
+  }
+
+  public visitLiteralIdentifier(node: AstLiteralIdentifier): void {
+    this.visitTokens(node);
+  }
+
+  public visitParenthesizedExpression(node: AstParenthesizedExpression): void {
+    this.visitTokens(node);
+    super.visitParenthesizedExpression(node);
+  }
+
+  public visitInvocationExpression(node: AstInvocationExpression): void {
+    this.visitTokens(node);
+    super.visitInvocationExpression(node);
+  }
+
+  private visitTokens(node: AstNode): void {
+    this.tokens.push(node.beginToken);
+    this.tokens.push(node.endToken);
+  }
+}

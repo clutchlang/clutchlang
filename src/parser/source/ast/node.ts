@@ -4,22 +4,6 @@ import { AstVisitor } from './visitor';
 export abstract class AstNode {
   public abstract visit(visitor: AstVisitor): void;
 
-  /**
-   * Offset from the beginning of the file to the first character.
-   */
-  public get offset(): number {
-    /* istanbul ignore next */
-    return this.beginToken.span.start.offset;
-  }
-
-  /**
-   * Number of characters in the syntactic entity's source range.
-   */
-  public get length(): number {
-    /* istanbul ignore next */
-    return this.beginToken.span.end.offset - this.endToken.span.start.offset;
-  }
-
   public abstract get beginToken(): Token;
   public abstract get endToken(): Token;
 }
@@ -30,12 +14,10 @@ export class AstCompilationUnit extends AstNode {
   }
 
   public get beginToken(): Token {
-    /* istanbul ignore next */
     return this.functions[0].beginToken;
   }
 
   public get endToken(): Token {
-    /* istanbul ignore next */
     return this.functions[this.functions.length - 1].endToken;
   }
 
@@ -58,12 +40,10 @@ export abstract class AstLiteralExpression extends AstNode {
   }
 
   public get beginToken(): Token {
-    /* istanbul ignore next */
     return this.token;
   }
 
   public get endToken(): Token {
-    /* istanbul ignore next */
     return this.token;
   }
 }
