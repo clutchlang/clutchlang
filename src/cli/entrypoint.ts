@@ -60,11 +60,22 @@ export function run(options: IOptions): void {
     process.stdin.on('data', chunk => {
       buffer += chunk;
       if (buffer.endsWith('\n\n')) {
-        const output = parse(buffer).visit(new visitor());
-        // tslint:disable-next-line:no-any
-        process.stdout.write(output as any);
-        process.stdout.write('\n');
-        buffer = '';
+        try {
+          const output = parse(buffer).visit(new visitor());
+          // tslint:disable-next-line:no-any
+          process.stdout.write(output as any);
+          process.stdout.write('\n');
+        } catch (e) {
+          if (e instanceof SyntaxError) {
+            process.stderr.write((e as Error).message);
+            process.stderr.write('\n');
+            process.stderr.write('\n');
+          } else {
+            throw e;
+          }
+        } finally {
+          buffer = '';
+        }
       }
     });
     process.on('SIGINT', () => {

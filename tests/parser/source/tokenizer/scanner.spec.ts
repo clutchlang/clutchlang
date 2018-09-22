@@ -84,12 +84,20 @@ describe('SourceScanner', () => {
   });
 });
 
-describe(`${SourceFile}`, () => {
+describe('SourceFile', () => {
   it('should calculate number of lines', () => {
     const file = new SourceFile('aaa\nbbbbb\r\nccc\n\r');
     const lines = file.lines;
     expect(lines).toBe(4);
     expect(lines).toEqual(file.lines);
+  });
+
+  it('should read a specific line in the file', () => {
+    const file = new SourceFile('aaa\nbbbbb\r\nccc\n\r');
+    expect(file.readLine(0)).toBe('aaa');
+    expect(file.readLine(1)).toBe('bbbbb');
+    expect(file.readLine(2)).toBe('');
+    expect(file.readLine(3)).toBe('ccc');
   });
 
   describe('should compute the line number of an offset', () => {
@@ -173,7 +181,7 @@ describe(`${SourceFile}`, () => {
   });
 });
 
-it(`${SourceLocation} should have sensible defaults`, () => {
+it('SourceLocation should have sensible defaults', () => {
   const a = new SourceLocation(6, {
     column: 2,
     line: 1,
@@ -191,7 +199,7 @@ it(`${SourceLocation} should have sensible defaults`, () => {
   expect(b.source).toBeUndefined();
 });
 
-describe(`${SourceSpan}`, () => {
+describe('SourceSpan', () => {
   it('should disallow a negative start', () => {
     expect(() => {
       return new SourceSpan(
@@ -232,12 +240,48 @@ describe(`${SourceSpan}`, () => {
     const span = new SourceSpan(
       new SourceLocation(12, { source: 'names.json' }),
       new SourceLocation(15, { source: 'names.json' }),
-      // {"names": ["Abe", "George"]}
-      //             ^^^
       'Abe'
     );
     expect(span.message('Invalid name')).toBe(
       'line 1, column 13 of names.json: Invalid name'
+    );
+  });
+
+  it('should return a formatted message without a source URL', () => {
+    const span = new SourceSpan(
+      new SourceLocation(12),
+      new SourceLocation(15),
+      'Abe'
+    );
+    expect(span.message('Invalid name')).toBe(
+      'line 1, column 13: Invalid name'
+    );
+  });
+
+  it('should return a highlighted message from 1 line', () => {
+    const file = new SourceFile('{"names": ["Abe", "George"]}', 'names.json');
+    const span = file.span(12, 15);
+    // {"names": ["Abe", "George"]}
+    //             ^^^
+    expect(span.highlight('Invalid name')).toBe(
+      'Line 1 in <names.json>:\n' +
+        '  {"names": ["Abe", "George"]}\n' +
+        '              ^^^\n' +
+        'Invalid name'
+    );
+  });
+
+  it('should return a highlighted message from >1 line', () => {
+    const file = new SourceFile('[\n  1,\n  2,\n]', 'numbers.json');
+    const span = file.span(0, file.contents.length);
+    expect(span.highlight('Bad data')).toBe(
+      '<numbers.json>:\n' +
+        '1: [\n' +
+        '2:   1,\n' +
+        '3:   2,\n' +
+        '4: ]\n' +
+        '\n' +
+        'Bad data'
     );
   });
 });

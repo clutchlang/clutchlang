@@ -1,11 +1,12 @@
 import { Characters } from './characters';
+import { SourceSpan } from './scanner';
 
 export class Token {
   public readonly value: string;
 
   constructor(
     public readonly kind: TokenKind,
-    public readonly offset: number,
+    public readonly span: SourceSpan,
     value: string
   ) {
     this.value = value;
