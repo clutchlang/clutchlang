@@ -34,7 +34,10 @@ export type AstExpression =
   | AstInvocationExpression
   | AstParenthesizedExpression;
 
-export type AstStatement = AstExpression | AstVariableDeclaration;
+export type AstStatement =
+  | AstExpression
+  | AstVariableDeclaration
+  | AstReturnStatement;
 
 export class AstVariableDeclaration extends AstNode {
   constructor(
@@ -55,6 +58,23 @@ export class AstVariableDeclaration extends AstNode {
 
   public visit(visitor: AstVisitor): void {
     return visitor.visitVariableDeclaration(this);
+  }
+}
+
+export class AstReturnStatement extends AstNode {
+  constructor(
+    public readonly beginToken: Token,
+    public readonly value: AstExpression
+  ) {
+    super();
+  }
+
+  public get endToken(): Token {
+    return this.value.endToken;
+  }
+
+  public visit(visitor: AstVisitor): void {
+    return visitor.visitReturnStatement(this);
   }
 }
 

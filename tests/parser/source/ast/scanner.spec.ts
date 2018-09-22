@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 // tslint:disable:no-magic-numbers
 
 import { TokenScanner } from '../../../../src/parser/source/ast/scanner';
@@ -12,7 +13,7 @@ import { token } from '../common';
 describe('TokenScanner', () => {
   it('should peek a token', () => {
     const scanner = new TokenScanner([
-      new Token(RegExpToken.Identifier, 0, 'main'),
+      new Token(RegExpToken.Identifier, null as any, 'main'),
     ]);
     expect(scanner.position).toBe(0);
     expect(scanner.peek()).toMatchObject(token(RegExpToken.Identifier, 'main'));
@@ -21,8 +22,8 @@ describe('TokenScanner', () => {
 
   it('should read tokens', () => {
     const scanner = new TokenScanner([
-      new Token(RegExpToken.Identifier, 0, 'main'),
-      new Token(StringToken.Arrow, 0, '=>'),
+      new Token(RegExpToken.Identifier, null as any, 'main'),
+      new Token(StringToken.Arrow, null as any, '=>'),
     ]);
     expect(scanner.position).toBe(0);
     expect(scanner.read()).toMatchObject(token(RegExpToken.Identifier, 'main'));
@@ -37,8 +38,8 @@ describe('TokenScanner', () => {
 
   it('should scan 1 token', () => {
     const scanner = new TokenScanner([
-      new Token(RegExpToken.Identifier, 0, 'main'),
-      new Token(StringToken.Arrow, 0, '=>'),
+      new Token(RegExpToken.Identifier, null as any, 'main'),
+      new Token(StringToken.Arrow, null as any, '=>'),
     ]);
     expect(scanner.position).toBe(0);
     expect(scanner.scan(RegExpToken.Identifier)).toBe(true);
@@ -51,8 +52,8 @@ describe('TokenScanner', () => {
 
   it('should scan 2 tokens', () => {
     const scanner = new TokenScanner([
-      new Token(RegExpToken.Identifier, 0, 'main'),
-      new Token(StringToken.Arrow, 0, '=>'),
+      new Token(RegExpToken.Identifier, null as any, 'main'),
+      new Token(StringToken.Arrow, null as any, '=>'),
     ]);
     expect(scanner.position).toBe(0);
     expect(scanner.scan(RegExpToken.Identifier, StringToken.Arrow)).toBe(true);
@@ -66,8 +67,8 @@ describe('TokenScanner', () => {
 
   it('should not scan 2 tokens', () => {
     const scanner = new TokenScanner([
-      new Token(RegExpToken.Identifier, 0, 'main'),
-      new Token(StringToken.Arrow, 0, '=>'),
+      new Token(RegExpToken.Identifier, null as any, 'main'),
+      new Token(StringToken.Arrow, null as any, '=>'),
     ]);
     expect(scanner.position).toBe(0);
     expect(scanner.scan(RegExpToken.Identifier, SymbolToken.LCurly)).toBe(

@@ -34,6 +34,7 @@ export class SymbolToken {
 export class StringToken {
   public static readonly Arrow = new StringToken('=>');
   public static readonly Let = new StringToken('let');
+  public static readonly Return = new StringToken('return');
 
   public readonly kind = 'String';
 

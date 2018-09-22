@@ -307,6 +307,23 @@ it('should lex a function with two parameters', () => {
   ]);
 });
 
+it('should lex a function with a return statement', () => {
+  const scanner = new SourceScanner(`
+    f => {
+      return true
+    }
+  `);
+  const lexer = new Lexer(scanner);
+  expect(Array.from(lexer)).toMatchObject([
+    token(RegExpToken.Identifier, 'f'),
+    token(StringToken.Arrow),
+    token(SymbolToken.LCurly),
+    token(StringToken.Return),
+    token(RegExpToken.LiteralBoolean, 'true'),
+    token(SymbolToken.RCurly),
+  ]);
+});
+
 describe('should catch lexing errors', () => {
   it('expected identifier', () => {
     const scanner = new SourceScanner('$ => {}');
