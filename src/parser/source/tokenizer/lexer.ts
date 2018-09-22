@@ -107,9 +107,15 @@ export class Lexer implements Iterable<Token> {
     if (declareLet) {
       yield declareLet;
       yield* this.scanLetDeclare();
-    } else {
-      yield* this.scanExpression();
+      return;
     }
+    const declareReturn = this.scanOptional(StringToken.Return);
+    if (declareReturn) {
+      yield declareReturn;
+      yield* this.scanExpression();
+      return;
+    }
+    yield* this.scanExpression();
   }
 
   protected *scanLetDeclare(): Iterable<Token> {

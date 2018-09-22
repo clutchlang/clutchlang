@@ -7,6 +7,8 @@ import {
   AstLiteralNumber,
   AstLiteralString,
   AstParenthesizedExpression,
+  AstReturnStatement,
+  AstStatement,
   AstVariableDeclaration,
 } from '../parser/source/ast/node';
 import { AstVisitor } from '../parser/source/ast/visitor';
@@ -28,7 +30,7 @@ export class JsOutputTranspiler extends AstVisitor {
   public visitFunctionDeclaration(node: AstFunctionDeclaration): string {
     return `
       function ${node.name}(${node.parameters.map(e => e.name).join(', ')}) {
-        ${node.body.map(e => `${e.visit(this)};`).join('\n')}
+      ${this.visitExpressionBody(node.body)}
       }
       ${node.name === 'main' ? 'main();' : ''}
     `;
@@ -69,5 +71,29 @@ export class JsOutputTranspiler extends AstVisitor {
     node: AstParenthesizedExpression
   ): string {
     return `(${node.body.map(e => e.visit(this)).join(', ')})`;
+  }
+
+  public visitReturnStatement(node: AstReturnStatement): string {
+    return `return ${node.value.visit(this)}`;
+  }
+
+  private isStatementOnly(node: AstStatement): boolean {
+    // TODO: Find a better way of doing this.
+    return (
+      node instanceof AstReturnStatement ||
+      node instanceof AstVariableDeclaration
+    );
+  }
+
+  private visitExpressionBody(nodes: AstStatement[]): string {
+    let buffer = '';
+    for (let i = 0; i < nodes.length; i++) {
+      // Implicit return.
+      if (i === nodes.length - 1 && !this.isStatementOnly(nodes[i])) {
+        buffer += 'return  ';
+      }
+      buffer += nodes[i].visit(this) + ';\n';
+    }
+    return buffer;
   }
 }

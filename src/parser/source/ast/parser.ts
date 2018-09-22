@@ -15,6 +15,7 @@ import {
   AstLiteralNumber,
   AstLiteralString,
   AstParenthesizedExpression,
+  AstReturnStatement,
   AstStatement,
   AstVariableDeclaration,
 } from './node';
@@ -133,8 +134,13 @@ export class AstParser {
     if (maybeLet) {
       const identifier = this.scanRequired(RegExpToken.Identifier);
       this.scanRequired(SymbolToken.Equals);
-      const expression = this.parseExpression();
-      return new AstVariableDeclaration(maybeLet, identifier, expression!);
+      const expression = this.parseExpression()!;
+      return new AstVariableDeclaration(maybeLet, identifier, expression);
+    }
+    const maybeReturn = this.scanOptional(StringToken.Return);
+    if (maybeReturn) {
+      const expression = this.parseExpression()!;
+      return new AstReturnStatement(maybeReturn, expression);
     }
     return this.parseExpression();
   }
@@ -155,7 +161,11 @@ export class AstParser {
       /* istanbul ignore next */
       const next = this.scanner.peek().kind;
       /* istanbul ignore next */
-      throw new SyntaxError(`Expected ${kind.name} got ${next.name}.`);
+      throw new SyntaxError(
+        this.scanner
+          .read()
+          .span.highlight(`Expected ${kind.name} got ${next.name}.`)
+      );
     }
     return this.scanner.lastMatch[0];
   }

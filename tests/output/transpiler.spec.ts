@@ -21,6 +21,17 @@ describe('JsOutputTranspiler', () => {
         foobar
         method(false)
         f(1 2)
+      }
+
+      explicit => {
+        return true
+      }
+
+      implicit => {
+        true
+      }
+
+      noReturn => {
         let variable = 5
       }
     `);

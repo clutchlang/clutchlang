@@ -61,6 +61,21 @@ $ npm run clc -- -w
 
 ::= `/[_a-zA-Z][_a-zA-Z0-9]{0,30}/`
 
+### `STATEMENT`
+
+::=
+  [`LET`](#let) |
+  [`RETURN`](#return) |
+  [`EXPRESSION`](#expression)
+
+#### `LET`
+
+::= `let` [`IDENTIFIER`](#identifier) `=` [`EXPRESSION`](#expression)
+
+#### `RETURN`
+
+::= `return` [`EXPRESSION`](#expression)
+
 ### `EXPRESSION`
 
 ::= 

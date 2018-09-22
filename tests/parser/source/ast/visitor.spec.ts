@@ -31,6 +31,9 @@ describe('PrintTreeVisitor', () => {
       returnsF2 => f(1 2)
       returnsPF => (f)
       returnsPF0 => (f())
+      returnsExplicit => {
+        return true
+      }
     `);
     expect(program.visit(visitor)).toMatchSnapshot();
   });

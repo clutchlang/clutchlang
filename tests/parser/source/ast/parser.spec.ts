@@ -11,6 +11,7 @@ import {
   AstLiteralString,
   AstNode,
   AstParenthesizedExpression,
+  AstReturnStatement,
   AstVariableDeclaration,
 } from '../../../../src/parser/source/ast/node';
 import { AstVisitor } from '../../../../src/parser/source/ast/visitor';
@@ -98,6 +99,10 @@ it('AstNode.beginToken/endToken should be set', () => {
 
     rfn => true
 
+    efn => {
+      return true
+    }
+
     fn1(a) => {
       true
       false
@@ -182,6 +187,11 @@ class WalkTokensVisitor extends AstVisitor {
   public visitInvocationExpression(node: AstInvocationExpression): void {
     this.visitTokens(node);
     super.visitInvocationExpression(node);
+  }
+
+  public visitReturnStatement(node: AstReturnStatement): void {
+    this.visitTokens(node);
+    super.visitReturnStatement(node);
   }
 
   private visitTokens(node: AstNode): void {

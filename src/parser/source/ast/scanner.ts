@@ -29,17 +29,18 @@ export class TokenScanner {
   }
 
   /**
-   * Returns true if @param tokens was matched, in order.
+   * Returns true if @param kinds was matched, in order.
    */
-  public scan(...tokens: TokenKind[]): boolean {
+  public scan(...kinds: TokenKind[]): boolean {
     let offset = 0;
-    for (const token of tokens) {
-      if (this.peek(offset++).kind.kind !== token.kind) {
+    for (const kind of kinds) {
+      const nextToken = this.peek(offset++);
+      if (nextToken.kind.name !== kind.name) {
         this.mLastMatch = [];
         return false;
       }
     }
-    this.mLastMatch = this.sliceMatches(tokens.length);
+    this.mLastMatch = this.sliceMatches(kinds.length);
     return true;
   }
 

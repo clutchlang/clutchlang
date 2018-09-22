@@ -23,12 +23,17 @@ exports[`PrintTreeVisitor should emit a few more functions 1`] = `
             LiteralNumber: 1
             LiteralNumber: 2
         FunctionDeclaration (name = returnsPF)
-          LiteralIdentifier: f
+          ParenthesizedExpression:
+            LiteralIdentifier: f
         FunctionDeclaration (name = returnsPF0)
-          InvocationExpression:
-            Target:
-              LiteralIdentifier: f
-            Args:
+          ParenthesizedExpression:
+            InvocationExpression:
+              Target:
+                LiteralIdentifier: f
+              Args:
+          FunctionDeclaration (name = returnsExplicit)
+            ReturnStatement
+              LiteralBoolean: true
 "
 `;
 
