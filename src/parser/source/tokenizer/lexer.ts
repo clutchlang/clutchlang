@@ -18,7 +18,7 @@ export class Lexer implements Iterable<Token> {
    * Invalid identifiers.
    */
 
-  private static readonly keywords = new Set(['true', 'false']);
+  private static readonly keywords = new Set(['true', 'false', 'let']);
 
   constructor(private readonly scanner: SourceScanner) {}
 
@@ -102,7 +102,23 @@ export class Lexer implements Iterable<Token> {
     }
   }
 
-  protected *scanExpressionOrBlock(): Iterable<Token> {
+  protected *scanStatement(): Iterable<Token> {
+    const declareLet = this.scanOptional(StringToken.Let);
+    if (declareLet) {
+      yield declareLet;
+      yield* this.scanLetDeclare();
+    } else {
+      yield* this.scanExpression();
+    }
+  }
+
+  protected *scanLetDeclare(): Iterable<Token> {
+    yield this.scanIdentifier();
+    yield this.scanRequired(SymbolToken.Equals);
+    yield* this.scanExpression();
+  }
+
+  protected *scanExpressionOrStatementBlock(): Iterable<Token> {
     this.consumeWhitespace();
     if (this.scanner.peek() === Characters.LCurly) {
       yield this.scanRequired(SymbolToken.LCurly);
@@ -118,7 +134,7 @@ export class Lexer implements Iterable<Token> {
           checkRCurly = false;
           break;
         }
-        yield* this.scanExpression();
+        yield* this.scanStatement();
       }
       if (checkRCurly) {
         yield this.scanRequired(SymbolToken.RCurly);
@@ -143,7 +159,7 @@ export class Lexer implements Iterable<Token> {
     }
     this.consumeWhitespace();
     yield this.scanRequired(StringToken.Arrow);
-    yield* this.scanExpressionOrBlock();
+    yield* this.scanExpressionOrStatementBlock();
   }
 
   protected scanIdentifier(): Token {

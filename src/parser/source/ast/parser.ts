@@ -15,6 +15,8 @@ import {
   AstLiteralNumber,
   AstLiteralString,
   AstParenthesizedExpression,
+  AstStatement,
+  AstVariableDeclaration,
 } from './node';
 import { TokenScanner } from './scanner';
 
@@ -87,22 +89,22 @@ export class AstParser {
     }
     this.scanRequired(StringToken.Arrow);
     if (this.scanOptional(SymbolToken.LCurly)) {
-      const expressions = this.parseExpressions();
+      const statements = this.parseStatements();
       const endToken = this.scanRequired(SymbolToken.RCurly);
       const fn = new AstFunctionDeclaration(
         identifier,
         endToken,
         parameters,
-        expressions
+        statements
       );
       return fn;
     }
-    const expression = this.parseExpression()!;
+    const statement = this.parseStatement()!;
     return new AstFunctionDeclaration(
       identifier,
       this.scanner.lastMatch[this.scanner.lastMatch.length - 1],
       parameters,
-      [expression]
+      [statement]
     );
   }
 
@@ -114,6 +116,27 @@ export class AstParser {
       expression = this.parseExpression();
     }
     return expressions;
+  }
+
+  private parseStatements(): AstStatement[] {
+    const statements: AstStatement[] = [];
+    let statement = this.parseStatement();
+    while (statement) {
+      statements.push(statement);
+      statement = this.parseStatement();
+    }
+    return statements;
+  }
+
+  private parseStatement(): AstStatement | undefined {
+    const maybeLet = this.scanOptional(StringToken.Let);
+    if (maybeLet) {
+      const identifier = this.scanRequired(RegExpToken.Identifier);
+      this.scanRequired(SymbolToken.Equals);
+      const expression = this.parseExpression();
+      return new AstVariableDeclaration(maybeLet, identifier, expression!);
+    }
+    return this.parseExpression();
   }
 
   private scanOptional(token: TokenKind): Token | undefined {

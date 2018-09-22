@@ -28,6 +28,7 @@ exports[`JsOutputTranspiler should support most ast nodes 1`] = `
 foobar;
 method(false);
 f(1, 2);
+let variable = 5;
       }
       
     "

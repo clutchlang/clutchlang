@@ -9,7 +9,7 @@ Array [
   },
   Object {
     "kind": "}",
-    "offset": "315 -> 316",
+    "offset": "341 -> 342",
     "value": "}",
   },
   Object {
@@ -109,7 +109,7 @@ Array [
   },
   Object {
     "kind": "}",
-    "offset": "274 -> 275",
+    "offset": "300 -> 301",
     "value": "}",
   },
   Object {
@@ -273,33 +273,53 @@ Array [
     "value": "false",
   },
   Object {
+    "kind": "let",
+    "offset": "276 -> 279",
+    "value": "let",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "291 -> 295",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "291 -> 295",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "291 -> 295",
+    "value": "true",
+  },
+  Object {
     "kind": "Identifier",
-    "offset": "281 -> 284",
+    "offset": "307 -> 310",
     "value": "fn2",
   },
   Object {
     "kind": "}",
-    "offset": "315 -> 316",
+    "offset": "341 -> 342",
     "value": "}",
   },
   Object {
     "kind": "Identifier",
-    "offset": "301 -> 302",
+    "offset": "327 -> 328",
     "value": "a",
   },
   Object {
     "kind": "Identifier",
-    "offset": "301 -> 302",
+    "offset": "327 -> 328",
     "value": "a",
   },
   Object {
     "kind": "Identifier",
-    "offset": "309 -> 310",
+    "offset": "335 -> 336",
     "value": "b",
   },
   Object {
     "kind": "Identifier",
-    "offset": "309 -> 310",
+    "offset": "335 -> 336",
     "value": "b",
   },
 ]
