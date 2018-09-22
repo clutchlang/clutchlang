@@ -256,9 +256,9 @@ describe('SourceSpan', () => {
     //             ^^^
     expect(span.highlight('Invalid name')).toBe(
       'Line 1:\n' +
-      '  {"names": ["Abe", "George"]}\n' +
-      '              ^^^\n' +
-      'Invalid name'
+        '  {"names": ["Abe", "George"]}\n' +
+        '              ^^^\n' +
+        'Invalid name'
     );
   });
 
@@ -266,12 +266,7 @@ describe('SourceSpan', () => {
     const file = new SourceFile('[\n  1,\n  2,\n]');
     const span = file.span(0, file.contents.length);
     expect(span.highlight('Bad data')).toBe(
-      '1: [\n' +
-      '2:   1,\n' +
-      '3:   2,\n' +
-      '4: ]\n' +
-      '\n' +
-      'Bad data'
+      '1: [\n' + '2:   1,\n' + '3:   2,\n' + '4: ]\n' + '\n' + 'Bad data'
     );
   });
 });

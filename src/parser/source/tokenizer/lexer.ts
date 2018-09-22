@@ -49,14 +49,14 @@ export class Lexer implements Iterable<Token> {
    * @param message
    */
   protected fail(message: string): never {
-    throw new SyntaxError(this.scanner.span.message(message));
+    throw new SyntaxError(this.scanner.span.highlight(message));
   }
 
   protected scanOptional(kind: TokenKind): Token | undefined {
     this.consumeWhitespace();
     const result = this.scanner.scan(kind.pattern);
     return result
-      ? new Token(kind, this.scanner.lastPosition, this.scanner.lastMatch![0])
+      ? new Token(kind, this.scanner.lastSpan(), this.scanner.lastMatch![0])
       : undefined;
   }
 
@@ -75,11 +75,7 @@ export class Lexer implements Iterable<Token> {
       }
       this.fail(`Expected ${pattern}, got "${this.substring}"`);
     }
-    return new Token(
-      kind,
-      this.scanner.lastPosition,
-      this.scanner.lastMatch![0]
-    );
+    return new Token(kind, this.scanner.lastSpan(), this.scanner.lastMatch![0]);
   }
 
   protected scanCompilationUnit(): Iterable<Token> {
@@ -168,6 +164,6 @@ export class Lexer implements Iterable<Token> {
     while (!this.scanOptional(SymbolToken.RParen)) {
       yield* this.scanExpression();
     }
-    yield new Token(SymbolToken.RParen, this.scanner.lastPosition, ')');
+    yield new Token(SymbolToken.RParen, this.scanner.lastSpan(), ')');
   }
 }

@@ -80,6 +80,13 @@ export class SourceScanner {
     return new SourceSpan(start, end, match);
   }
 
+  /**
+   * Returns the last match as a @see {SourceSpan}.
+   */
+  public lastSpan(): SourceSpan {
+    return this.mSourceFile.span(this.lastPosition, this.position);
+  }
+
   public get substring(): string {
     return this.contents.substring(this.position);
   }
@@ -370,7 +377,9 @@ export class SourceSpan {
     let buffer = '';
     if (startLine === endLine) {
       if (this.start instanceof FileLocation) {
-        buffer += `Line ${startLine + 1 + 1}${this.source ? ` in <${this.source}> `: ''}:\n`;
+        buffer += `Line ${startLine + 1 + 1}${
+          this.source ? ` in <${this.source}> ` : ''
+        }:\n`;
         const substring = this.start.file.readLine(startLine);
         buffer += `  ${substring}\n`;
         buffer += `  ${' '.repeat(this.start.column)}${'^'.repeat(
@@ -385,7 +394,7 @@ export class SourceSpan {
           buffer += `<${this.source}>:\n`;
         }
         for (let l = startLine; l < endLine + 1; l++) {
-          buffer += `${l + 1}: ${this.start.file.readLine(l)}\n`
+          buffer += `${l + 1}: ${this.start.file.readLine(l)}\n`;
         }
       } else {
         return this.message(message);
