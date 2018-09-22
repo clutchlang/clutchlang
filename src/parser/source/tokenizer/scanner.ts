@@ -172,10 +172,30 @@ export class SourceFile {
   }
 
   /**
+   * Returns the substring representing the @param line number.
+   */
+  public readLine(line: number): string {
+    const contents = this.contents;
+    const substring = contents.substring(
+      this.lineStarts[line - 1] || 0,
+      this.lineStarts[line] || this.contents.length
+    );
+    return substring.split(/\n|\r/)[0];
+  }
+
+  /**
    * Returns a pointer to the provided @param offset in this file.
    */
   public location(offset: number): SourceLocation {
     return new FileLocation(this, offset);
+  }
+
+  public span(start: number, end: number): SourceSpan {
+    return new SourceSpan(
+      this.location(start),
+      this.location(end),
+      this.contents.substring(start, end)
+    );
   }
 
   /**
@@ -321,6 +341,59 @@ export class SourceSpan {
     buffer += `: ${message}`;
     return buffer;
   }
+
+  /**
+   * Returns a message associating @param message underlined.
+   *
+   * ```
+   * <FILE>:
+   *   1: aaaa
+   *  ..
+   *  99: bbbb
+   *
+   * MESSAGE
+   * ```
+   *
+   * or
+   *
+   * ```
+   * Line 3 in <FILE>:
+   *   aaaaa bbbbb ccccc
+   *         ^^^^^
+   *
+   * MESSAGE
+   * ```
+   */
+  public highlight(message: string): string {
+    const startLine = this.start.line;
+    const endLine = this.end.line;
+    let buffer = '';
+    if (startLine === endLine) {
+      if (this.start instanceof FileLocation) {
+        buffer += `Line ${startLine + 1 + 1}${this.source ? ` in <${this.source}> `: ''}:\n`;
+        const substring = this.start.file.readLine(startLine);
+        buffer += `  ${substring}\n`;
+        buffer += `  ${' '.repeat(this.start.column)}${'^'.repeat(
+          this.text.length
+        )}`;
+      } else {
+        return this.message(message);
+      }
+    } else {
+      if (this.start instanceof FileLocation) {
+        if (this.source) {
+          buffer += `<${this.source}>:\n`;
+        }
+        for (let l = startLine; l < endLine + 1; l++) {
+          buffer += `${l + 1}: ${this.start.file.readLine(l)}\n`
+        }
+      } else {
+        return this.message(message);
+      }
+    }
+    buffer += `\n${message}`;
+    return buffer;
+  }
 }
 
 /**
@@ -328,7 +401,7 @@ export class SourceSpan {
  */
 export class FileLocation implements SourceLocation {
   constructor(
-    private readonly file: SourceFile,
+    public readonly file: SourceFile,
     public readonly offset: number
   ) {}
 

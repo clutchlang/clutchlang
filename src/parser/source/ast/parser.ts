@@ -38,19 +38,28 @@ export class AstParser {
     const token = this.scanner.peek();
     switch (token.kind) {
       case SymbolToken.LParen:
-        this.scanRequired(SymbolToken.LParen);
+        const beginToken = this.scanRequired(SymbolToken.LParen);
         const expressions = this.parseExpressions();
-        this.scanRequired(SymbolToken.RParen);
-        return new AstParenthesizedExpression(expressions);
+        const endToken = this.scanRequired(SymbolToken.RParen);
+        return new AstParenthesizedExpression(
+          beginToken,
+          endToken,
+          expressions
+        );
       case RegExpToken.Identifier:
         if (this.scanner.peek(1).kind === SymbolToken.LParen) {
           const identifier = this.scanner.read();
           this.scanRequired(SymbolToken.LParen);
+          // tslint:disable-next-line:no-shadowed-variable
+          const expressions = this.parseExpressions();
+          // tslint:disable-next-line:no-shadowed-variable
+          const endToken = this.scanRequired(SymbolToken.RParen);
           const invocation = new AstInvocationExpression(
+            identifier,
+            endToken,
             new AstLiteralIdentifier(identifier),
-            this.parseExpressions()
+            expressions
           );
-          this.scanRequired(SymbolToken.RParen);
           return invocation;
         }
         return new AstLiteralIdentifier(this.scanner.read());
@@ -78,16 +87,23 @@ export class AstParser {
     }
     this.scanRequired(StringToken.Arrow);
     if (this.scanOptional(SymbolToken.LCurly)) {
+      const expressions = this.parseExpressions();
+      const endToken = this.scanRequired(SymbolToken.RCurly);
       const fn = new AstFunctionDeclaration(
         identifier,
+        endToken,
         parameters,
-        this.parseExpressions()
+        expressions
       );
-      this.scanRequired(SymbolToken.RCurly);
       return fn;
     }
     const expression = this.parseExpression()!;
-    return new AstFunctionDeclaration(identifier, parameters, [expression]);
+    return new AstFunctionDeclaration(
+      identifier,
+      this.scanner.lastMatch[this.scanner.lastMatch.length - 1],
+      parameters,
+      [expression]
+    );
   }
 
   private parseExpressions(): AstExpression[] {
@@ -107,14 +123,17 @@ export class AstParser {
     return undefined;
   }
 
-  private scanRequired(token: TokenKind): void {
+  private scanRequired(kind: TokenKind): Token {
     /* istanbul ignore next */
-    if (!this.scanner.scan(token)) {
+    const token = this.scanner.scan(kind);
+    /* istanbul ignore next */
+    if (!token) {
       // The lexer should prevent this happening in a typical program.
       /* istanbul ignore next */
       const next = this.scanner.peek().kind;
       /* istanbul ignore next */
-      throw new SyntaxError(`Expected ${token.name} got ${next.name}.`);
+      throw new SyntaxError(`Expected ${kind.name} got ${next.name}.`);
     }
+    return this.scanner.lastMatch[0];
   }
 }
