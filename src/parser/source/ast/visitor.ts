@@ -33,7 +33,7 @@ export abstract class AstVisitor {
     }
   }
 
-  public visitInvocationExpression(node: AstInvocationExpression) {
+  public visitInvocationExpression(node: AstInvocationExpression): void {
     for (const a of node.args) {
       a.visit(this);
     }
