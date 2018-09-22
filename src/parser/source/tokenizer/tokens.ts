@@ -20,6 +20,7 @@ export class SymbolToken {
   public static readonly RCurly = new SymbolToken(Characters.RCurly);
   public static readonly LParen = new SymbolToken(Characters.LParen);
   public static readonly RParen = new SymbolToken(Characters.RParen);
+  public static readonly Equals = new SymbolToken(Characters.Equals);
 
   public readonly kind = 'Symbol';
 
@@ -32,6 +33,7 @@ export class SymbolToken {
 
 export class StringToken {
   public static readonly Arrow = new StringToken('=>');
+  public static readonly Let = new StringToken('let');
 
   public readonly kind = 'String';
 

@@ -11,6 +11,7 @@ import {
   AstLiteralString,
   AstNode,
   AstParenthesizedExpression,
+  AstVariableDeclaration,
 } from '../../../../src/parser/source/ast/node';
 import { AstVisitor } from '../../../../src/parser/source/ast/visitor';
 import { Token } from '../../../../src/parser/source/tokenizer/tokens';
@@ -111,6 +112,7 @@ it('AstNode.beginToken/endToken should be set', () => {
       fooBar
       (false true)
       (true false)
+      let variable = true
     }
 
     fn2(a b) => {
@@ -149,6 +151,11 @@ class WalkTokensVisitor extends AstVisitor {
   public visitFunctionDeclaration(node: AstFunctionDeclaration): void {
     this.visitTokens(node);
     super.visitFunctionDeclaration(node);
+  }
+
+  public visitVariableDeclaration(node: AstVariableDeclaration): void {
+    this.visitTokens(node);
+    super.visitVariableDeclaration(node);
   }
 
   public visitLiteralBoolean(node: AstLiteralBoolean): void {

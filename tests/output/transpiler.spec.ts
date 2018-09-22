@@ -21,6 +21,7 @@ describe('JsOutputTranspiler', () => {
         foobar
         method(false)
         f(1 2)
+        let variable = 5
       }
     `);
     const visitor = new JsOutputTranspiler();

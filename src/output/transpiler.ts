@@ -7,6 +7,7 @@ import {
   AstLiteralNumber,
   AstLiteralString,
   AstParenthesizedExpression,
+  AstVariableDeclaration,
 } from '../parser/source/ast/node';
 import { AstVisitor } from '../parser/source/ast/visitor';
 
@@ -31,6 +32,10 @@ export class JsOutputTranspiler extends AstVisitor {
       }
       ${node.name === 'main' ? 'main();' : ''}
     `;
+  }
+
+  public visitVariableDeclaration(node: AstVariableDeclaration): string {
+    return `let ${node.name} = ${node.value.visit(this)}`;
   }
 
   public visitLiteralBoolean(node: AstLiteralBoolean): string {

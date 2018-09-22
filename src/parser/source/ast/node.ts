@@ -34,6 +34,30 @@ export type AstExpression =
   | AstInvocationExpression
   | AstParenthesizedExpression;
 
+export type AstStatement = AstExpression | AstVariableDeclaration;
+
+export class AstVariableDeclaration extends AstNode {
+  constructor(
+    public readonly beginToken: Token,
+    private readonly identifier: Token,
+    public readonly value: AstExpression
+  ) {
+    super();
+  }
+
+  public get endToken(): Token {
+    return this.value.endToken;
+  }
+
+  public get name(): string {
+    return this.identifier.value;
+  }
+
+  public visit(visitor: AstVisitor): void {
+    return visitor.visitVariableDeclaration(this);
+  }
+}
+
 export abstract class AstLiteralExpression extends AstNode {
   constructor(protected readonly token: Token) {
     super();
@@ -122,7 +146,7 @@ export class AstFunctionDeclaration extends AstNode {
     public readonly beginToken: Token,
     public readonly endToken: Token,
     public readonly parameters: AstLiteralIdentifier[],
-    public readonly body: AstExpression[]
+    public readonly body: AstStatement[]
   ) {
     super();
   }

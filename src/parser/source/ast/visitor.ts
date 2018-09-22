@@ -7,6 +7,7 @@ import {
   AstLiteralNumber,
   AstLiteralString,
   AstParenthesizedExpression,
+  AstVariableDeclaration,
 } from './node';
 
 export abstract class AstVisitor {
@@ -20,6 +21,10 @@ export abstract class AstVisitor {
     for (const e of node.body) {
       e.visit(this);
     }
+  }
+
+  public visitVariableDeclaration(node: AstVariableDeclaration): void {
+    node.value.visit(this);
   }
 
   public abstract visitLiteralBoolean(node: AstLiteralBoolean): void;
@@ -63,6 +68,13 @@ export class PrintTreeVisitor extends AstVisitor {
     this.write(`FunctionDeclaration (name = ${node.name})`);
     this.indentMore();
     super.visitFunctionDeclaration(node);
+    this.indentLess();
+  }
+
+  public visitVariableDeclaration(node: AstVariableDeclaration): void {
+    this.write(`VariableDeclaration (name = ${node.name})`);
+    this.indentMore();
+    super.visitVariableDeclaration(node);
     this.indentLess();
   }
 
