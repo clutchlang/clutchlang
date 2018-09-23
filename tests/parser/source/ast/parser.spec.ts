@@ -4,6 +4,7 @@ import { parse } from '../../../../src/parser/parse';
 import {
   AstCompilationUnit,
   AstFunctionDeclaration,
+  AstIfExpression,
   AstInvocationExpression,
   AstLiteralBoolean,
   AstLiteralIdentifier,
@@ -64,6 +65,9 @@ describe('AstParser', () => {
         if (e instanceof AstParenthesizedExpression) {
           return `(...)`;
         }
+        if (e instanceof AstIfExpression) {
+          return `if ...`;
+        }
         return e.value;
       })
     ).toEqual([1, 1.5, -1, -1.5, 'Hello', true, false, 'foobar']);
@@ -123,7 +127,15 @@ it('AstNode.beginToken/endToken should be set', () => {
     fn2(a b) => {
       a
       b
+      if a {
+        1
+      } else {
+        2
+      }
+      if b 3
     }
+
+    fnif(a) => if a true else false
   `);
   const tokens: Token[] = [];
   unit.visit(new WalkTokensVisitor(tokens));
@@ -156,6 +168,11 @@ class WalkTokensVisitor extends AstVisitor {
   public visitFunctionDeclaration(node: AstFunctionDeclaration): void {
     this.visitTokens(node);
     super.visitFunctionDeclaration(node);
+  }
+
+  public visitIfExpression(node: AstIfExpression): void {
+    this.visitTokens(node);
+    super.visitIfExpression(node);
   }
 
   public visitVariableDeclaration(node: AstVariableDeclaration): void {

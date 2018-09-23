@@ -34,6 +34,18 @@ describe('JsOutputTranspiler', () => {
       noReturn => {
         let variable = 5
       }
+
+      withIf => if true 1
+
+      withIfElse => if true 1 else 2
+
+      withIfStatement => {
+        if (true) {
+          print(1)
+        } else {
+          print(2)
+        }
+      }
     `);
     const visitor = new JsOutputTranspiler();
     expect(program.visit(visitor)).toMatchSnapshot();

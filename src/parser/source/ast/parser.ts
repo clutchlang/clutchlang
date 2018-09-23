@@ -9,6 +9,7 @@ import {
   AstCompilationUnit,
   AstExpression,
   AstFunctionDeclaration,
+  AstIfExpression,
   AstInvocationExpression,
   AstLiteralBoolean,
   AstLiteralIdentifier,
@@ -40,6 +41,8 @@ export class AstParser {
   private parseExpression(): AstExpression | undefined {
     const token = this.scanner.peek();
     switch (token.kind) {
+      case StringToken.If:
+        return this.parseIfExpression();
       case SymbolToken.LParen:
         const beginToken = this.scanRequired(SymbolToken.LParen);
         const expressions = this.parseExpressions();
@@ -75,6 +78,32 @@ export class AstParser {
       default:
         return undefined;
     }
+  }
+
+  private parseIfExpression(): AstIfExpression {
+    const beginIf = this.scanRequired(StringToken.If);
+    let endIf: Token;
+    const exprIf = this.parseExpression()!;
+    let exprBody: AstStatement[];
+    if (this.scanOptional(SymbolToken.LCurly)) {
+      exprBody = this.parseStatements();
+      endIf = this.scanRequired(SymbolToken.RCurly);
+    } else {
+      exprBody = [this.parseExpression()!];
+      endIf = exprBody[0].endToken;
+    }
+    const beginElse = this.scanOptional(StringToken.Else);
+    let elseBody: AstStatement[] = [];
+    if (beginElse) {
+      if (this.scanOptional(SymbolToken.LCurly)) {
+        elseBody = this.parseStatements();
+        endIf = this.scanRequired(SymbolToken.RCurly);
+      } else {
+        elseBody = [this.parseExpression()!];
+        endIf = elseBody[0].endToken;
+      }
+    }
+    return new AstIfExpression(beginIf, exprIf, exprBody, elseBody, endIf);
   }
 
   private parseFunctionDeclaration(): AstFunctionDeclaration {

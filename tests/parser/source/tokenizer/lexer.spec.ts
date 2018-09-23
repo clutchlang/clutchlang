@@ -324,6 +324,66 @@ it('should lex a function with a return statement', () => {
   ]);
 });
 
+describe('If expressions', () => {
+  it('should lex a simple if/then', () => {
+    const scanner = new SourceScanner(`
+      f => if true 1
+  `);
+    const lexer = new Lexer(scanner);
+    expect(Array.from(lexer)).toMatchObject([
+      token(RegExpToken.Identifier, 'f'),
+      token(StringToken.Arrow),
+      token(StringToken.If),
+      token(RegExpToken.LiteralBoolean, 'true'),
+      token(RegExpToken.LiteralNumber, '1'),
+    ]);
+  });
+
+  it('should lex a simple if/then/else', () => {
+    const scanner = new SourceScanner(`
+      f => if true 1 else 2
+  `);
+    const lexer = new Lexer(scanner);
+    expect(Array.from(lexer)).toMatchObject([
+      token(RegExpToken.Identifier, 'f'),
+      token(StringToken.Arrow),
+      token(StringToken.If),
+      token(RegExpToken.LiteralBoolean, 'true'),
+      token(RegExpToken.LiteralNumber, '1'),
+      token(StringToken.Else),
+      token(RegExpToken.LiteralNumber, '2'),
+    ]);
+  });
+
+  it('should lex if/then/else with blocks', () => {
+    const scanner = new SourceScanner(`
+      f => {
+        if true {
+          1
+        } else {
+          2
+        }
+      }
+    `);
+    const lexer = new Lexer(scanner);
+    expect(Array.from(lexer)).toMatchObject([
+      token(RegExpToken.Identifier, 'f'),
+      token(StringToken.Arrow),
+      token(SymbolToken.LCurly),
+      token(StringToken.If),
+      token(RegExpToken.LiteralBoolean, 'true'),
+      token(SymbolToken.LCurly),
+      token(RegExpToken.LiteralNumber, '1'),
+      token(SymbolToken.RCurly),
+      token(StringToken.Else),
+      token(SymbolToken.LCurly),
+      token(RegExpToken.LiteralNumber, '2'),
+      token(SymbolToken.RCurly),
+      token(SymbolToken.RCurly),
+    ]);
+  });
+});
+
 describe('should catch lexing errors', () => {
   it('expected identifier', () => {
     const scanner = new SourceScanner('$ => {}');
