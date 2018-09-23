@@ -27,7 +27,7 @@ import { AstVisitor } from '../parser/source/ast/visitor';
 export class JsOutputTranspiler extends AstVisitor {
   public visitCompilationUnit(node: AstCompilationUnit): string {
     const output = node.functions.map(e => e.visit(this)).join('\n');
-    return prettier.format(output, {parser: 'babylon'});
+    return prettier.format(output, { parser: 'babylon' });
   }
 
   public visitFunctionDeclaration(node: AstFunctionDeclaration): string {
@@ -63,7 +63,11 @@ export class JsOutputTranspiler extends AstVisitor {
     return ` (function () {
         if (${node.ifExpression.visit(this)}) {
           ${this.visitExpressionBody(node.ifBody)}
-        }${node.elseBody.length ? ` else {\n          ${this.visitExpressionBody(node.elseBody)}\n}` : ''}
+        }${
+          node.elseBody.length
+            ? ` else {\n          ${this.visitExpressionBody(node.elseBody)}\n}`
+            : ''
+        }
       })()
     `;
   }
