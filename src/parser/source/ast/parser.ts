@@ -53,7 +53,8 @@ export class AstParser {
           expressions
         );
       case RegExpToken.Identifier:
-        if (this.scanner.peek(1).kind === SymbolToken.LParen) {
+        const nextToken = this.scanner.peek(1);
+        if (nextToken && nextToken.kind === SymbolToken.LParen) {
           const identifier = this.scanner.read();
           this.scanRequired(SymbolToken.LParen);
           // tslint:disable-next-line:no-shadowed-variable

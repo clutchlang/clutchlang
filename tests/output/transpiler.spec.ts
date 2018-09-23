@@ -46,6 +46,8 @@ describe('JsOutputTranspiler', () => {
           print(2)
         }
       }
+
+      ternary(a b c) => if a b else c
     `);
     const visitor = new JsOutputTranspiler();
     expect(program.visit(visitor)).toMatchSnapshot();

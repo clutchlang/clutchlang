@@ -93,6 +93,14 @@ describe('AstParser', () => {
   });
 });
 
+it('should parse a function that uses identifiers with if', () => {
+  const unit = parse(`
+    ternary(a b c) => if a b else c
+  `);
+  expect(unit.functions[0].parameters.map(e => e.name)).toEqual(['a', 'b', 'c']);
+  expect(unit.functions[0].body[0]).toBeInstanceOf(AstIfExpression);
+});
+
 it('AstNode.beginToken/endToken should be set', () => {
   const unit = parse(`
     main => {
