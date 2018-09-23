@@ -65,6 +65,16 @@ function withIfStatement() {
     }
   })();
 }
+
+function ternary(a, b, c) {
+  return (function() {
+    if (a) {
+      return b;
+    } else {
+      return c;
+    }
+  })();
+}
 "
 `;
 
