@@ -39,8 +39,7 @@ function noReturn() {
 }
 
 function withIf() {
-  return;
-  (function() {
+  return (function() {
     if (true) {
       return 1;
     }
@@ -48,8 +47,7 @@ function withIf() {
 }
 
 function withIfElse() {
-  return;
-  (function() {
+  return (function() {
     if (true) {
       return 1;
     } else {
@@ -59,8 +57,7 @@ function withIfElse() {
 }
 
 function withIfStatement() {
-  return;
-  (function() {
+  return (function() {
     if (true) {
       return console.log(1);
     } else {
