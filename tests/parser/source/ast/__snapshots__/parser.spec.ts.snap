@@ -8,9 +8,9 @@ Array [
     "value": "main",
   },
   Object {
-    "kind": "}",
-    "offset": "379 -> 380",
-    "value": "}",
+    "kind": "Boolean",
+    "offset": "481 -> 486",
+    "value": "false",
   },
   Object {
     "kind": "Identifier",
@@ -329,7 +329,7 @@ Array [
   },
   Object {
     "kind": "}",
-    "offset": "379 -> 380",
+    "offset": "448 -> 449",
     "value": "}",
   },
   Object {
@@ -351,6 +351,126 @@ Array [
     "kind": "Identifier",
     "offset": "373 -> 374",
     "value": "b",
+  },
+  Object {
+    "kind": "if",
+    "offset": "381 -> 383",
+    "value": "if",
+  },
+  Object {
+    "kind": "}",
+    "offset": "429 -> 430",
+    "value": "}",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "384 -> 385",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "384 -> 385",
+    "value": "a",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "396 -> 397",
+    "value": "1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "396 -> 397",
+    "value": "1",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "421 -> 422",
+    "value": "2",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "421 -> 422",
+    "value": "2",
+  },
+  Object {
+    "kind": "if",
+    "offset": "437 -> 439",
+    "value": "if",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "442 -> 443",
+    "value": "3",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "440 -> 441",
+    "value": "b",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "440 -> 441",
+    "value": "b",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "442 -> 443",
+    "value": "3",
+  },
+  Object {
+    "kind": "Number",
+    "offset": "442 -> 443",
+    "value": "3",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "455 -> 459",
+    "value": "fnif",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "481 -> 486",
+    "value": "false",
+  },
+  Object {
+    "kind": "if",
+    "offset": "466 -> 468",
+    "value": "if",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "481 -> 486",
+    "value": "false",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "469 -> 470",
+    "value": "a",
+  },
+  Object {
+    "kind": "Identifier",
+    "offset": "469 -> 470",
+    "value": "a",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "471 -> 475",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "471 -> 475",
+    "value": "true",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "481 -> 486",
+    "value": "false",
+  },
+  Object {
+    "kind": "Boolean",
+    "offset": "481 -> 486",
+    "value": "false",
   },
 ]
 `;

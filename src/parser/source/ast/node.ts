@@ -31,6 +31,7 @@ export type AstExpression =
   | AstLiteralNumber
   | AstLiteralString
   | AstLiteralIdentifier
+  | AstIfExpression
   | AstInvocationExpression
   | AstParenthesizedExpression;
 
@@ -129,6 +130,22 @@ export class AstLiteralString extends AstLiteralExpression {
 
   public visit(visitor: AstVisitor): void {
     return visitor.visitLiteralString(this);
+  }
+}
+
+export class AstIfExpression extends AstNode {
+  constructor(
+    public readonly beginToken: Token,
+    public readonly ifExpression: AstExpression,
+    public readonly ifBody: AstStatement[],
+    public readonly elseBody: AstStatement[],
+    public readonly endToken: Token
+  ) {
+    super();
+  }
+
+  public visit(visitor: AstVisitor): void {
+    return visitor.visitIfExpression(this);
   }
 }
 

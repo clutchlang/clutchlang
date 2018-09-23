@@ -1,6 +1,8 @@
+import * as prettier from 'prettier';
 import {
   AstCompilationUnit,
   AstFunctionDeclaration,
+  AstIfExpression,
   AstInvocationExpression,
   AstLiteralBoolean,
   AstLiteralIdentifier,
@@ -24,7 +26,8 @@ import { AstVisitor } from '../parser/source/ast/visitor';
  */
 export class JsOutputTranspiler extends AstVisitor {
   public visitCompilationUnit(node: AstCompilationUnit): string {
-    return node.functions.map(e => e.visit(this)).join('\n');
+    const output = node.functions.map(e => e.visit(this)).join('\n');
+    return prettier.format(output, {parser: 'babylon'});
   }
 
   public visitFunctionDeclaration(node: AstFunctionDeclaration): string {
@@ -54,6 +57,15 @@ export class JsOutputTranspiler extends AstVisitor {
 
   public visitLiteralIdentifier(node: AstLiteralIdentifier): string {
     return node.name.toString();
+  }
+
+  public visitIfExpression(node: AstIfExpression): string {
+    return ` (function () {
+        if (${node.ifExpression.visit(this)}) {
+          ${this.visitExpressionBody(node.ifBody)}
+        }${node.elseBody.length ? ` else {\n          ${this.visitExpressionBody(node.elseBody)}\n}` : ''}
+      })()
+    `;
   }
 
   public visitInvocationExpression(node: AstInvocationExpression): string {

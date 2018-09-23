@@ -33,6 +33,8 @@ export class SymbolToken {
 
 export class StringToken {
   public static readonly Arrow = new StringToken('=>');
+  public static readonly Else = new StringToken('else');
+  public static readonly If = new StringToken('if');
   public static readonly Let = new StringToken('let');
   public static readonly Return = new StringToken('return');
 

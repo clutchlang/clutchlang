@@ -17,8 +17,7 @@ export class Lexer implements Iterable<Token> {
   /**
    * Invalid identifiers.
    */
-
-  private static readonly keywords = new Set(['true', 'false', 'let']);
+  private static readonly keywords = new Set(['true', 'false', 'let', 'if']);
 
   constructor(private readonly scanner: SourceScanner) {}
 
@@ -86,6 +85,18 @@ export class Lexer implements Iterable<Token> {
     const literal = this.scanLiteral();
     if (literal) {
       yield literal;
+      return;
+    }
+    const startIf = this.scanOptional(StringToken.If);
+    if (startIf) {
+      yield startIf;
+      yield* this.scanExpression();
+      yield* this.scanExpressionOrStatementBlock();
+      const startElse = this.scanOptional(StringToken.Else);
+      if (startElse) {
+        yield startElse;
+        yield* this.scanExpressionOrStatementBlock();
+      }
       return;
     }
     const identifier = this.scanOptional(RegExpToken.Identifier);

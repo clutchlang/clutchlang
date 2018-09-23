@@ -35,7 +35,7 @@ export class TokenScanner {
     let offset = 0;
     for (const kind of kinds) {
       const nextToken = this.peek(offset++);
-      if (nextToken.kind.name !== kind.name) {
+      if (!nextToken || nextToken.kind.name !== kind.name) {
         this.mLastMatch = [];
         return false;
       }

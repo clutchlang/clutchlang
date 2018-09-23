@@ -60,5 +60,35 @@ exports[`PrintTreeVisitor should emit a readable structure for a program 1`] = `
         LiteralIdentifier: print
       Args:
         LiteralString: Hello World
+    FunctionDeclaration (name = hasIfExpression)
+      IfExpression
+        If
+          LiteralIdentifier: a
+        Then
+          LiteralBoolean: true
+        Else
+          LiteralBoolean: false
+    FunctionDeclaration (name = hasIfStatements)
+      IfExpression
+        If
+          ParenthesizedExpression:
+            LiteralBoolean: true
+        Then
+          InvocationExpression:
+            Target:
+              LiteralIdentifier: print
+            Args:
+              LiteralNumber: 1
+          Else
+            InvocationExpression:
+              Target:
+                LiteralIdentifier: print
+              Args:
+                LiteralNumber: 2
+          IfExpression
+            If
+              LiteralBoolean: false
+            Then
+              LiteralNumber: 3
 "
 `;

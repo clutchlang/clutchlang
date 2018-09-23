@@ -18,6 +18,15 @@ describe('PrintTreeVisitor', () => {
       hasInvocationBody => {
         print('Hello World')
       }
+      hasIfExpression(a) => if a true else false
+      hasIfStatements => {
+        if (true) {
+          print(1)
+        } else {
+          print(2)
+        }
+        if false 3
+      }
     `);
     expect(program.visit(visitor)).toMatchSnapshot();
   });

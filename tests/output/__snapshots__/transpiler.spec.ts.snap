@@ -1,69 +1,80 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JsOutputTranspiler should support "Hello World" 1`] = `
+"function main() {
+  return console.log(\\"Hello World\\");
+}
+main();
 "
-      function main() {
-      return  console.log('Hello World');
-
-      }
-      main();
-    "
 `;
 
 exports[`JsOutputTranspiler should support functions with parameters 1`] = `
+"function print2(a, b) {
+  console.log(a);
+  return console.log(b);
+}
 "
-      function print2(a, b) {
-      console.log(a);
-return  console.log(b);
-
-      }
-      
-    "
 `;
 
 exports[`JsOutputTranspiler should support most ast nodes 1`] = `
+"function example() {
+  true;
+  1;
+  (\\"Hello\\");
+  foobar;
+  method(false);
+  return f(1, 2);
+}
+
+function explicit() {
+  return true;
+}
+
+function implicit() {
+  return true;
+}
+
+function noReturn() {
+  let variable = 5;
+}
+
+function withIf() {
+  return;
+  (function() {
+    if (true) {
+      return 1;
+    }
+  })();
+}
+
+function withIfElse() {
+  return;
+  (function() {
+    if (true) {
+      return 1;
+    } else {
+      return 2;
+    }
+  })();
+}
+
+function withIfStatement() {
+  return;
+  (function() {
+    if (true) {
+      return console.log(1);
+    } else {
+      return console.log(2);
+    }
+  })();
+}
 "
-      function example() {
-      true;
-1;
-'Hello';
-foobar;
-method(false);
-return  f(1, 2);
-
-      }
-      
-    
-
-      function explicit() {
-      return true;
-
-      }
-      
-    
-
-      function implicit() {
-      return  true;
-
-      }
-      
-    
-
-      function noReturn() {
-      let variable = 5;
-
-      }
-      
-    "
 `;
 
 exports[`JsOutputTranspiler should support parenthesized ast nodes 1`] = `
+"function example() {
+  true, false;
+  return false, true;
+}
 "
-      function example() {
-      (true, false);
-return  (false, true);
-
-      }
-      
-    "
 `;

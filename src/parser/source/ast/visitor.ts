@@ -1,6 +1,7 @@
 import {
   AstCompilationUnit,
   AstFunctionDeclaration,
+  AstIfExpression,
   AstInvocationExpression,
   AstLiteralBoolean,
   AstLiteralIdentifier,
@@ -35,6 +36,16 @@ export abstract class AstVisitor {
 
   public visitParenthesizedExpression(node: AstParenthesizedExpression): void {
     for (const e of node.body) {
+      e.visit(this);
+    }
+  }
+
+  public visitIfExpression(node: AstIfExpression): void {
+    node.ifExpression.visit(this);
+    for (const b of node.ifBody) {
+      b.visit(this);
+    }
+    for (const e of node.elseBody) {
       e.visit(this);
     }
   }
@@ -80,6 +91,26 @@ export class PrintTreeVisitor extends AstVisitor {
     this.write(`VariableDeclaration (name = ${node.name})`);
     this.indentMore();
     super.visitVariableDeclaration(node);
+    this.indentLess();
+  }
+
+  public visitIfExpression(node: AstIfExpression): void {
+    this.write('IfExpression');
+    this.indentMore();
+    this.write('If');
+    this.indentMore();
+    node.ifExpression.visit(this);
+    this.indentLess();
+    this.write('Then');
+    this.indentMore();
+    node.ifBody.forEach(e => e.visit(this));
+    this.indentLess();
+    if (node.elseBody.length > 0) {
+      this.write('Else');
+      this.indentMore();
+      node.elseBody.forEach(e => e.visit(this));
+      this.indentLess();
+    }
     this.indentLess();
   }
 
