@@ -21,7 +21,7 @@ export function splitLines(text: string): string[] {
   let sliceStart = 0;
   let currentChar = 0;
   for (let i = 0; i < length; i++) {
-    let previousChar = currentChar;
+    const previousChar = currentChar;
     currentChar = text.codePointAt(i)!;
     if (currentChar !== Characters.CR) {
       if (currentChar !== Characters.LF) {

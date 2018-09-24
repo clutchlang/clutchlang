@@ -1,7 +1,9 @@
+// tslint:disable:no-magic-numbers
+
 import {
   SourceSpan,
-  UnexpectedTokenError,
   Token,
+  UnexpectedTokenError,
 } from '../../src/agnostic/scanner';
 
 describe('SourceSpan', () => {

@@ -80,7 +80,7 @@ export class SourceSpan {
 export type ErrorReporter = (
   span: SourceSpan,
   error: ScanningError
-) => Token | Array<Token> | void;
+) => Token | Token[] | void;
 
 /**
  * Error types that may be provided to a @see ErrorReporter.
