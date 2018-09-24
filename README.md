@@ -55,11 +55,15 @@ $ npm run clc -- -w
 
 ::= 
  [`IDENTIFIER`](#identifier) `=>`
- [`EXPRESSION`](#expression) | `{` [`EXPRESSION`](#expression)+ `}`
+ [`BLOCK`](#block)
 
 ### `IDENTIFIER`
 
 ::= `/[_a-zA-Z][_a-zA-Z0-9]{0,30}/`
+
+### `BLOCK`
+
+::= [`STATEMENT`](#statement) | `{` [`STATEMENT`](#statement)+ `}`
 
 ### `STATEMENT`
 
@@ -81,17 +85,23 @@ $ npm run clc -- -w
 ::= 
   [`LITERAL`](#literal) |
   [`PARENTHESIZED`](#parenthesized) |
+  [`IF`](#if) |
   [`INVOCATION`](#invocation)
 
 #### `PARENTHESIZED`
 
 ::=
-  `(` [`EXPRESSION`](#expression)+ `)`
+  `(` [`EXPRESSION`](#expression) `)`
+
+#### `IF`
+
+::= `if` [`EXPRESSION`](#expression) [`BLOCK`](#BLOCK)
+  [`else` [`BLOCK`](#BLOCK)]
 
 #### `INVOCATION`
 
 ::=
- [`EXPRESSION`](#expression) `(` [`EXPRESSION`](#expression)+ `)`
+ [`EXPRESSION`](#expression) `.` `(` [`EXPRESSION`](#expression)+ `)`
 
 #### `LITERAL`
 
