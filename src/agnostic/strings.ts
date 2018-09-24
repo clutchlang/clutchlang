@@ -2,9 +2,6 @@
  * Character codes that will be frequently referred to across the program.
  */
 export const enum Characters {
-  CR = 13,
-  LF = 10,
-
   // Numbers
   $0 = 48,
   $1 = 49,
@@ -16,6 +13,56 @@ export const enum Characters {
   $7 = 55,
   $8 = 56,
   $9 = 57,
+
+  // Letters
+  $A = 65,
+  $Z = 90,
+  $a = 97,
+  $z = 122,
+
+  // Symbols
+  $_ = 95,
+
+  // Misc
+  $CR = 13,
+  $LF = 10,
+  $SPACE = 32,
+  $TAB = 9,
+}
+
+/**
+ * Returns whether @param character is considered a digit.
+ */
+export function isDigit(character: number): boolean {
+  return character >= Characters.$0 && character <= Characters.$9;
+}
+
+/**
+ * Returns whether @param character is considered a letter.
+ */
+export function isLetter(character: number): boolean {
+  return (
+    (character >= Characters.$A && character <= Characters.$Z) ||
+    (character >= Characters.$a && character <= Characters.$z)
+  );
+}
+
+/**
+ * Returns whether @param character is considered a new line terminator.
+ */
+export function isNewLine(character: number): boolean {
+  return character === Characters.$CR || character === Characters.$LF;
+}
+
+/**
+ * Returns whether @param character is considered whitespace.
+ */
+export function isWhiteSpace(character: number): boolean {
+  return (
+    character === Characters.$SPACE ||
+    character === Characters.$TAB ||
+    isNewLine(character)
+  );
 }
 
 /**
@@ -35,11 +82,11 @@ export function splitLines(text: string): string[] {
   for (let i = 0; i < length; i++) {
     const previousChar = currentChar;
     currentChar = text.codePointAt(i)!;
-    if (currentChar !== Characters.CR) {
-      if (currentChar !== Characters.LF) {
+    if (currentChar !== Characters.$CR) {
+      if (currentChar !== Characters.$LF) {
         continue;
       }
-      if (previousChar === Characters.CR) {
+      if (previousChar === Characters.$CR) {
         sliceStart = i + 1;
         continue;
       }

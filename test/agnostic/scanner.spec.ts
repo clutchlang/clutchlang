@@ -2,10 +2,10 @@
 
 import {
   SourceFile,
+  StringLexer,
   StringScanner,
   StringSpan,
 } from '../../src/agnostic/scanner';
-import { Characters } from '../../src/agnostic/strings';
 
 describe('StringSpan', () => {
   describe('should throw on an invalid', () => {
@@ -111,11 +111,11 @@ describe('StringScanner', () => {
     expect(scanner.hasNext()).toBe(true);
     expect(scanner.hasNext($1)).toBe(true);
     expect(scanner.hasNext($2)).toBe(false);
-    expect(scanner.next()).toBe('1');
+    scanner.advance();
     expect(scanner.hasNext($2)).toBe(true);
     expect(scanner.hasNext($3)).toBe(false);
-    expect(scanner.next()).toBe('2');
-    expect(scanner.next()).toBe('3');
+    scanner.advance();
+    scanner.advance();
     expect(scanner.hasNext()).toBe(false);
   });
 
@@ -130,25 +130,24 @@ describe('StringScanner', () => {
     expect(scanner.hasNext('333')).toBe(true);
   });
 
-  it('should return tokens', () => {
-    const scanner = new StringScanner('122333');
-    expect(scanner.next(Characters.$1)).toBe('1');
-    expect(scanner.next('22')).toBe('22');
-  });
-
   it('should reset the scanner', () => {
     const scanner = new StringScanner('A');
     expect(scanner.position).toBe(0);
-    scanner.next();
+    scanner.advance();
     expect(scanner.position).toBe(1);
     scanner.reset();
     expect(scanner.position).toBe(0);
   });
+});
 
-  it('should catch errors throw by the scanner', () => {
-    const scanner = new StringScanner('122333');
-    expect(() => scanner.next(Characters.$2)).toThrowErrorMatchingSnapshot();
-    scanner.next(Characters.$1);
-    expect(() => scanner.next('33')).toThrowErrorMatchingSnapshot();
-  });
+it('StringLexer should scan and fetch tokens', () => {
+  const lexer = new StringLexer(new StringScanner('AAA111if'));
+  expect(lexer.scanWhiteSpace()).toBe(false);
+  expect(lexer.scanLetters()).toBe(true);
+  expect(lexer.nextToken).toBe('AAA');
+  expect(lexer.scanDigits()).toBe(true);
+  expect(lexer.nextToken).toBe('111');
+  expect(lexer.scanExactly('else')).toBe(false);
+  expect(lexer.scanExactly('if')).toBe(true);
+  expect(lexer.nextToken).toBe('if');
 });

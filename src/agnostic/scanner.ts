@@ -1,5 +1,11 @@
 import { assertMin, assertRange } from './errors';
-import { Characters, splitLines } from './strings';
+import {
+  Characters,
+  isDigit,
+  isLetter,
+  isWhiteSpace,
+  splitLines,
+} from './strings';
 
 /**
  * Represents a line of @member text with a @member line number.
@@ -211,13 +217,16 @@ export class SourceFile {
     this.mLineStartsCache = [];
     for (let i = 0; i < this.length; i++) {
       let c = this.contents.charCodeAt(i);
-      if (c === Characters.CR) {
+      if (c === Characters.$CR) {
         const j = i + 1;
-        if (j >= this.length || this.contents.charCodeAt(j) !== Characters.LF) {
-          c = Characters.LF;
+        if (
+          j >= this.length ||
+          this.contents.charCodeAt(j) !== Characters.$LF
+        ) {
+          c = Characters.$LF;
         }
       }
-      if (c === Characters.LF) {
+      if (c === Characters.$LF) {
         this.mLineStartsCache.push(i + 1);
       }
     }
@@ -301,29 +310,17 @@ export class StringScanner {
   }
 
   /**
-   * Returns the next token, throwing @see UnexpectedTokenException on no match.
+   * Returns the next character and advances the position counter.
    */
-  public next(pattern?: number | string): string {
-    if (pattern === undefined) {
-      return String.fromCharCode(this.data.charCodeAt(this.position++));
-    }
-    if (typeof pattern === 'number') {
-      const nextChar = this.data.charCodeAt(this.position);
-      if (pattern === nextChar) {
-        this.position++;
-        return String.fromCharCode(pattern);
-      }
-      throw new UnexpectedTokenException(
-        String.fromCharCode(pattern),
-        String.fromCharCode(nextChar)
-      );
-    }
-    const substring = this.substring();
-    if (substring.startsWith(pattern)) {
-      this.position += pattern.length;
-      return pattern;
-    }
-    throw new UnexpectedTokenException(pattern);
+  public advance(): number {
+    return this.data.charCodeAt(this.position++);
+  }
+
+  /**
+   * Returns the next character.
+   */
+  public peek(): number {
+    return this.data.charCodeAt(this.position);
   }
 
   /**
@@ -334,17 +331,78 @@ export class StringScanner {
   }
 }
 
-export class UnexpectedTokenException extends Error {
-  constructor(
-    public readonly expected: string,
-    public readonly received?: string
-  ) {
-    super();
+/**
+ * A higher-level lexer built on top of @see StringScanner.
+ */
+export class StringLexer {
+  private mPosition = 0;
+
+  constructor(private readonly scanner: StringScanner) {}
+
+  /**
+   * Return a string representing all scanned characters so far.
+   */
+  public get nextToken(): string {
+    const result = this.scanner.substring(
+      this.mPosition,
+      this.scanner.position
+    );
+    this.mPosition = this.scanner.position;
+    return result;
   }
 
-  public get message(): string {
-    return `Expected "${this.expected}"${
-      this.received ? `, got "${this.received}"` : ''
-    }.`;
+  /**
+   * Advances the scanner if exactly @param substring is found.
+   *
+   * Returns whether the substring was found.
+   */
+  public scanExactly(substring: string): boolean {
+    const found = this.scanner.hasNext(substring);
+    if (found) {
+      this.scanner.position += substring.length;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Advances the scanner until a non-digit is found.
+   *
+   * Returns whether at least a single digit character was found.
+   */
+  public scanDigits(): boolean {
+    return this.scanUntil(isDigit);
+  }
+
+  /**
+   * Advances the scanner until a non-letter is found.
+   *
+   * Returns whether at least a single letter character was found.
+   */
+  public scanLetters(): boolean {
+    return this.scanUntil(isLetter);
+  }
+
+  /**
+   * Advances the scanner until non-whitespace is found.
+   *
+   * Returns whether at least a single whitespace character was found.
+   */
+  public scanWhiteSpace(): boolean {
+    return this.scanUntil(isWhiteSpace);
+  }
+
+  /**
+   * Advances the scanner until @param predicate returns false.
+   *
+   * Returns whether the scanner was advanced forward at least once.
+   */
+  public scanUntil(predicate: (character: number) => boolean): boolean {
+    let success = false;
+    while (predicate(this.scanner.peek())) {
+      this.scanner.advance();
+      success = true;
+    }
+    return success;
   }
 }
