@@ -1,5 +1,5 @@
-import { Characters, splitLines } from './strings';
 import { assertMin, assertRange } from './errors';
+import { Characters, splitLines } from './strings';
 
 /**
  * Represents a line of @member text with a @member line number.
@@ -283,27 +283,47 @@ export class StringScanner {
   }
 
   /**
-   * Returns whether another token exists.
+   * Returns whether the next token(s) match the provided pattern.
    */
-  public hasNext(): boolean;
-
-  /**
-   * Returns whether the next token is @param char.
-   */
-  public hasNext(char: number): boolean;
-
-  public hasNext(char?: number): boolean {
+  public hasNext(pattern?: number | string): boolean {
     const position = this.position;
-    return position < this.length && char === undefined || this.data.charCodeAt(position) === char;
+    if (position === this.length) {
+      return false;
+    }
+    if (pattern === undefined) {
+      return true;
+    }
+    if (typeof pattern === 'number') {
+      return this.data.charCodeAt(position) === pattern;
+    }
+    const substring = this.substring();
+    return substring.startsWith(pattern);
   }
 
   /**
-   * Returns the next character.
-   * 
-   * Throws a @see RangeError if there is no remaining characters.
+   * Returns the next token, throwing @see UnexpectedTokenException on no match.
    */
-  public nextChar(): number {
-    return this.data.charCodeAt(this.position++);
+  public next(pattern?: number | string): string {
+    if (pattern === undefined) {
+      return String.fromCharCode(this.data.charCodeAt(this.position++));
+    }
+    if (typeof pattern === 'number') {
+      const nextChar = this.data.charCodeAt(this.position);
+      if (pattern === nextChar) {
+        this.position++;
+        return String.fromCharCode(pattern);
+      }
+      throw new UnexpectedTokenException(
+        String.fromCharCode(pattern),
+        String.fromCharCode(nextChar)
+      );
+    }
+    const substring = this.substring();
+    if (substring.startsWith(pattern)) {
+      this.position += pattern.length;
+      return pattern;
+    }
+    throw new UnexpectedTokenException(pattern);
   }
 
   /**
@@ -311,5 +331,20 @@ export class StringScanner {
    */
   public reset(): void {
     this.position = 0;
+  }
+}
+
+export class UnexpectedTokenException extends Error {
+  constructor(
+    public readonly expected: string,
+    public readonly received?: string
+  ) {
+    super();
+  }
+
+  public get message(): string {
+    return `Expected "${this.expected}"${
+      this.received ? `, got "${this.received}"` : ''
+    }.`;
   }
 }
