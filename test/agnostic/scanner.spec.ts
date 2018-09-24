@@ -2,9 +2,9 @@
 
 import {
   SourceFile,
+  StringLexer,
   StringScanner,
   StringSpan,
-  StringLexer,
 } from '../../src/agnostic/scanner';
 
 describe('StringSpan', () => {

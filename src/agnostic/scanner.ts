@@ -1,5 +1,11 @@
 import { assertMin, assertRange } from './errors';
-import { Characters, splitLines, isDigit, isLetter, isWhiteSpace } from './strings';
+import {
+  Characters,
+  isDigit,
+  isLetter,
+  isWhiteSpace,
+  splitLines,
+} from './strings';
 
 /**
  * Represents a line of @member text with a @member line number.
@@ -337,14 +343,17 @@ export class StringLexer {
    * Return a string representing all scanned characters so far.
    */
   public get nextToken(): string {
-    const result = this.scanner.substring(this.mPosition, this.scanner.position);
+    const result = this.scanner.substring(
+      this.mPosition,
+      this.scanner.position
+    );
     this.mPosition = this.scanner.position;
     return result;
   }
 
   /**
    * Advances the scanner if exactly @param substring is found.
-   * 
+   *
    * Returns whether the substring was found.
    */
   public scanExactly(substring: string): boolean {
@@ -358,7 +367,7 @@ export class StringLexer {
 
   /**
    * Advances the scanner until a non-digit is found.
-   * 
+   *
    * Returns whether at least a single digit character was found.
    */
   public scanDigits(): boolean {
@@ -367,7 +376,7 @@ export class StringLexer {
 
   /**
    * Advances the scanner until a non-letter is found.
-   * 
+   *
    * Returns whether at least a single letter character was found.
    */
   public scanLetters(): boolean {
@@ -376,7 +385,7 @@ export class StringLexer {
 
   /**
    * Advances the scanner until non-whitespace is found.
-   * 
+   *
    * Returns whether at least a single whitespace character was found.
    */
   public scanWhiteSpace(): boolean {
@@ -385,7 +394,7 @@ export class StringLexer {
 
   /**
    * Advances the scanner until @param predicate returns false.
-   * 
+   *
    * Returns whether the scanner was advanced forward at least once.
    */
   public scanUntil(predicate: (character: number) => boolean): boolean {
