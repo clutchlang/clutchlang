@@ -1,4 +1,4 @@
-import { splitLines } from '../../src/agnostic/strings';
+import { splitLines, isDigit, isLetter, isNewLine, isWhiteSpace } from '../../src/agnostic/strings';
 
 describe('splitLines', () => {
   it('should split an empty string', () => {
@@ -31,5 +31,61 @@ describe('splitLines', () => {
 
   it('should split a string ending with a CR+LF (DOS-style)', () => {
     expect(splitLines('1\r\n')).toEqual(['1']);
+  });
+});
+
+describe('', () => {
+  function characters(string: string): number[] {
+    const characters: number[] = new Array(string.length);
+    for (let i = 0; i < string.length; i++) {
+      characters[i] = string.charCodeAt(i);
+    }
+    return characters;
+  }
+
+  test('isDigit should find digits', () => {
+    expect(Array.from(characters('1234567890A').map(isDigit))).toEqual([
+      true, // 1
+      true, // 2
+      true, // 3
+      true, // 4
+      true, // 5
+      true, // 6
+      true, // 7
+      true, // 8
+      true, // 9
+      true, // 0
+      false, // A
+    ]);
+  });
+
+  test('isDigit should find letters', () => {
+    expect(Array.from(characters('ABCabc1').map(isLetter))).toEqual([
+      true, // A
+      true, // B
+      true, // C
+      true, // a
+      true, // b
+      true, // c
+      false, // 1
+    ]);
+  });
+
+  test('isWhiteSpace should find letters', () => {
+    expect(Array.from(characters(' \t\n\rA').map(isWhiteSpace))).toEqual([
+      true, // 
+      true, // \t
+      true, // \n
+      true, // \r
+      false, // A
+    ]);
+  });
+
+  test('isNewLine should find new lines', () => {
+    expect(Array.from(characters('\n\r\t').map(isNewLine))).toEqual([
+      true, // \n
+      true, // \r
+      false, // \t
+    ]);
   });
 });
