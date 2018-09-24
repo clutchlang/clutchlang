@@ -1,4 +1,5 @@
 import { Characters, splitLines } from './strings';
+import { assertMin, assertRange } from './errors';
 
 /**
  * Represents a line of @member text with a @member line number.
@@ -101,15 +102,9 @@ export class StringSpan extends AbstractSpan {
     public readonly text: string
   ) {
     super();
-    if (offset < 0) {
-      throw new RangeError(`Invalid offset: ${offset}`);
-    }
-    if (column < 0) {
-      throw new RangeError(`Invalid column: ${column}`);
-    }
-    if (line < 0) {
-      throw new RangeError(`Invalid line: ${line}`);
-    }
+    assertMin('offset', offset);
+    assertMin('column', column);
+    assertMin('line', line);
   }
 }
 
@@ -251,36 +246,70 @@ export class FileSpan extends AbstractSpan {
 }
 
 /**
- * A function that handles receiving a @param span and @param error.
- *
- * May optionally return token(s) to recover from the error. Otherwise it is
- * expected the error reporting was fatal and that parsing should be immediately
- * stopped.
+ * A simple low-level scanner for incrementally reading data in a streaming manner.
  */
-export type ErrorReporter = (
-  span: ISourceSpan,
-  error: ScanningError
-) => Token | Token[] | void;
+export class StringScanner {
+  private mPosition = 0;
 
-/**
- * Error types that may be provided to a @see ErrorReporter.
- */
-export type ScanningError = UnexpectedTokenError;
+  constructor(private readonly data: string) {}
 
-/**
- * A syntax error that occurs as a result of an unexpected @member token.
- *
- * Optionally contains a @member context, or what was being parsed when the
- * error ocurrred, i.e. "argument list" or "function body". May be omitted if
- * the context is not clear or provided.
- */
-export class UnexpectedTokenError extends SyntaxError {
-  constructor(public readonly token: Token, public readonly context?: string) {
-    super(`Unexpected "token"${context ? ` in ${context}` : ''}.`);
+  /**
+   * Length of the data being read.
+   */
+  public get length(): number {
+    return this.data.length;
+  }
+
+  /**
+   * Current position of the scanner.
+   */
+  public get position(): number {
+    return this.mPosition;
+  }
+
+  /**
+   * Sets the current position of the scanner.
+   */
+  public set position(position: number) {
+    assertRange('position', position, 0, this.length);
+    this.mPosition = position;
+  }
+
+  /**
+   * Returns a substring of the underlying data of @param start -> @param end.
+   */
+  public substring(start = this.position, end = this.length): string {
+    return this.data.substring(start, end);
+  }
+
+  /**
+   * Returns whether another token exists.
+   */
+  public hasNext(): boolean;
+
+  /**
+   * Returns whether the next token is @param char.
+   */
+  public hasNext(char: number): boolean;
+
+  public hasNext(char?: number): boolean {
+    const position = this.position;
+    return position < this.length && char === undefined || this.data.charCodeAt(position) === char;
+  }
+
+  /**
+   * Returns the next character.
+   * 
+   * Throws a @see RangeError if there is no remaining characters.
+   */
+  public nextChar(): number {
+    return this.data.charCodeAt(this.position++);
+  }
+
+  /**
+   * Resets the @member position back to 0.
+   */
+  public reset(): void {
+    this.position = 0;
   }
 }
-
-/**
- * A token that was scanned.
- */
-export class Token {}
