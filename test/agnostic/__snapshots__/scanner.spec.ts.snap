@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StringScanner should catch errors throw by the scanner 1`] = `"Expected \\"2\\", got \\"1\\"."`;
+
+exports[`StringScanner should catch errors throw by the scanner 2`] = `"Expected \\"33\\"."`;

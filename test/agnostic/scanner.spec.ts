@@ -2,10 +2,10 @@
 
 import {
   SourceFile,
+  StringScanner,
   StringSpan,
-  Token,
-  UnexpectedTokenError,
 } from '../../src/agnostic/scanner';
+import { Characters } from '../../src/agnostic/strings';
 
 describe('StringSpan', () => {
   describe('should throw on an invalid', () => {
@@ -77,14 +77,78 @@ describe('SourceFile', () => {
   });
 });
 
-describe('UnexpectedTokenError', () => {
-  it('should be supported without context', () => {
-    const error = new UnexpectedTokenError(new Token());
-    expect(error.message).toBe('Unexpected "token".');
+describe('StringScanner', () => {
+  it('should return the length of the underlying data', () => {
+    const scanner = new StringScanner('123');
+    expect(scanner.length).toBe(3);
   });
 
-  it('should be supported with context', () => {
-    const error = new UnexpectedTokenError(new Token(), 'Context');
-    expect(error.message).toBe('Unexpected "token" in Context.');
+  it('should return the position, and allow mutation', () => {
+    const scanner = new StringScanner('123');
+    expect(scanner.position).toBe(0);
+    scanner.position++;
+    expect(scanner.position).toBe(1);
+    scanner.position++;
+    expect(scanner.position).toBe(2);
+    scanner.position++;
+    expect(scanner.position).toBe(3);
+    expect(() => scanner.position++).toThrowError(RangeError);
+    expect(scanner.position).toBe(3);
+  });
+
+  it('should return a substring of the underlying data', () => {
+    const scanner = new StringScanner('123');
+    expect(scanner.substring()).toBe('123');
+    expect(scanner.substring(1)).toBe('23');
+    expect(scanner.substring(1, 2)).toBe('2');
+  });
+
+  it('should return if there are remaining matching characters', () => {
+    const $1 = 49;
+    const $2 = 50;
+    const $3 = 51;
+    const scanner = new StringScanner('123');
+    expect(scanner.hasNext()).toBe(true);
+    expect(scanner.hasNext($1)).toBe(true);
+    expect(scanner.hasNext($2)).toBe(false);
+    expect(scanner.next()).toBe('1');
+    expect(scanner.hasNext($2)).toBe(true);
+    expect(scanner.hasNext($3)).toBe(false);
+    expect(scanner.next()).toBe('2');
+    expect(scanner.next()).toBe('3');
+    expect(scanner.hasNext()).toBe(false);
+  });
+
+  it('should return if there are remaining strings', () => {
+    const scanner = new StringScanner('122333');
+    expect(scanner.hasNext('1')).toBe(true);
+    scanner.position = 1;
+    expect(scanner.hasNext('3')).toBe(false);
+    expect(scanner.hasNext('22')).toBe(true);
+    scanner.position = 3;
+    expect(scanner.hasNext('3333')).toBe(false);
+    expect(scanner.hasNext('333')).toBe(true);
+  });
+
+  it('should return tokens', () => {
+    const scanner = new StringScanner('122333');
+    expect(scanner.next(Characters.$1)).toBe('1');
+    expect(scanner.next('22')).toBe('22');
+  });
+
+  it('should reset the scanner', () => {
+    const scanner = new StringScanner('A');
+    expect(scanner.position).toBe(0);
+    scanner.next();
+    expect(scanner.position).toBe(1);
+    scanner.reset();
+    expect(scanner.position).toBe(0);
+  });
+
+  it('should catch errors throw by the scanner', () => {
+    const scanner = new StringScanner('122333');
+    expect(() => scanner.next(Characters.$2)).toThrowErrorMatchingSnapshot();
+    scanner.next(Characters.$1);
+    expect(() => scanner.next('33')).toThrowErrorMatchingSnapshot();
   });
 });

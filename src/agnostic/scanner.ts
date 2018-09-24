@@ -1,3 +1,4 @@
+import { assertMin, assertRange } from './errors';
 import { Characters, splitLines } from './strings';
 
 /**
@@ -101,15 +102,9 @@ export class StringSpan extends AbstractSpan {
     public readonly text: string
   ) {
     super();
-    if (offset < 0) {
-      throw new RangeError(`Invalid offset: ${offset}`);
-    }
-    if (column < 0) {
-      throw new RangeError(`Invalid column: ${column}`);
-    }
-    if (line < 0) {
-      throw new RangeError(`Invalid line: ${line}`);
-    }
+    assertMin('offset', offset);
+    assertMin('column', column);
+    assertMin('line', line);
   }
 }
 
@@ -251,36 +246,105 @@ export class FileSpan extends AbstractSpan {
 }
 
 /**
- * A function that handles receiving a @param span and @param error.
- *
- * May optionally return token(s) to recover from the error. Otherwise it is
- * expected the error reporting was fatal and that parsing should be immediately
- * stopped.
+ * A simple low-level scanner for incrementally reading data in a streaming manner.
  */
-export type ErrorReporter = (
-  span: ISourceSpan,
-  error: ScanningError
-) => Token | Token[] | void;
+export class StringScanner {
+  private mPosition = 0;
 
-/**
- * Error types that may be provided to a @see ErrorReporter.
- */
-export type ScanningError = UnexpectedTokenError;
+  constructor(private readonly data: string) {}
 
-/**
- * A syntax error that occurs as a result of an unexpected @member token.
- *
- * Optionally contains a @member context, or what was being parsed when the
- * error ocurrred, i.e. "argument list" or "function body". May be omitted if
- * the context is not clear or provided.
- */
-export class UnexpectedTokenError extends SyntaxError {
-  constructor(public readonly token: Token, public readonly context?: string) {
-    super(`Unexpected "token"${context ? ` in ${context}` : ''}.`);
+  /**
+   * Length of the data being read.
+   */
+  public get length(): number {
+    return this.data.length;
+  }
+
+  /**
+   * Current position of the scanner.
+   */
+  public get position(): number {
+    return this.mPosition;
+  }
+
+  /**
+   * Sets the current position of the scanner.
+   */
+  public set position(position: number) {
+    assertRange('position', position, 0, this.length);
+    this.mPosition = position;
+  }
+
+  /**
+   * Returns a substring of the underlying data of @param start -> @param end.
+   */
+  public substring(start = this.position, end = this.length): string {
+    return this.data.substring(start, end);
+  }
+
+  /**
+   * Returns whether the next token(s) match the provided pattern.
+   */
+  public hasNext(pattern?: number | string): boolean {
+    const position = this.position;
+    if (position === this.length) {
+      return false;
+    }
+    if (pattern === undefined) {
+      return true;
+    }
+    if (typeof pattern === 'number') {
+      return this.data.charCodeAt(position) === pattern;
+    }
+    const substring = this.substring();
+    return substring.startsWith(pattern);
+  }
+
+  /**
+   * Returns the next token, throwing @see UnexpectedTokenException on no match.
+   */
+  public next(pattern?: number | string): string {
+    if (pattern === undefined) {
+      return String.fromCharCode(this.data.charCodeAt(this.position++));
+    }
+    if (typeof pattern === 'number') {
+      const nextChar = this.data.charCodeAt(this.position);
+      if (pattern === nextChar) {
+        this.position++;
+        return String.fromCharCode(pattern);
+      }
+      throw new UnexpectedTokenException(
+        String.fromCharCode(pattern),
+        String.fromCharCode(nextChar)
+      );
+    }
+    const substring = this.substring();
+    if (substring.startsWith(pattern)) {
+      this.position += pattern.length;
+      return pattern;
+    }
+    throw new UnexpectedTokenException(pattern);
+  }
+
+  /**
+   * Resets the @member position back to 0.
+   */
+  public reset(): void {
+    this.position = 0;
   }
 }
 
-/**
- * A token that was scanned.
- */
-export class Token {}
+export class UnexpectedTokenException extends Error {
+  constructor(
+    public readonly expected: string,
+    public readonly received?: string
+  ) {
+    super();
+  }
+
+  public get message(): string {
+    return `Expected "${this.expected}"${
+      this.received ? `, got "${this.received}"` : ''
+    }.`;
+  }
+}
