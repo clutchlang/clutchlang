@@ -117,7 +117,6 @@ export class StringSpan extends AbstractSpan {
  * An input file loaded in memory.
  */
 export class SourceFile {
-
   /**
    * Length of the file in characters.
    */
