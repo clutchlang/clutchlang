@@ -1,11 +1,5 @@
 import { assertMin, assertRange } from './errors';
-import {
-  Characters,
-  isDigit,
-  isLetter,
-  isWhiteSpace,
-  splitLines,
-} from './strings';
+import { Characters, splitLines } from './strings';
 
 /**
  * Represents a line of @member text with a @member line number.
@@ -258,15 +252,22 @@ export class FileSpan extends AbstractSpan {
  * A simple low-level scanner for incrementally reading data in a streaming manner.
  */
 export class StringScanner {
+  /**
+   * Represents the file or content currently being read.
+   */
+  public readonly source: SourceFile;
+
   private mPosition = 0;
 
-  constructor(private readonly data: string) {}
+  constructor(data: string) {
+    this.source = new SourceFile(data);
+  }
 
   /**
    * Length of the data being read.
    */
   public get length(): number {
-    return this.data.length;
+    return this.source.length;
   }
 
   /**
@@ -288,7 +289,7 @@ export class StringScanner {
    * Returns a substring of the underlying data of @param start -> @param end.
    */
   public substring(start = this.position, end = this.length): string {
-    return this.data.substring(start, end);
+    return this.source.contents.substring(start, end);
   }
 
   /**
@@ -303,24 +304,40 @@ export class StringScanner {
       return true;
     }
     if (typeof pattern === 'number') {
-      return this.data.charCodeAt(position) === pattern;
+      return this.source.contents.charCodeAt(position) === pattern;
     }
-    const substring = this.substring();
-    return substring.startsWith(pattern);
+    return this.source.contents.startsWith(pattern, position);
+  }
+
+  /**
+   * Returns whether the next token(s) match the provided pattern.
+   *
+   * Unlike @member hasNext, advances the position counter on true.
+   */
+  public match(pattern: number | string): boolean {
+    if (this.hasNext(pattern)) {
+      if (typeof pattern === 'string') {
+        this.mPosition += pattern.length;
+      } else {
+        this.mPosition++;
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
    * Returns the next character and advances the position counter.
    */
   public advance(): number {
-    return this.data.charCodeAt(this.position++);
+    return this.source.contents.charCodeAt(this.position++);
   }
 
   /**
    * Returns the next character.
    */
-  public peek(): number {
-    return this.data.charCodeAt(this.position);
+  public peek(offset = 0): number {
+    return this.source.contents.charCodeAt(this.position + offset);
   }
 
   /**
@@ -328,81 +345,5 @@ export class StringScanner {
    */
   public reset(): void {
     this.position = 0;
-  }
-}
-
-/**
- * A higher-level lexer built on top of @see StringScanner.
- */
-export class StringLexer {
-  private mPosition = 0;
-
-  constructor(private readonly scanner: StringScanner) {}
-
-  /**
-   * Return a string representing all scanned characters so far.
-   */
-  public get nextToken(): string {
-    const result = this.scanner.substring(
-      this.mPosition,
-      this.scanner.position
-    );
-    this.mPosition = this.scanner.position;
-    return result;
-  }
-
-  /**
-   * Advances the scanner if exactly @param substring is found.
-   *
-   * Returns whether the substring was found.
-   */
-  public scanExactly(substring: string): boolean {
-    const found = this.scanner.hasNext(substring);
-    if (found) {
-      this.scanner.position += substring.length;
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Advances the scanner until a non-digit is found.
-   *
-   * Returns whether at least a single digit character was found.
-   */
-  public scanDigits(): boolean {
-    return this.scanUntil(isDigit);
-  }
-
-  /**
-   * Advances the scanner until a non-letter is found.
-   *
-   * Returns whether at least a single letter character was found.
-   */
-  public scanLetters(): boolean {
-    return this.scanUntil(isLetter);
-  }
-
-  /**
-   * Advances the scanner until non-whitespace is found.
-   *
-   * Returns whether at least a single whitespace character was found.
-   */
-  public scanWhiteSpace(): boolean {
-    return this.scanUntil(isWhiteSpace);
-  }
-
-  /**
-   * Advances the scanner until @param predicate returns false.
-   *
-   * Returns whether the scanner was advanced forward at least once.
-   */
-  public scanUntil(predicate: (character: number) => boolean): boolean {
-    let success = false;
-    while (predicate(this.scanner.peek())) {
-      this.scanner.advance();
-      success = true;
-    }
-    return success;
   }
 }

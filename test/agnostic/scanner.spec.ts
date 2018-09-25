@@ -2,10 +2,10 @@
 
 import {
   SourceFile,
-  StringLexer,
   StringScanner,
   StringSpan,
 } from '../../src/agnostic/scanner';
+import { Characters } from '../../src/agnostic/strings';
 
 describe('StringSpan', () => {
   describe('should throw on an invalid', () => {
@@ -138,16 +138,15 @@ describe('StringScanner', () => {
     scanner.reset();
     expect(scanner.position).toBe(0);
   });
-});
 
-it('StringLexer should scan and fetch tokens', () => {
-  const lexer = new StringLexer(new StringScanner('AAA111if'));
-  expect(lexer.scanWhiteSpace()).toBe(false);
-  expect(lexer.scanLetters()).toBe(true);
-  expect(lexer.nextToken).toBe('AAA');
-  expect(lexer.scanDigits()).toBe(true);
-  expect(lexer.nextToken).toBe('111');
-  expect(lexer.scanExactly('else')).toBe(false);
-  expect(lexer.scanExactly('if')).toBe(true);
-  expect(lexer.nextToken).toBe('if');
+  it('should peek and match', () => {
+    const scanner = new StringScanner('AB');
+    expect(scanner.peek()).toBe(Characters.$A);
+    expect(scanner.position).toBe(0);
+    expect(scanner.match(Characters.$A)).toBe(true);
+    expect(scanner.match(Characters.$Z)).toBe(false);
+    expect(scanner.position).toBe(1);
+    expect(scanner.match('B')).toBe(true);
+    expect(scanner.position).toBe(2);
+  });
 });

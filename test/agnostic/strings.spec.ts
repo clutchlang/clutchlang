@@ -1,5 +1,6 @@
 import {
   isDigit,
+  isHexadecimel,
   isLetter,
   isNewLine,
   isWhiteSpace,
@@ -62,6 +63,28 @@ describe('', () => {
       true, // 9
       true, // 0
       false, // A
+    ]);
+    expect(
+      Array.from(toChars('0123ABCDEFGabcdefg').map(isHexadecimel))
+    ).toEqual([
+      true, // 0
+      true, // 1
+      true, // 2
+      true, // 3
+      true, // A
+      true, // B
+      true, // C
+      true, // D
+      true, // E
+      true, // F
+      false, // G
+      true, // a
+      true, // b
+      true, // c
+      true, // d
+      true, // e
+      true, // f
+      false, // g
     ]);
   });
 
