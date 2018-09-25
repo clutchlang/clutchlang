@@ -249,6 +249,11 @@ export class FileSpan extends AbstractSpan {
 }
 
 /**
+ * A matching function for checking the type of @param char.
+ */
+type Matcher = (char: number) => boolean;
+
+/**
  * A simple low-level scanner for incrementally reading data in a streaming manner.
  */
 export class StringScanner {
@@ -293,34 +298,46 @@ export class StringScanner {
   }
 
   /**
-   * Returns whether the next token(s) match the provided pattern.
+   * Returns whether additional characters have yet to be scanned.
    */
-  public hasNext(pattern?: number | string): boolean {
-    const position = this.position;
-    if (position === this.length) {
-      return false;
-    }
-    if (pattern === undefined) {
-      return true;
-    }
-    if (typeof pattern === 'number') {
-      return this.source.contents.charCodeAt(position) === pattern;
-    }
-    return this.source.contents.startsWith(pattern, position);
+  public hasNext(): boolean {
+    return this.position < this.length;
   }
 
   /**
-   * Returns whether the next token(s) match the provided pattern.
+   * Returns whether the next character is the same as @param pattern.
    *
-   * Unlike @member hasNext, advances the position counter on true.
+   * If true, @member position is advanced by one.
    */
-  public match(pattern: number | string): boolean {
-    if (this.hasNext(pattern)) {
-      if (typeof pattern === 'string') {
+  public match(pattern: number): boolean;
+
+  /**
+   * Returns whether @param substring matches the beginning at @param position.
+   *
+   * If true, @member position is advanced by the length of the pattern string.
+   */
+  // tslint:disable-next-line:unified-signatures
+  public match(substring: string): boolean;
+
+  /**
+   * Returns whether the next character is true when @param matcher is called.
+   *
+   * If true, @member position is advanced by one.
+   */
+  // tslint:disable-next-line:unified-signatures
+  public match(matcher: Matcher): boolean;
+
+  public match(pattern: string | number | Matcher): boolean {
+    if (typeof pattern === 'string') {
+      if (this.source.contents.startsWith(pattern, this.position)) {
         this.mPosition += pattern.length;
-      } else {
-        this.mPosition++;
+        return true;
       }
+      return false;
+    }
+    const next = this.peek();
+    if (typeof pattern === 'number' ? next === pattern : pattern(next)) {
+      this.mPosition++;
       return true;
     }
     return false;

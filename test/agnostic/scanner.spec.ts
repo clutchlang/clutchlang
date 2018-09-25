@@ -104,30 +104,24 @@ describe('StringScanner', () => {
   });
 
   it('should return if there are remaining matching characters', () => {
-    const $1 = 49;
-    const $2 = 50;
-    const $3 = 51;
     const scanner = new StringScanner('123');
     expect(scanner.hasNext()).toBe(true);
-    expect(scanner.hasNext($1)).toBe(true);
-    expect(scanner.hasNext($2)).toBe(false);
-    scanner.advance();
-    expect(scanner.hasNext($2)).toBe(true);
-    expect(scanner.hasNext($3)).toBe(false);
-    scanner.advance();
-    scanner.advance();
+    expect(scanner.match(Characters.$1)).toBe(true);
+    expect(scanner.match(Characters.$3)).toBe(false);
+    expect(scanner.match(Characters.$2)).toBe(true);
+    expect(scanner.match(Characters.$3)).toBe(true);
     expect(scanner.hasNext()).toBe(false);
   });
 
   it('should return if there are remaining strings', () => {
     const scanner = new StringScanner('122333');
-    expect(scanner.hasNext('1')).toBe(true);
+    expect(scanner.match('1')).toBe(true);
     scanner.position = 1;
-    expect(scanner.hasNext('3')).toBe(false);
-    expect(scanner.hasNext('22')).toBe(true);
+    expect(scanner.match('3')).toBe(false);
+    expect(scanner.match('22')).toBe(true);
     scanner.position = 3;
-    expect(scanner.hasNext('3333')).toBe(false);
-    expect(scanner.hasNext('333')).toBe(true);
+    expect(scanner.match('3333')).toBe(false);
+    expect(scanner.match('333')).toBe(true);
   });
 
   it('should reset the scanner', () => {
