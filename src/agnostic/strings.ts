@@ -41,6 +41,11 @@ export const enum Characters {
   $SLASH = 47,
   $STAR = 42,
   $SQUOTE = 39,
+  $EXCLAIM = 33,
+  $PIPE = 124,
+  $AND = 38,
+  $CARET = 94,
+  $TILDE = 126,
 
   // Misc
   $CR = 13,

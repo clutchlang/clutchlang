@@ -107,6 +107,7 @@ describe('StringScanner', () => {
     const scanner = new StringScanner('123');
     expect(scanner.hasNext()).toBe(true);
     expect(scanner.match(Characters.$1)).toBe(true);
+    expect(scanner.match(c => c === Characters.$3)).toBe(false);
     expect(scanner.match(Characters.$3)).toBe(false);
     expect(scanner.match(Characters.$2)).toBe(true);
     expect(scanner.match(Characters.$3)).toBe(true);

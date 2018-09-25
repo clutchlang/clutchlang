@@ -61,32 +61,66 @@ describe('tokenize', () => {
       tokenizeKinds(`
       .
       +
+      ++
+      +=
       -
+      --
+      -=
       *
+      *=
       =
       ->
       ==
+      !=
       ===
+      !==
       >
       >=
+      >>
       <
       <=
+      <<
       /
+      /=
+      !
+      ~
+      ^
+      |
+      ||
+      &
+      &&
     `)
     ).toEqual([
       TokenKind.PERIOD,
       TokenKind.PLUS,
+      TokenKind.INCREMENT,
+      TokenKind.PLUS_BY,
       TokenKind.MINUS,
+      TokenKind.DECREMENT,
+      TokenKind.MINUS_BY,
       TokenKind.STAR,
-      TokenKind.ASSIGNMENT,
+      TokenKind.STAR_BY,
+      TokenKind.ASSIGN,
       TokenKind.ARROW,
-      TokenKind.EQUALITY,
-      TokenKind.IDENTITY,
+      TokenKind.EQUALS,
+      TokenKind.NOT_EQUALS,
+      TokenKind.IDENTICAL,
+      TokenKind.NOT_IDENTICAL,
       TokenKind.GREATER_THAN,
       TokenKind.GREATER_THAN_OR_EQUAL,
+      TokenKind.RIGHT_SHIFT,
       TokenKind.LESS_THAN,
       TokenKind.LESS_THAN_OR_EQUAL,
+      TokenKind.LEFT_SHIFT,
       TokenKind.SLASH,
+      TokenKind.SLASH_BY,
+      TokenKind.NEGATE,
+      TokenKind.LOGICAL_NOT,
+      TokenKind.LOGICAL_XOR,
+      TokenKind.LOGICAL_OR,
+      TokenKind.OR,
+      TokenKind.LOGICAL_AND,
+      TokenKind.AND,
       TokenKind.EOF,
     ]);
   });
@@ -97,8 +131,6 @@ describe('tokenize', () => {
       0
       1
       1.5
-      -1
-      -1.5
       3.14
       31.4
       0xAAA
@@ -113,8 +145,6 @@ describe('tokenize', () => {
       [TokenKind.NUMBER, '0'],
       [TokenKind.NUMBER, '1'],
       [TokenKind.NUMBER, '1.5'],
-      [TokenKind.NUMBER, '-1'],
-      [TokenKind.NUMBER, '-1.5'],
       [TokenKind.NUMBER, '3.14'],
       [TokenKind.NUMBER, '31.4'],
       [TokenKind.NUMBER, '0xAAA'],
