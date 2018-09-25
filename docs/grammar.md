@@ -37,24 +37,24 @@ See ["Design Note: Implicit Semiclons"][1] in _Crafting Interpreters_ for more.
 ## Syntax
 
 start<br>
-<a id="syntax:clutchFile">**clutchFile**</a><br>
-&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:topLevelElement">`topLevelElement`</a>`*`<br>
+**clutchFile**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`topLevelElement*`<br>
 &nbsp;&nbsp;;
 
-<a id="syntax:topLevelElement">**topLevelElement**</a><br>
-&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:class">`class`</a><br>
-&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:function">`function`</a><br>
+*topLevelElement**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`class`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`function`<br>
 &nbsp;&nbsp;;
 
 ### Functions
 
-<a id="syntax:function">**function**</a><br>
+**function**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;... TBD ...<br>
 &nbsp;&nbsp;;
 
 ### Classes
 
-<a id="syntax:class">**class**</a><br>
+**class**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;... TBD ...<br>
 &nbsp;&nbsp;;
 
