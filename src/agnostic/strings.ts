@@ -16,12 +16,31 @@ export const enum Characters {
 
   // Letters
   $A = 65,
+  $E = 69,
+  $F = 70,
+  $X = 88,
   $Z = 90,
   $a = 97,
+  $e = 101,
+  $f = 102,
+  $x = 120,
   $z = 122,
 
   // Symbols
   $_ = 95,
+  $EQUALS = 61,
+  $LANGLE = 60,
+  $RANGLE = 62,
+  $LPAREN = 40,
+  $RPAREN = 41,
+  $LCURLY = 123,
+  $RCURLY = 125,
+  $PERIOD = 46,
+  $MINUS = 45,
+  $PLUS = 43,
+  $SLASH = 47,
+  $STAR = 42,
+  $SQUOTE = 39,
 
   // Misc
   $CR = 13,
@@ -35,6 +54,17 @@ export const enum Characters {
  */
 export function isDigit(character: number): boolean {
   return character >= Characters.$0 && character <= Characters.$9;
+}
+
+/**
+ * Returns whether @param character is a hexadecimal digit.
+ */
+export function isHexadecimal(character: number): boolean {
+  return (
+    (character >= Characters.$A && character <= Characters.$F) ||
+    (character >= Characters.$a && character <= Characters.$f) ||
+    isDigit(character)
+  );
 }
 
 /**
