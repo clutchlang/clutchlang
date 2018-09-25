@@ -47,7 +47,7 @@ export enum TokenKind {
   WHILE = 'while',
 
   // Symbols
-  ARROW = '=>',
+  ARROW = '->',
   LEFT_PAREN = '(',
   RIGHT_PAREN = ')',
   LEFT_CURLY = '{',
@@ -131,14 +131,17 @@ export class ClutchLexer {
         return this.createToken(TokenKind.PERIOD);
       case Characters.$PLUS: // "+"
         return this.createToken(TokenKind.PLUS);
-      case Characters.$MINUS: // "-"
-        if (isDigit(this.program.peek())) {
-          return this.scanNumber(this.program.advance());
+      case Characters.$MINUS: // "-" or "->" or "-#"
+        if (this.program.match(isDigit)) {
+          return this.scanNumber(this.program.peek(-1));
+        }
+        if (this.program.match(Characters.$RANGLE)) {
+          return this.createToken(TokenKind.ARROW);
         }
         return this.createToken(TokenKind.MINUS);
       case Characters.$STAR: // "*"
         return this.createToken(TokenKind.STAR);
-      case Characters.$EQUALS: // "=" or "=>" or "==" or "==="
+      case Characters.$EQUALS: // "=" or "==" or "==="
         return this.scanEquals();
       case Characters.$LANGLE:
         return this.createToken(
@@ -215,12 +218,10 @@ export class ClutchLexer {
       if (this.program.match(Characters.$PERIOD)) {
         break;
       }
-      if (isDigit(next)) {
-        this.program.advance();
-        continue;
-      } else {
+      if (!isDigit(next)) {
         break;
       }
+      this.program.advance();
     }
     return this.scanDigits();
   }
@@ -259,19 +260,16 @@ export class ClutchLexer {
    * Scans tokens preceding with "=".
    */
   private scanEquals(): Token {
-    return this.createToken(
-      this.program.match(Characters.$RANGLE)
-        ? // "=>"
-          TokenKind.ARROW
-        : this.program.match(Characters.$EQUALS)
-          ? this.program.match(Characters.$EQUALS)
-            ? // "==="
-              TokenKind.IDENTITY
-            : // "=="
-              TokenKind.EQUALITY
-          : // "="
-            TokenKind.ASSIGNMENT
-    );
+    if (this.program.match(Characters.$EQUALS)) {
+      if (this.program.match(Characters.$EQUALS)) {
+        // "==="
+        return this.createToken(TokenKind.IDENTITY);
+      }
+      // "=="
+      return this.createToken(TokenKind.EQUALITY);
+    }
+    // "="
+    return this.createToken(TokenKind.ASSIGNMENT);
   }
 
   /**
@@ -299,9 +297,8 @@ export class ClutchLexer {
       const peek = this.program.peek();
       if (!predicate(peek)) {
         break;
-      } else {
-        this.program.advance();
       }
+      this.program.advance();
     }
   }
 
