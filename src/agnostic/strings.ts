@@ -57,9 +57,9 @@ export function isDigit(character: number): boolean {
 }
 
 /**
- * Returns whether @param character is a hexadecimel digit.
+ * Returns whether @param character is a hexadecimal digit.
  */
-export function isHexadecimel(character: number): boolean {
+export function isHexadecimal(character: number): boolean {
   return (
     (character >= Characters.$A && character <= Characters.$F) ||
     (character >= Characters.$a && character <= Characters.$f) ||
