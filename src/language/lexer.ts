@@ -165,9 +165,9 @@ export class ClutchLexer {
               ? TokenKind.MINUS_BY
               : this.program.match(Characters.$MINUS)
                 ? TokenKind.DECREMENT
-                : this.program.match(Characters.$EQUALS)
-                  ? TokenKind.MINUS_BY
-                  : TokenKind.MINUS
+                : TokenKind.MINUS
+          // Code coverage considers the `);` to be a missed line :(
+          /* istanbul ignore next */
         );
       case Characters.$STAR: // "*" or "*="
         return this.createToken(
