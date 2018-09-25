@@ -38,12 +38,12 @@ See ["Design Note: Implicit Semiclons"][1] in _Crafting Interpreters_ for more.
 
 start<br>
 <a id="syntax:clutchFile">**clutchFile**</a><br>
-&nbsp;&nbsp;:&nbsp;&nbsp;[`topLevelElement`](#syntax:topLevelElement)`*`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:topLevelElement">`topLevelElement`</a>`*`<br>
 &nbsp;&nbsp;;
 
 <a id="syntax:topLevelElement">**topLevelElement**</a><br>
-&nbsp;&nbsp;:&nbsp;&nbsp;[`class`](#syntax:class)<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;[`function`](#syntax:function)<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:class">`class`</a><br>
+&nbsp;&nbsp;:&nbsp;&nbsp;<a href="#syntax:function">`function`</a><br>
 &nbsp;&nbsp;;
 
 ### Functions
