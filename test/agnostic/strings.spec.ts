@@ -1,6 +1,6 @@
 import {
   isDigit,
-  isHexadecimel,
+  isHexadecimal,
   isLetter,
   isNewLine,
   isWhiteSpace,
@@ -65,7 +65,7 @@ describe('', () => {
       false, // A
     ]);
     expect(
-      Array.from(toChars('0123ABCDEFGabcdefg').map(isHexadecimel))
+      Array.from(toChars('0123ABCDEFGabcdefg').map(isHexadecimal))
     ).toEqual([
       true, // 0
       true, // 1
