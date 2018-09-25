@@ -52,21 +52,41 @@ export enum TokenKind {
   RIGHT_PAREN = ')',
   LEFT_CURLY = '{',
   RIGHT_CURLY = '}',
+
+  // Operators
   PERIOD = '.',
   PLUS = '+',
+  PLUS_BY = '+=',
   MINUS = '-',
+  MINUS_BY = '-=',
   STAR = '*',
+  STAR_BY = '*=',
   SLASH = '/',
-  ASSIGNMENT = '=',
-  EQUALITY = '==',
-  IDENTITY = '===',
+  SLASH_BY = '/=',
+  MODULUS = '%',
+  MODULUS_BY = '%=',
+  ASSIGN = '=',
+  EQUALS = '==',
+  NOT_EQUALS = '!=',
+  IDENTICAL = '===',
+  NOT_IDENTICAL = '!==',
   GREATER_THAN = '>',
   GREATER_THAN_OR_EQUAL = '>=',
   LESS_THAN = '<',
   LESS_THAN_OR_EQUAL = '<=',
+  LOGICAL_OR = '|',
+  OR = '||',
+  LOGICAL_AND = '&',
+  AND = '&&',
+  LOGICAL_XOR = '^',
+  NEGATE = '!',
+  LOGICAL_NOT = '~',
+  INCREMENT = '++',
+  DECREMENT = '--',
+  LEFT_SHIFT = '<<',
+  RIGHT_SHIFT = '>>',
 
   // Misc
-  KEYWORD = '<KEYWORD>',
   EOF = '<EOF>',
 }
 
@@ -129,36 +149,84 @@ export class ClutchLexer {
         return this.createToken(TokenKind.RIGHT_CURLY);
       case Characters.$PERIOD: // "."
         return this.createToken(TokenKind.PERIOD);
-      case Characters.$PLUS: // "+"
-        return this.createToken(TokenKind.PLUS);
-      case Characters.$MINUS: // "-" or "->" or "-#"
-        if (this.program.match(isDigit)) {
-          return this.scanNumber(this.program.peek(-1));
-        }
-        if (this.program.match(Characters.$RANGLE)) {
-          return this.createToken(TokenKind.ARROW);
-        }
-        return this.createToken(TokenKind.MINUS);
-      case Characters.$STAR: // "*"
-        return this.createToken(TokenKind.STAR);
+      case Characters.$PLUS: // "+" or "+=" or "++"
+        return this.createToken(
+          this.program.match(Characters.$EQUALS)
+            ? TokenKind.PLUS_BY
+            : this.program.match(Characters.$PLUS)
+              ? TokenKind.INCREMENT
+              : TokenKind.PLUS
+        );
+      case Characters.$MINUS: // "-" or "--" or "-=" or "->"
+        return this.createToken(
+          this.program.match(Characters.$RANGLE)
+            ? TokenKind.ARROW
+            : this.program.match(Characters.$EQUALS)
+              ? TokenKind.MINUS_BY
+              : this.program.match(Characters.$MINUS)
+                ? TokenKind.DECREMENT
+                : this.program.match(Characters.$EQUALS)
+                  ? TokenKind.MINUS_BY
+                  : TokenKind.MINUS
+        );
+      case Characters.$STAR: // "*" or "*="
+        return this.createToken(
+          this.program.match(Characters.$EQUALS)
+            ? TokenKind.STAR_BY
+            : TokenKind.STAR
+        );
       case Characters.$EQUALS: // "=" or "==" or "==="
-        return this.scanEquals();
-      case Characters.$LANGLE:
+        return this.createToken(
+          this.program.match(Characters.$EQUALS)
+            ? this.program.match(Characters.$EQUALS)
+              ? TokenKind.IDENTICAL
+              : TokenKind.EQUALS
+            : TokenKind.ASSIGN
+        );
+      case Characters.$LANGLE: // "<" or "<=" or "<<"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? TokenKind.LESS_THAN_OR_EQUAL
-            : TokenKind.LESS_THAN
+            : this.program.match(Characters.$LANGLE)
+              ? TokenKind.LEFT_SHIFT
+              : TokenKind.LESS_THAN
         );
-      case Characters.$RANGLE:
+      case Characters.$RANGLE: // ">" or ">=" or ">>"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? TokenKind.GREATER_THAN_OR_EQUAL
-            : TokenKind.GREATER_THAN
+            : this.program.match(Characters.$RANGLE)
+              ? TokenKind.RIGHT_SHIFT
+              : TokenKind.GREATER_THAN
         );
-      case Characters.$SLASH:
+      case Characters.$SLASH: // "/" or "//" or "/="
         return this.scanSlash();
-      case Characters.$SQUOTE:
+      case Characters.$SQUOTE: // "'"
         return this.scanString();
+      case Characters.$PIPE: // "|" or "||"
+        return this.createToken(
+          this.program.match(Characters.$PIPE)
+            ? TokenKind.OR
+            : TokenKind.LOGICAL_OR
+        );
+      case Characters.$AND: // "&" or "&&"
+        return this.createToken(
+          this.program.match(Characters.$AND)
+            ? TokenKind.AND
+            : TokenKind.LOGICAL_AND
+        );
+      case Characters.$TILDE: // "~"
+        return this.createToken(TokenKind.LOGICAL_NOT);
+      case Characters.$CARET: // "^"
+        return this.createToken(TokenKind.LOGICAL_XOR);
+      case Characters.$EXCLAIM: // "!" or "!=" or "!==""
+        return this.createToken(
+          this.program.match(Characters.$EQUALS)
+            ? this.program.match(Characters.$EQUALS)
+              ? TokenKind.NOT_IDENTICAL
+              : TokenKind.NOT_EQUALS
+            : TokenKind.NEGATE
+        );
       default:
         if (isWhiteSpace(character)) {
           this.position = this.program.position;
@@ -257,22 +325,6 @@ export class ClutchLexer {
   }
 
   /**
-   * Scans tokens preceding with "=".
-   */
-  private scanEquals(): Token {
-    if (this.program.match(Characters.$EQUALS)) {
-      if (this.program.match(Characters.$EQUALS)) {
-        // "==="
-        return this.createToken(TokenKind.IDENTITY);
-      }
-      // "=="
-      return this.createToken(TokenKind.EQUALITY);
-    }
-    // "="
-    return this.createToken(TokenKind.ASSIGNMENT);
-  }
-
-  /**
    * Scans tokens preceding with "/".
    */
   private scanSlash(): Token | undefined {
@@ -285,8 +337,12 @@ export class ClutchLexer {
       });
       return;
     }
-    // "/"
-    return this.createToken(TokenKind.SLASH);
+    // "/" or "/="
+    return this.createToken(
+      this.program.match(Characters.$EQUALS)
+        ? TokenKind.SLASH_BY
+        : TokenKind.SLASH
+    );
   }
 
   /**
