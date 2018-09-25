@@ -2,7 +2,7 @@ import { ISourceSpan, StringScanner } from '../agnostic/scanner';
 import {
   Characters,
   isDigit,
-  isHexadecimel,
+  isHexadecimal,
   isLetter,
   isWhiteSpace,
 } from '../agnostic/strings';
@@ -229,7 +229,7 @@ export class ClutchLexer {
    * Scans any tokens that are valid hexadecimel digits, returning a number.
    */
   private scanHexNumber(): Token {
-    this.scanPredicate(isHexadecimel);
+    this.scanPredicate(isHexadecimal);
     return this.createToken(TokenKind.NUMBER);
   }
 
