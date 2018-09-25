@@ -251,7 +251,7 @@ export class ClutchLexer {
       ClutchLexer.keywords[identifierOrKeyword] || TokenKind.IDENTIFIER,
       identifierOrKeyword,
       this.clearComments(),
-      this.position - identifierOrKeyword.length,
+      this.position - identifierOrKeyword.length
     );
   }
 
@@ -330,7 +330,12 @@ export class ClutchLexer {
    * Returns a new token with a @param kind and the current substring.
    */
   private createToken(kind: TokenKind, content = this.substring()): Token {
-    return new Token(kind, content, this.clearComments(), this.position - content.length);
+    return new Token(
+      kind,
+      content,
+      this.clearComments(),
+      this.position - content.length
+    );
   }
 
   /**
@@ -378,7 +383,7 @@ class Token implements IToken {
     public readonly kind: TokenKind,
     public readonly lexeme: string,
     public readonly comments: IComment[],
-    public readonly offset: number,
+    public readonly offset: number
   ) {}
 }
 
