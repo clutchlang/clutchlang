@@ -6,19 +6,19 @@ This section informally explains the grammar notation used below.
 
 ### Symbols and naming
 
-_Terminal symbol_ names start with an uppercase letter, e.g. `Identifier`.
-_Nonterminal symbol_ names start with a lowercase leter, e.g. `clutchFile`.
-Each _production_ starts with a colon (`:`).
-Symbol _definitions_ may have many productions terminated by a semicolon (`;`).
+_Terminal symbol_ names start with an uppercase letter, e.g. `Identifier`.<br>
+_Nonterminal symbol_ names start with a lowercase leter, e.g. `clutchFile`.<br>
+Each _production_ starts with a colon (`:`).<br>
+Symbol _definitions_ may have many productions terminated by a semicolon (`;`).<br>
 Symbol definitions may be prepended with _attributes_, e.g. `start`.
 
 ### EBNF expressions
 
-Operator `|` denotes _alternative_.
-Operator `*` denotes _iteration_ (zero or more).
-Operator `+` denotes _iteration_ (one or more).
-Operator `?` denotes _option_ (zero or one).
-alpha `{` beta `}` denotes a nonempty _beta_-seperated list of _alpha_'s.
+Operator `|` denotes _alternative_.<br>
+Operator `*` denotes _iteration_ (zero or more).<br>
+Operator `+` denotes _iteration_ (one or more).<br>
+Operator `?` denotes _option_ (zero or one).<br>
+alpha `{` beta `}` denotes a nonempty _beta_-seperated list of _alpha_'s.<br>
 Operator `++` means that no space or comment is allowed between operands.
 
 ## A note on whitespace
