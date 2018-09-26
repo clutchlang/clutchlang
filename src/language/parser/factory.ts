@@ -1,6 +1,6 @@
 import { splitLines, unescapeString } from '../../agnostic/strings';
 import { IToken } from '../lexer';
-import { Expression, Operator, StatementBlock } from '../parser';
+import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
   IfExpression,
@@ -10,6 +10,8 @@ import {
   SimpleName,
   UnaryExpression,
 } from './expressions';
+import { Statement } from './nodes';
+import { JumpStatement, StatementBlock, VariableStatement } from './statements';
 
 /**
  * Factory class for creating @class {AstNode} instances.
@@ -41,6 +43,27 @@ export class AstNodeFactory {
     elseBody?: Expression | StatementBlock
   ) {
     return new IfExpression(ifToken, condition, body, elseToken, elseBody);
+  }
+
+  public createStatementBlock(
+    start: IToken,
+    statements: Statement[],
+    end: IToken
+  ) {
+    return new StatementBlock(start, statements, end);
+  }
+
+  public createJumpStatement(keyword: IToken, expression: Expression) {
+    return new JumpStatement(keyword, expression);
+  }
+
+  public createVariableStatement(
+    start: IToken,
+    name: SimpleName,
+    assign: IToken,
+    expression: Expression
+  ) {
+    return new VariableStatement(start, name, assign, expression);
   }
 
   public createSimpleName(token: IToken): SimpleName {

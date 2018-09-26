@@ -6,20 +6,21 @@ import { AstNodeFactory, Operator } from '../../../src/language/parser';
 describe('AstNodeFactory', () => {
   const factory = new AstNodeFactory();
 
-  describe('<Expression>', () => {
-    const a = factory.createSimpleName({
-      comments: [],
-      kind: TokenKind.IDENTIFIER,
-      lexeme: 'a',
-      offset: 0,
-    });
-    const b = factory.createSimpleName({
-      comments: [],
-      kind: TokenKind.IDENTIFIER,
-      lexeme: 'b',
-      offset: 0,
-    });
+  const a = factory.createSimpleName({
+    comments: [],
+    kind: TokenKind.IDENTIFIER,
+    lexeme: 'a',
+    offset: 0,
+  });
 
+  const b = factory.createSimpleName({
+    comments: [],
+    kind: TokenKind.IDENTIFIER,
+    lexeme: 'b',
+    offset: 0,
+  });
+
+  describe('<Expression>', () => {
     it('should create BinaryExpression', () => {
       const $plus = {
         comments: [],
@@ -109,6 +110,61 @@ describe('AstNodeFactory', () => {
         expect(expr.ifToken).toBe($if);
         expect(expr.lastToken).toBe(a.lastToken);
       });
+    });
+  });
+
+  describe('Statement', () => {
+    it('should create a block', () => {
+      const $lc = {
+        comments: [],
+        kind: TokenKind.LEFT_CURLY,
+        lexeme: '{',
+        offset: 0,
+      };
+      const $rc = {
+        comments: [],
+        kind: TokenKind.RIGHT_CURLY,
+        lexeme: '}',
+        offset: 0,
+      };
+      const stmt = factory.createStatementBlock($lc, [], $rc);
+      expect(stmt.firstToken).toEqual($lc);
+      expect(stmt.statements).toEqual([]);
+      expect(stmt.lastToken).toEqual($rc);
+    });
+
+    it('should create a return statement', () => {
+      const $return = {
+        comments: [],
+        kind: TokenKind.RETURN,
+        lexeme: 'return',
+        offset: 0,
+      };
+      const stmt = factory.createJumpStatement($return, a);
+      expect(stmt.expression).toEqual(a);
+      expect(stmt.firstToken).toEqual($return);
+      expect(stmt.lastToken).toEqual(a.lastToken);
+    });
+
+    it('should create a let statement', () => {
+      const $let = {
+        comments: [],
+        kind: TokenKind.LET,
+        lexeme: 'let',
+        offset: 0,
+      };
+      const $eq = {
+        comments: [],
+        kind: TokenKind.ASSIGN,
+        lexeme: '=',
+        offset: 0,
+      };
+      const stmt = factory.createVariableStatement($let, a, $eq, b);
+      expect(stmt.assignToken).toEqual($eq);
+      expect(stmt.expression).toEqual(b);
+      expect(stmt.firstToken).toEqual($let);
+      expect(stmt.lastToken).toEqual(b.lastToken);
+      expect(stmt.name).toEqual(a);
     });
   });
 
