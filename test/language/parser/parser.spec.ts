@@ -71,13 +71,7 @@ describe('ClutchParser', () => {
     });
 
     describe('unary (prefix)', () => {
-      [
-        '++',
-        '--',
-        '-',
-        '+',
-        '!',
-      ].forEach(t => {
+      ['++', '--', '-', '+', '!'].forEach(t => {
         const text = `${t} a`;
         it(text, () => {
           const expr = parseExpression(text);
@@ -88,10 +82,7 @@ describe('ClutchParser', () => {
     });
 
     xdescribe('unary (postfix)', () => {
-      [
-        '++',
-        '--',
-      ].forEach(t => {
+      ['++', '--'].forEach(t => {
         const text = `a ${t}`;
         it(text, () => {
           const expr = parseExpression(text);
