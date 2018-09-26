@@ -19,7 +19,7 @@ export abstract class AstNode {
 
 export abstract class TopLevelElement extends AstNode {}
 
-export class FunctionElement extends TopLevelElement {
+export class FunctionDeclaration extends TopLevelElement {
   constructor(
     public readonly name: SimpleName,
     public readonly parameters: SimpleName[],
