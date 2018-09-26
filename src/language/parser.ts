@@ -2,6 +2,24 @@ import { splitLines, unescapeString } from '../agnostic/strings';
 import { IToken } from './lexer';
 
 export class AstNodeFactory {
+  public createUnaryExpression(
+    target: Expression,
+    operator: Operator,
+    operatorToken: IToken,
+    isPrefix: boolean
+  ) {
+    return new UnaryExpression(target, operator, operatorToken, isPrefix);
+  }
+
+  public createBinaryExpression(
+    left: Expression,
+    operator: Operator,
+    operatorToken: IToken,
+    right: Expression
+  ) {
+    return new BinaryExpression(left, operator, operatorToken, right);
+  }
+
   public createSimpleName(token: IToken): SimpleName {
     return new SimpleName(token, token.lexeme);
   }
@@ -56,6 +74,132 @@ export abstract class AstNode {
    * The last token that was scanned to form this node.
    */
   public abstract get lastToken(): IToken;
+}
+
+/**
+ * Base class for any statement.
+ */
+export abstract class Statement extends AstNode {}
+
+/**
+ * Base class for any expression.
+ */
+export abstract class Expression extends AstNode implements Statement {}
+
+/**
+ * Valid categories for operators, ordered by precedence.
+ */
+export enum Precedence {
+  Postfix,
+  Prefix,
+  Multiplicative,
+  Additive,
+  Comparison,
+  Equality,
+  Conjunction,
+  Disjunction,
+  Assignment,
+}
+
+/**
+ * Valid operators.
+ */
+export class Operator {
+  public static readonly Increment = new Operator(Precedence.Postfix);
+  public static readonly Decrement = new Operator(Precedence.Postfix);
+  public static readonly Accessor = new Operator(Precedence.Postfix);
+
+  public static readonly UnaryNegative = new Operator(Precedence.Prefix);
+  public static readonly UnaryPositive = new Operator(Precedence.Prefix);
+  public static readonly UnaryIncrement = new Operator(Precedence.Prefix);
+  public static readonly UnaryDecrement = new Operator(Precedence.Prefix);
+  public static readonly UnaryNegation = new Operator(Precedence.Prefix);
+
+  public static readonly Multiply = new Operator(Precedence.Multiplicative);
+  public static readonly Divide = new Operator(Precedence.Multiplicative);
+  public static readonly Modulus = new Operator(Precedence.Multiplicative);
+
+  public static readonly Add = new Operator(Precedence.Additive);
+  public static readonly Subtract = new Operator(Precedence.Additive);
+
+  public static readonly Less = new Operator(Precedence.Comparison);
+  public static readonly Greater = new Operator(Precedence.Comparison);
+  public static readonly LessOrEqual = new Operator(Precedence.Comparison);
+  public static readonly GreaterOrEqual = new Operator(Precedence.Comparison);
+
+  public static readonly Equal = new Operator(Precedence.Equality);
+  public static readonly NotEqual = new Operator(Precedence.Equality);
+  public static readonly Identical = new Operator(Precedence.Equality);
+  public static readonly NotIdentical = new Operator(Precedence.Equality);
+
+  public static readonly And = new Operator(Precedence.Conjunction);
+  public static readonly Or = new Operator(Precedence.Disjunction);
+
+  public static readonly Assign = new Operator(Precedence.Assignment);
+  public static readonly AddAssign = new Operator(Precedence.Assignment);
+  public static readonly SubtractAssign = new Operator(Precedence.Assignment);
+  public static readonly MultiplyAssign = new Operator(Precedence.Assignment);
+  public static readonly DivideAssign = new Operator(Precedence.Assignment);
+  public static readonly ModulusAssign = new Operator(Precedence.Assignment);
+
+  private constructor(public readonly kind: Precedence) {}
+}
+
+/**
+ * An expression formed with an @member operator and a @member target.
+ */
+export abstract class OperatorExpression extends Expression {
+  constructor(
+    public readonly target: Expression,
+    public readonly operator: Operator,
+    protected readonly operatorToken: IToken
+  ) {
+    super();
+  }
+}
+
+/**
+ * An expression of the former `<OP><EXPR>` or `<EXPR><OP>`.
+ */
+export class UnaryExpression extends OperatorExpression {
+  constructor(
+    target: Expression,
+    operator: Operator,
+    operatorToken: IToken,
+    protected readonly isPrefix: boolean
+  ) {
+    super(target, operator, operatorToken);
+  }
+
+  public get firstToken(): IToken {
+    return this.isPrefix ? this.operatorToken : this.target.firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return this.isPrefix ? this.target.lastToken : this.operatorToken;
+  }
+}
+
+/**
+ * An expression of the former `<LEFT><OPERATOR><RIGHT>`.
+ */
+export class BinaryExpression extends OperatorExpression {
+  constructor(
+    public readonly left: Expression,
+    operator: Operator,
+    operatorToken: IToken,
+    public readonly right: Expression
+  ) {
+    super(left, operator, operatorToken);
+  }
+
+  public get firstToken(): IToken {
+    return this.left.firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return this.right.lastToken;
+  }
 }
 
 /**
