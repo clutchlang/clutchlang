@@ -1,15 +1,14 @@
 import { IToken } from '../lexer';
 import { SimpleName } from './expressions';
-import { AstNode, Expression, Statement } from './nodes';
+import { Expression, Statement } from './nodes';
+import { AstVisitor } from './visitors';
 
-export class StatementBlock extends AstNode {
+export class StatementBlock {
   constructor(
     public readonly firstToken: IToken,
     public readonly statements: Statement[],
     public readonly lastToken: IToken
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export class JumpStatement extends Statement {
@@ -18,6 +17,10 @@ export class JumpStatement extends Statement {
     public readonly expression: Expression
   ) {
     super();
+  }
+
+  public accept<R>(visitor: AstVisitor<R>): R {
+    return visitor.visitJumpStatement(this);
   }
 
   public get lastToken(): IToken {
@@ -33,6 +36,10 @@ export class VariableStatement extends Statement {
     public readonly expression: Expression
   ) {
     super();
+  }
+
+  public accept<R>(visitor: AstVisitor<R>): R {
+    return visitor.visitVariableStatement(this);
   }
 
   public get lastToken(): IToken {

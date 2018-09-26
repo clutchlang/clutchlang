@@ -1,3 +1,5 @@
+// tslint:disable:no-magic-numbers
+
 import {
   isDigit,
   isHexadecimal,
@@ -5,6 +7,7 @@ import {
   isNewLine,
   isWhiteSpace,
   splitLines,
+  StringBuffer,
 } from '../../src/agnostic/strings';
 
 describe('splitLines', () => {
@@ -117,4 +120,23 @@ describe('', () => {
       false, // \t
     ]);
   });
+});
+
+it('StringBuffer should create a formatted string', () => {
+  const buffer = new StringBuffer();
+  buffer.writeLine('<html>');
+  buffer.indent(2);
+  buffer.writeLine('<body>');
+  buffer.writeLine('</body>');
+  buffer.indent(-2);
+  buffer.writeLine('</html>');
+  expect(buffer.toString()).toEqual('<html>\n  <body>\n  </body>\n</html>\n');
+});
+
+it('StringBuffer should create a formatted list of items', () => {
+  const buffer = new StringBuffer();
+  buffer.write('[');
+  buffer.writeAll([1, 2, 3], ', ');
+  buffer.write(']');
+  expect(buffer.toString()).toEqual('[1, 2, 3]');
 });

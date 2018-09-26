@@ -1,11 +1,16 @@
 import { IToken } from '../lexer';
 import { SimpleName } from './expressions';
 import { StatementBlock } from './statements';
+import { AstVisitor } from './visitors';
 
 /**
  * Base class for anything in the syntax tree.
  */
 export abstract class AstNode {
+  /**
+   * Try the node through the provided @param visitor.
+   */
+  public abstract accept<R>(visitor: AstVisitor<R>): R;
   /**
    * The first token that was scanned to form this node.
    */
@@ -29,6 +34,10 @@ export class FunctionDeclaration extends TopLevelElement {
     super();
   }
 
+  public accept<R>(visitor: AstVisitor<R>): R {
+    return visitor.visitFunctionDeclaration(this);
+  }
+
   public get firstToken(): IToken {
     return this.name.firstToken;
   }
@@ -41,12 +50,22 @@ export class FunctionDeclaration extends TopLevelElement {
 /**
  * Base class for any statement.
  */
-export abstract class Statement extends AstNode {}
+export abstract class Statement extends AstNode {
+  /**
+   * Try the node through the provided @param visitor.
+   */
+  public abstract accept<R>(visitor: AstVisitor<R>): R;
+}
 
 /**
  * Base class for any expression.
  */
-export abstract class Expression extends Statement {}
+export abstract class Expression extends Statement {
+  /**
+   * Try the node through the provided @param visitor.
+   */
+  public abstract accept<R>(visitor: AstVisitor<R>): R;
+}
 
 /**
  * An AST node that was formed from a single @interface IToken.
