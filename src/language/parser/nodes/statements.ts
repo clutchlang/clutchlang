@@ -1,7 +1,7 @@
-import { IToken } from '../lexer';
+import { IToken } from '../../lexer';
+import { AstVisitor } from '../visitors';
 import { SimpleName } from './expressions';
 import { Expression, Statement } from './nodes';
-import { AstVisitor } from './visitors';
 
 export class StatementBlock {
   constructor(

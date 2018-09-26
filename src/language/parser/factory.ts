@@ -10,15 +10,28 @@ import {
   LiteralString,
   SimpleName,
   UnaryExpression,
-} from './expressions';
-import { FunctionDeclaration, Statement } from './nodes';
-import { JumpStatement, StatementBlock, VariableStatement } from './statements';
+} from './nodes/expressions';
+import {
+  FileRoot,
+  FunctionDeclaration,
+  Statement,
+  TopLevelElement,
+} from './nodes/nodes';
+import {
+  JumpStatement,
+  StatementBlock,
+  VariableStatement,
+} from './nodes/statements';
 
 /**
  * Factory class for creating @class {AstNode} instances.
  */
 export class AstNodeFactory {
-  public createFunction(
+  public createFileRoot(topLevelElements: TopLevelElement[]): FileRoot {
+    return new FileRoot(topLevelElements);
+  }
+
+  public createFunctionDeclaration(
     name: SimpleName,
     parameters: SimpleName[],
     arrowToken: IToken,

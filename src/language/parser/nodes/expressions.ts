@@ -1,8 +1,8 @@
-import { IToken } from '../lexer';
+import { IToken } from '../../lexer';
+import { AstVisitor } from '../visitors';
 import { Expression, SimpleNode } from './nodes';
 import { Operator } from './operators';
 import { StatementBlock } from './statements';
-import { AstVisitor } from './visitors';
 
 /**
  * An expression formed with an @member operator and a @member target.

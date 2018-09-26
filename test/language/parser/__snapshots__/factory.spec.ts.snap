@@ -98,6 +98,18 @@ exports[`AstNodeFactory Statement should create a return statement 1`] = `
 "
 `;
 
+exports[`AstNodeFactory should create a file root 1`] = `
+"FileRoot:
+  Elements:
+    FunctionDeclaration:
+      Name:
+        <#a>
+      Parameters:
+      Body:
+        <#b>
+"
+`;
+
 exports[`AstNodeFactory should create a function 1`] = `
 "FunctionDeclaration:
   Name:

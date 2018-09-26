@@ -25,6 +25,21 @@ describe('AstNodeFactory', () => {
     offset: 0,
   });
 
+  it('should create a file root', () => {
+    const $arrow = {
+      comments: [],
+      kind: TokenKind.ARROW,
+      lexeme: '->',
+      offset: 0,
+    };
+    const $function = factory.createFunctionDeclaration(a, [], $arrow, b);
+    const fileRoot = factory.createFileRoot([$function]);
+    expect(fileRoot.firstToken).toEqual($function.firstToken);
+    expect(fileRoot.lastToken).toEqual($function.lastToken);
+    expect(fileRoot.topLevelElements).toEqual([$function]);
+    expect(fileRoot.accept(visitor)).toMatchSnapshot();
+  });
+
   it('should create a function', () => {
     const $arrow = {
       comments: [],
@@ -32,7 +47,7 @@ describe('AstNodeFactory', () => {
       lexeme: '->',
       offset: 0,
     };
-    const $function = factory.createFunction(a, [b], $arrow, b);
+    const $function = factory.createFunctionDeclaration(a, [b], $arrow, b);
     expect($function.arrowToken).toEqual($arrow);
     expect($function.body).toEqual(b);
     expect($function.firstToken).toEqual(a.firstToken);
