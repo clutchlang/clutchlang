@@ -19,8 +19,8 @@ export class JumpStatement extends Statement {
     super();
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitJumpStatement(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitJumpStatement(this, context);
   }
 
   public get lastToken(): IToken {
@@ -38,8 +38,8 @@ export class VariableStatement extends Statement {
     super();
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitVariableStatement(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitVariableStatement(this, context);
   }
 
   public get lastToken(): IToken {

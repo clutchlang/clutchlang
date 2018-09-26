@@ -24,14 +24,14 @@ export class UnaryExpression extends OperatorExpression {
   constructor(
     target: Expression,
     operator: Operator,
-    operatorToken: IToken,
+    public readonly operatorToken: IToken,
     protected readonly isPrefix: boolean
   ) {
     super(target, operator, operatorToken);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitUnaryExpression(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitUnaryExpression(this, context);
   }
 
   public get firstToken(): IToken {
@@ -50,14 +50,14 @@ export class BinaryExpression extends OperatorExpression {
   constructor(
     public readonly left: Expression,
     operator: Operator,
-    operatorToken: IToken,
+    public readonly operatorToken: IToken,
     public readonly right: Expression
   ) {
     super(left, operator, operatorToken);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitBinaryExpression(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitBinaryExpression(this, context);
   }
 
   public get firstToken(): IToken {
@@ -88,8 +88,8 @@ export class IfExpression extends Expression {
     this.lastToken = elseBody ? elseBody.lastToken : body.lastToken;
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitIfExpression(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitIfExpression(this, context);
   }
 }
 
@@ -103,8 +103,8 @@ export class InvokeExpression extends Expression {
     super();
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitInvokeExpression(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitInvokeExpression(this, context);
   }
 
   public get firstToken(): IToken {
@@ -124,8 +124,8 @@ export class LiteralBoolean extends SimpleNode implements Expression {
     super(token);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitLiteralBoolean(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralBoolean(this, context);
   }
 }
 
@@ -137,8 +137,8 @@ export class LiteralNumber extends SimpleNode implements Expression {
     super(token);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitLiteralNumber(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralNumber(this, context);
   }
 }
 
@@ -165,8 +165,8 @@ export class LiteralString extends SimpleNode implements Expression {
     super(token);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitLiteralString(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralString(this, context);
   }
 }
 
@@ -178,7 +178,7 @@ export class SimpleName extends SimpleNode implements Expression {
     super(token);
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitSimpleName(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitSimpleName(this, context);
   }
 }

@@ -1,10 +1,15 @@
 // tslint:disable:no-magic-numbers
 
 import { TokenKind } from '../../../src/language/lexer';
-import { AstNodeFactory, Operator } from '../../../src/language/parser';
+import {
+  AstNodeFactory,
+  Operator,
+  PrintTreeVisitor,
+} from '../../../src/language/parser';
 
 describe('AstNodeFactory', () => {
   const factory = new AstNodeFactory();
+  const visitor = new PrintTreeVisitor();
 
   const a = factory.createSimpleName({
     comments: [],
@@ -34,6 +39,7 @@ describe('AstNodeFactory', () => {
     expect($function.lastToken).toEqual(b.lastToken);
     expect($function.name).toEqual(a);
     expect($function.parameters).toEqual([b]);
+    expect($function.accept(visitor)).toMatchSnapshot();
   });
 
   describe('<Expression>', () => {
@@ -51,6 +57,7 @@ describe('AstNodeFactory', () => {
       expect(expr.operator).toBe(Operator.Add);
       expect(expr.right).toBe(b);
       expect(expr.target).toBe(a);
+      expect(expr.accept(visitor)).toMatchSnapshot();
     });
 
     it('should create prefix UnaryExpression', () => {
@@ -70,6 +77,7 @@ describe('AstNodeFactory', () => {
       expect(expr.lastToken).toBe(a.lastToken);
       expect(expr.operator).toEqual(Operator.UnaryNegation);
       expect(expr.target).toBe(a);
+      expect(expr.accept(visitor)).toMatchSnapshot();
     });
 
     it('should create postfix UnaryExpression', () => {
@@ -89,6 +97,7 @@ describe('AstNodeFactory', () => {
       expect(expr.lastToken).toBe($accessor);
       expect(expr.operator).toEqual(Operator.Accessor);
       expect(expr.target).toBe(a);
+      expect(expr.accept(visitor)).toMatchSnapshot();
     });
 
     describe('should create IfExpression', () => {
@@ -108,6 +117,7 @@ describe('AstNodeFactory', () => {
         expect(expr.firstToken).toEqual($if);
         expect(expr.ifToken).toBe($if);
         expect(expr.lastToken).toBe(b.lastToken);
+        expect(expr.accept(visitor)).toMatchSnapshot();
       });
 
       it('with else', () => {
@@ -125,6 +135,7 @@ describe('AstNodeFactory', () => {
         expect(expr.firstToken).toEqual($if);
         expect(expr.ifToken).toBe($if);
         expect(expr.lastToken).toBe(a.lastToken);
+        expect(expr.accept(visitor)).toMatchSnapshot();
       });
     });
   });
@@ -160,6 +171,7 @@ describe('AstNodeFactory', () => {
       expect(stmt.expression).toEqual(a);
       expect(stmt.firstToken).toEqual($return);
       expect(stmt.lastToken).toEqual(a.lastToken);
+      expect(stmt.accept(visitor)).toMatchSnapshot();
     });
 
     it('should create a let statement', () => {
@@ -181,6 +193,7 @@ describe('AstNodeFactory', () => {
       expect(stmt.firstToken).toEqual($let);
       expect(stmt.lastToken).toEqual(b.lastToken);
       expect(stmt.name).toEqual(a);
+      expect(stmt.accept(visitor)).toMatchSnapshot();
     });
   });
 
@@ -204,6 +217,7 @@ describe('AstNodeFactory', () => {
     expect(expr.openToken).toEqual($open);
     expect(expr.parameters).toEqual([]);
     expect(expr.target).toEqual(a);
+    expect(expr.accept(visitor)).toMatchSnapshot();
   });
 
   describe('LiteralBoolean', () => {
@@ -218,6 +232,7 @@ describe('AstNodeFactory', () => {
       expect($true.firstToken).toBe(token);
       expect($true.lastToken).toBe(token);
       expect($true.value).toBe(true);
+      expect($true.accept(visitor)).toMatchSnapshot();
     });
 
     it('should evaluate false', () => {
@@ -227,10 +242,11 @@ describe('AstNodeFactory', () => {
         lexeme: 'false',
         offset: 0,
       };
-      const $true = factory.createLiteralBoolean(token);
-      expect($true.firstToken).toBe(token);
-      expect($true.lastToken).toBe(token);
-      expect($true.value).toBe(false);
+      const $false = factory.createLiteralBoolean(token);
+      expect($false.firstToken).toBe(token);
+      expect($false.lastToken).toBe(token);
+      expect($false.value).toBe(false);
+      expect($false.accept(visitor)).toMatchSnapshot();
     });
   });
 
@@ -246,6 +262,7 @@ describe('AstNodeFactory', () => {
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
       expect($1.value).toBe(1);
+      expect($1.accept(visitor)).toMatchSnapshot();
     });
 
     it('should evaluate float', () => {
@@ -259,6 +276,7 @@ describe('AstNodeFactory', () => {
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
       expect($1.value).toBe(1.5);
+      expect($1.accept(visitor)).toMatchSnapshot();
     });
 
     it('should evaluate hex', () => {
@@ -272,6 +290,7 @@ describe('AstNodeFactory', () => {
       expect($0xFFF.firstToken).toBe(token);
       expect($0xFFF.lastToken).toBe(token);
       expect($0xFFF.value).toBe(0xfff);
+      expect($0xFFF.accept(visitor)).toMatchSnapshot();
     });
 
     it('should evaluate exponential', () => {
@@ -285,6 +304,7 @@ describe('AstNodeFactory', () => {
       expect($2e6.firstToken).toBe(token);
       expect($2e6.lastToken).toBe(token);
       expect($2e6.value).toBe(2e6);
+      expect($2e6.accept(visitor)).toMatchSnapshot();
     });
   });
 
@@ -300,6 +320,7 @@ describe('AstNodeFactory', () => {
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
       expect(empty.value).toBe('');
+      expect(empty.accept(visitor)).toMatchSnapshot();
     });
 
     it('should evaluate a single-line string', () => {
@@ -357,5 +378,6 @@ describe('AstNodeFactory', () => {
     expect(fooBar.firstToken).toBe(token);
     expect(fooBar.lastToken).toBe(token);
     expect(fooBar.name).toBe('fooBar');
+    expect(fooBar.accept(visitor)).toMatchSnapshot();
   });
 });

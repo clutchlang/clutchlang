@@ -10,7 +10,7 @@ export abstract class AstNode {
   /**
    * Try the node through the provided @param visitor.
    */
-  public abstract accept<R>(visitor: AstVisitor<R>): R;
+  public abstract accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R;
   /**
    * The first token that was scanned to form this node.
    */
@@ -34,8 +34,8 @@ export class FunctionDeclaration extends TopLevelElement {
     super();
   }
 
-  public accept<R>(visitor: AstVisitor<R>): R {
-    return visitor.visitFunctionDeclaration(this);
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitFunctionDeclaration(this, context);
   }
 
   public get firstToken(): IToken {
@@ -50,22 +50,12 @@ export class FunctionDeclaration extends TopLevelElement {
 /**
  * Base class for any statement.
  */
-export abstract class Statement extends AstNode {
-  /**
-   * Try the node through the provided @param visitor.
-   */
-  public abstract accept<R>(visitor: AstVisitor<R>): R;
-}
+export abstract class Statement extends AstNode {}
 
 /**
  * Base class for any expression.
  */
-export abstract class Expression extends Statement {
-  /**
-   * Try the node through the provided @param visitor.
-   */
-  public abstract accept<R>(visitor: AstVisitor<R>): R;
-}
+export abstract class Expression extends Statement {}
 
 /**
  * An AST node that was formed from a single @interface IToken.
