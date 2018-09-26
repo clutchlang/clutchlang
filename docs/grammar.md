@@ -90,17 +90,17 @@ start<br>
 
 #### Precedence
 
-| Precedence | Title          | Symbols               |
-|------------|----------------|-----------------------|
-| Highest    | Postfix        | ++, --, .             |
-|            | Prefix         | -, +, ++, --, !       |
-|            | Multiplicative | *, /, %               |
-|            | Additive       | +, -                  |
-|            | Comparison     | <, >, <=, >=          |
-|            | Equality       | ==, !=, ===, !==      |
-|            | Conjunction    | &&                    |
-|            | Disjunction    | ||                    |
-| Lowest     | Assignment     | =, +=, -=, *=, /=, %= |
+| Precedence | Title          | Symbols                           |
+|------------|----------------|-----------------------------------|
+| Highest    | Postfix        | `++`, `--`, `.`                   |
+|            | Prefix         | `-`, `+`, `++`, `--`, `!`         |
+|            | Multiplicative | `*`, `/`, `%`                     |
+|            | Additive       | `+`, `-`                          |
+|            | Comparison     | `<`, `>`, `<=`, `>=`              |
+|            | Equality       | `==`, `!=`, `===`, `!==`          |
+|            | Conjunction    | `&&`                              |
+|            | Disjunction    | `||`                              |
+| Lowest     | Assignment     | `=`, `+=`, `-=`, `*=`, `/=`, `%=` |
 
 #### Rules
 
