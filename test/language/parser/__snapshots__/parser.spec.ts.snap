@@ -1,6 +1,76 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ClutchParser should parse and print additive + 1`] = `
+exports[`ClutchParser should parse and print binary a != b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: !=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a !== b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: !==
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a % b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: %
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a %= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: %=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a && b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: &&
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a * b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: *
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a *= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: *=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a + b 1`] = `
 "BinaryExpression:
   Left:
     <#a>
@@ -10,27 +80,180 @@ exports[`ClutchParser should parse and print additive + 1`] = `
 "
 `;
 
-exports[`ClutchParser should parse and print literals boolean [false] 1`] = `
-"<false>
+exports[`ClutchParser should parse and print binary a += b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: +=
+  Right:
+    <#b>
 "
 `;
 
-exports[`ClutchParser should parse and print literals boolean [true] 1`] = `
-"<#true>
+exports[`ClutchParser should parse and print binary a / b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: /
+  Right:
+    <#b>
 "
 `;
 
-exports[`ClutchParser should parse and print literals number 1`] = `
+exports[`ClutchParser should parse and print binary a /= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: /=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a < b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: <
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a <= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: <=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a = b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: =
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a == b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: ==
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a === b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: ===
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a > b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: >
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a >= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: >=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a || b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: ||
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a - b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: -
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print binary a -= b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: -=
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print literal 
+          Hello
+          World!
+         1`] = `
+"<#Hello>
+"
+`;
+
+exports[`ClutchParser should parse and print literal 'Hello' 1`] = `
+"<Hello>
+"
+`;
+
+exports[`ClutchParser should parse and print literal 1 1`] = `
 "<1>
 "
 `;
 
-exports[`ClutchParser should parse and print literals string 1`] = `
-"<foo>
+exports[`ClutchParser should parse and print literal 1.5 1`] = `
+"<1.5>
 "
 `;
 
-exports[`ClutchParser should parse and print literals variable 1`] = `
-"<#foo>
+exports[`ClutchParser should parse and print literal 3.14 1`] = `
+"<3.14>
+"
+`;
+
+exports[`ClutchParser should parse and print literal 30.4 1`] = `
+"<30.4>
+"
+`;
+
+exports[`ClutchParser should parse and print literal false 1`] = `
+"<false>
+"
+`;
+
+exports[`ClutchParser should parse and print literal fooBar 1`] = `
+"<#fooBar>
+"
+`;
+
+exports[`ClutchParser should parse and print literal true 1`] = `
+"<#true>
 "
 `;

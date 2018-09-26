@@ -1,5 +1,6 @@
 import { tokenize } from '../../../src/language/lexer';
 import {
+  BinaryExpression,
   ClutchParser,
   Expression,
   PrintTreeVisitor,
@@ -11,36 +12,59 @@ describe('ClutchParser', () => {
     return new ClutchParser(tokens).parseExpression();
   }
 
-  function printExpressionTree(expression: string): string {
-    return parseExpression(expression).accept(new PrintTreeVisitor());
-  }
-
   describe('should parse and print', () => {
-    describe('literals', () => {
-      it('string', () => {
-        expect(printExpressionTree("'foo'")).toMatchSnapshot();
-      });
-
-      it('number', () => {
-        expect(printExpressionTree('1')).toMatchSnapshot();
-      });
-
-      it('boolean [false]', () => {
-        expect(printExpressionTree('false')).toMatchSnapshot();
-      });
-
-      it('boolean [true]', () => {
-        expect(printExpressionTree('true')).toMatchSnapshot();
-      });
-
-      it('variable', () => {
-        expect(printExpressionTree('foo')).toMatchSnapshot();
+    describe('literal', () => {
+      [
+        "'Hello'",
+        `
+          Hello
+          World!
+        `,
+        '1',
+        '1.5',
+        '3.14',
+        '30.4',
+        'true',
+        'false',
+        'fooBar',
+      ].forEach(t => {
+        it(t, () => {
+          const expr = parseExpression(t);
+          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+        });
       });
     });
 
-    describe('additive', () => {
-      it.only('+', () => {
-        expect(printExpressionTree('a + b')).toMatchSnapshot();
+    describe('binary', () => {
+      [
+        '*',
+        '/',
+        '%',
+        '+',
+        '-',
+        '<',
+        '>',
+        '<=',
+        '>=',
+        '==',
+        '!=',
+        '===',
+        '!==',
+        '&&',
+        '||',
+        '=',
+        '+=',
+        '-=',
+        '*=',
+        '/=',
+        '%=',
+      ].forEach(t => {
+        const text = `a ${t} b`;
+        it(text, () => {
+          const expr = parseExpression(`a ${t} b`);
+          expect(expr).toBeInstanceOf(BinaryExpression);
+          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+        });
       });
     });
   });
