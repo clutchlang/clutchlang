@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClutchParser should parse and print additive + 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: +
+  Right:
+    <#b>
+"
+`;
+
+exports[`ClutchParser should parse and print literals boolean [false] 1`] = `
+"<false>
+"
+`;
+
+exports[`ClutchParser should parse and print literals boolean [true] 1`] = `
+"<#true>
+"
+`;
+
+exports[`ClutchParser should parse and print literals number 1`] = `
+"<1>
+"
+`;
+
+exports[`ClutchParser should parse and print literals string 1`] = `
+"<foo>
+"
+`;
+
+exports[`ClutchParser should parse and print literals variable 1`] = `
+"<#foo>
+"
+`;

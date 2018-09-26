@@ -11,6 +11,7 @@ export enum Precedence {
   Conjunction,
   Disjunction,
   Assignment,
+  Literal,
 }
 
 /**
