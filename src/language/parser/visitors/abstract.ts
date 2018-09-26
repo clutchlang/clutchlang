@@ -17,7 +17,7 @@ import { JumpStatement, VariableStatement } from '../nodes/statements';
 export abstract class AstVisitor<R, C> {
   // Misc
   public abstract visitFileRoot(node: FileRoot, context?: C): R;
-  
+
   // Expressions
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
   public abstract visitIfExpression(node: IfExpression, context?: C): R;

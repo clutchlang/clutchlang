@@ -22,10 +22,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     super();
   }
 
-  public visitFileRoot(
-    node: FileRoot,
-    writer = new StringBuffer()
-  ): string {
+  public visitFileRoot(node: FileRoot, writer = new StringBuffer()): string {
     return this.visitNode(node, writer, () => {
       this.writeIndented('Elements:', writer, () => {
         node.topLevelElements.forEach(e => e.accept(this, writer));

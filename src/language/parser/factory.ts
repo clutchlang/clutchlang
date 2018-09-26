@@ -11,8 +11,17 @@ import {
   SimpleName,
   UnaryExpression,
 } from './nodes/expressions';
-import { FileRoot, FunctionDeclaration, Statement, TopLevelElement } from './nodes/nodes';
-import { JumpStatement, StatementBlock, VariableStatement } from './nodes/statements';
+import {
+  FileRoot,
+  FunctionDeclaration,
+  Statement,
+  TopLevelElement,
+} from './nodes/nodes';
+import {
+  JumpStatement,
+  StatementBlock,
+  VariableStatement,
+} from './nodes/statements';
 
 /**
  * Factory class for creating @class {AstNode} instances.

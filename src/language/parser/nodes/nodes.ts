@@ -11,7 +11,7 @@ export abstract class AstNode {
    * Try the node through the provided @param visitor.
    */
   public abstract accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R;
-  
+
   /**
    * The first token that was scanned to form this node.
    */
