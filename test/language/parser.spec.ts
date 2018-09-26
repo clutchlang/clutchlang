@@ -1,7 +1,12 @@
 // tslint:disable:no-magic-numbers
 
-import { TokenKind } from "../../src/language/lexer";
-import { LiteralBoolean, LiteralNumber, LiteralString, SimpleName } from "../../src/language/parser";
+import { TokenKind } from '../../src/language/lexer';
+import {
+  LiteralBoolean,
+  LiteralNumber,
+  LiteralString,
+  SimpleName,
+} from '../../src/language/parser';
 
 describe('LiteralBoolean', () => {
   it('should evaluate true', () => {
@@ -68,7 +73,7 @@ describe('LiteralNumber', () => {
     const $0xFFF = new LiteralNumber(token);
     expect($0xFFF.firstToken).toBe(token);
     expect($0xFFF.lastToken).toBe(token);
-    expect($0xFFF.value).toBe(0xFFF);
+    expect($0xFFF.value).toBe(0xfff);
   });
 
   it('should evaluate exponential', () => {

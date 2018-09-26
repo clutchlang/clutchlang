@@ -53,15 +53,17 @@ export class LiteralNumber extends SimpleNode {
 
   constructor(token: IToken) {
     super(token);
-    this.value = /^0(x|X)/.test(token.lexeme) ? parseInt(token.lexeme, 16) : parseFloat(token.lexeme);
+    this.value = /^0(x|X)/.test(token.lexeme)
+      ? parseInt(token.lexeme, 16)
+      : parseFloat(token.lexeme);
   }
 }
 
 /**
  * A literal string compatible with JavaScript.
- * 
+ *
  * Strings in Clutch are supported single and multi-line. A multi-line string
- * automatically has baseline indentation normalization. For example, the 
+ * automatically has baseline indentation normalization. For example, the
  * following:
  * ```
  * let x = '
@@ -69,7 +71,7 @@ export class LiteralNumber extends SimpleNode {
  *     World!
  * '
  * ```
- * 
+ *
  * ... is identical to:
  * ```
  * 'Hello\n  World!'
