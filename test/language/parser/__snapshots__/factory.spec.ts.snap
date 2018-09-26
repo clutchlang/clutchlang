@@ -1,0 +1,117 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AstNodeFactory <Expression> should create BinaryExpression 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: +
+  Right:
+    <#b>
+"
+`;
+
+exports[`AstNodeFactory <Expression> should create IfExpression  1`] = `
+"IfExpression:
+  If:
+    <#a>
+  Body:
+    <#b>
+"
+`;
+
+exports[`AstNodeFactory <Expression> should create IfExpression with else 1`] = `
+"IfExpression:
+  If:
+    <#a>
+  Body:
+    <#b>
+"
+`;
+
+exports[`AstNodeFactory <Expression> should create postfix UnaryExpression 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: !
+"
+`;
+
+exports[`AstNodeFactory <Expression> should create prefix UnaryExpression 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: !
+"
+`;
+
+exports[`AstNodeFactory LiteralBoolean should evaluate false 1`] = `
+"<false>
+"
+`;
+
+exports[`AstNodeFactory LiteralBoolean should evaluate true 1`] = `
+"<true>
+"
+`;
+
+exports[`AstNodeFactory LiteralNumber should evaluate exponential 1`] = `
+"<2000000>
+"
+`;
+
+exports[`AstNodeFactory LiteralNumber should evaluate float 1`] = `
+"<1.5>
+"
+`;
+
+exports[`AstNodeFactory LiteralNumber should evaluate hex 1`] = `
+"<4095>
+"
+`;
+
+exports[`AstNodeFactory LiteralNumber should evaluate int 1`] = `
+"<1>
+"
+`;
+
+exports[`AstNodeFactory LiteralString should evaluate an empty string 1`] = `
+"<>
+"
+`;
+
+exports[`AstNodeFactory SimpleName should implement AstNode 1`] = `
+"<#fooBar>
+"
+`;
+
+exports[`AstNodeFactory Statement should create a let statement 1`] = `
+"VariableStatement:
+  Assign:
+    <#b>
+"
+`;
+
+exports[`AstNodeFactory Statement should create a return statement 1`] = `
+"JumpStatement:
+  Return:
+    <#a>
+"
+`;
+
+exports[`AstNodeFactory should create a function 1`] = `
+"FunctionDeclaration:
+  Name:
+    <#a>
+  Parameters:
+    <#b>
+  Body:
+    <#b>
+"
+`;
+
+exports[`AstNodeFactory should create an invoke expression 1`] = `
+"InvokeExpression:
+  Target:
+  Parameters:
+"
+`;
