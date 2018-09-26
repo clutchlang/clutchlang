@@ -1,6 +1,48 @@
 import { splitLines, unescapeString } from '../agnostic/strings';
 import { IToken } from './lexer';
 
+export class AstNodeFactory {
+  public createSimpleName(token: IToken): SimpleName {
+    return new SimpleName(token, token.lexeme);
+  }
+
+  public createLiteralBoolean(token: IToken): LiteralBoolean {
+    return new LiteralBoolean(token, token.lexeme === 'true');
+  }
+
+  public createLiteralNumber(token: IToken): LiteralNumber {
+    return new LiteralNumber(token, this.parseLiteralNumberValue(token.lexeme));
+  }
+
+  public createLiteralString(token: IToken): LiteralString {
+    return new LiteralString(token, this.parseLiteralStringValue(token.lexeme));
+  }
+
+  protected parseLiteralNumberValue(lexeme: string) {
+    return /^0(x|X)/.test(lexeme) ? parseInt(lexeme, 16) : parseFloat(lexeme);
+  }
+
+  protected parseLiteralStringValue(lexeme: string): string {
+    const lines = splitLines(lexeme);
+    if (lines.length === 0) {
+      return '';
+    }
+    if (lines.length === 1) {
+      return unescapeString(lines[0]);
+    }
+    const buffer: string[] = [];
+    let l = 1;
+    let line = unescapeString(lines[l]);
+    const baseline = line.length - line.trimLeft().length;
+    l--;
+    while (l++ < lines.length - 1) {
+      line = unescapeString(lines[l]);
+      buffer.push(line.substring(baseline));
+    }
+    return buffer.join('\n');
+  }
+}
+
 /**
  * Base class for anything in the syntax tree.
  */
@@ -37,11 +79,8 @@ export abstract class SimpleNode extends AstNode {
  * A literal boolean compatible with JavaScript.
  */
 export class LiteralBoolean extends SimpleNode {
-  public readonly value: boolean;
-
-  constructor(token: IToken) {
+  constructor(token: IToken, public readonly value: boolean) {
     super(token);
-    this.value = token.lexeme === 'true';
   }
 }
 
@@ -49,13 +88,8 @@ export class LiteralBoolean extends SimpleNode {
  * A literal number compatible with JavaScript.
  */
 export class LiteralNumber extends SimpleNode {
-  public readonly value: number;
-
-  constructor(token: IToken) {
+  constructor(token: IToken, public readonly value: number) {
     super(token);
-    this.value = /^0(x|X)/.test(token.lexeme)
-      ? parseInt(token.lexeme, 16)
-      : parseFloat(token.lexeme);
   }
 }
 
@@ -78,31 +112,8 @@ export class LiteralNumber extends SimpleNode {
  * ```
  */
 export class LiteralString extends SimpleNode {
-  private static parseString(raw: string): string {
-    const lines = splitLines(raw);
-    if (lines.length === 0) {
-      return '';
-    }
-    if (lines.length === 1) {
-      return unescapeString(lines[0]);
-    }
-    const buffer: string[] = [];
-    let l = 1;
-    let line = unescapeString(lines[l]);
-    const baseline = line.length - line.trimLeft().length;
-    l--;
-    while (l++ < lines.length - 1) {
-      line = unescapeString(lines[l]);
-      buffer.push(line.substring(baseline));
-    }
-    return buffer.join('\n');
-  }
-
-  public readonly value: string;
-
-  constructor(token: IToken) {
+  constructor(token: IToken, public readonly value: string) {
     super(token);
-    this.value = LiteralString.parseString(token.lexeme);
   }
 }
 
@@ -110,10 +121,7 @@ export class LiteralString extends SimpleNode {
  * Represents a reference to some identifier by name.
  */
 export class SimpleName extends SimpleNode {
-  public readonly name: string;
-
-  constructor(token: IToken) {
+  constructor(token: IToken, public readonly name: string) {
     super(token);
-    this.name = token.lexeme;
   }
 }
