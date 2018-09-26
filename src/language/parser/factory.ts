@@ -4,25 +4,35 @@ import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
   IfExpression,
+  InvokeExpression,
   LiteralBoolean,
   LiteralNumber,
   LiteralString,
   SimpleName,
   UnaryExpression,
 } from './expressions';
-import { Statement } from './nodes';
+import { FunctionDeclaration, Statement } from './nodes';
 import { JumpStatement, StatementBlock, VariableStatement } from './statements';
 
 /**
  * Factory class for creating @class {AstNode} instances.
  */
 export class AstNodeFactory {
+  public createFunction(
+    name: SimpleName,
+    parameters: SimpleName[],
+    arrowToken: IToken,
+    body: Expression | StatementBlock
+  ): FunctionDeclaration {
+    return new FunctionDeclaration(name, parameters, arrowToken, body);
+  }
+
   public createUnaryExpression(
     target: Expression,
     operator: Operator,
     operatorToken: IToken,
     isPrefix: boolean
-  ) {
+  ): UnaryExpression {
     return new UnaryExpression(target, operator, operatorToken, isPrefix);
   }
 
@@ -31,7 +41,7 @@ export class AstNodeFactory {
     operator: Operator,
     operatorToken: IToken,
     right: Expression
-  ) {
+  ): BinaryExpression {
     return new BinaryExpression(left, operator, operatorToken, right);
   }
 
@@ -41,8 +51,17 @@ export class AstNodeFactory {
     body: Expression | StatementBlock,
     elseToken?: IToken,
     elseBody?: Expression | StatementBlock
-  ) {
+  ): IfExpression {
     return new IfExpression(ifToken, condition, body, elseToken, elseBody);
+  }
+
+  public createInvokeExpression(
+    target: Expression,
+    openToken: IToken,
+    parameters: Expression[],
+    closeToken: IToken
+  ): InvokeExpression {
+    return new InvokeExpression(target, openToken, parameters, closeToken);
   }
 
   public createStatementBlock(

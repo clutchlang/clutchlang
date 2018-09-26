@@ -20,6 +20,22 @@ describe('AstNodeFactory', () => {
     offset: 0,
   });
 
+  it('should create a function', () => {
+    const $arrow = {
+      comments: [],
+      kind: TokenKind.ARROW,
+      lexeme: '->',
+      offset: 0,
+    };
+    const $function = factory.createFunction(a, [b], $arrow, b);
+    expect($function.arrowToken).toEqual($arrow);
+    expect($function.body).toEqual(b);
+    expect($function.firstToken).toEqual(a.firstToken);
+    expect($function.lastToken).toEqual(b.lastToken);
+    expect($function.name).toEqual(a);
+    expect($function.parameters).toEqual([b]);
+  });
+
   describe('<Expression>', () => {
     it('should create BinaryExpression', () => {
       const $plus = {
@@ -166,6 +182,28 @@ describe('AstNodeFactory', () => {
       expect(stmt.lastToken).toEqual(b.lastToken);
       expect(stmt.name).toEqual(a);
     });
+  });
+
+  it('should create an invoke expression', () => {
+    const $open = {
+      comments: [],
+      kind: TokenKind.LEFT_PAREN,
+      lexeme: '(',
+      offset: 0,
+    };
+    const $close = {
+      comments: [],
+      kind: TokenKind.RIGHT_PAREN,
+      lexeme: '(',
+      offset: 0,
+    };
+    const expr = factory.createInvokeExpression(a, $open, [], $close);
+    expect(expr.closeToken).toEqual($close);
+    expect(expr.firstToken).toEqual(a.firstToken);
+    expect(expr.lastToken).toEqual($close);
+    expect(expr.openToken).toEqual($open);
+    expect(expr.parameters).toEqual([]);
+    expect(expr.target).toEqual(a);
   });
 
   describe('LiteralBoolean', () => {

@@ -80,6 +80,25 @@ export class IfExpression extends Expression {
   }
 }
 
+export class InvokeExpression extends Expression {
+  constructor(
+    public readonly target: Expression,
+    public readonly openToken: IToken,
+    public readonly parameters: Expression[],
+    public readonly closeToken: IToken
+  ) {
+    super();
+  }
+
+  public get firstToken(): IToken {
+    return this.target.firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return this.closeToken;
+  }
+}
+
 /**
  * A literal boolean compatible with JavaScript.
  */
