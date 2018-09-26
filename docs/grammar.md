@@ -99,7 +99,7 @@ start<br>
 |            | Comparison     | `<`, `>`, `<=`, `>=`              |
 |            | Equality       | `==`, `!=`, `===`, `!==`          |
 |            | Conjunction    | `&&`                              |
-|            | Disjunction    | `||`                              |
+|            | Disjunction    | <code>&#124;&#124;</code>         |
 | Lowest     | Assignment     | `=`, `+=`, `-=`, `*=`, `/=`, `%=` |
 
 #### Rules
