@@ -139,3 +139,44 @@ export function splitLines(text: string): string[] {
 export function unescapeString(raw: string): string {
   return raw.replace('\\n', '\n');
 }
+
+/**
+ * Aids in incrementally writing a string, including proper indentation.
+ */
+export class StringBuffer {
+  private indents = '';
+
+  constructor(private buffer = '') {}
+
+  public write(object: unknown): void {
+    this.buffer += `${this.indents}${object}`;
+  }
+
+  public writeAll(objects: Iterable<unknown>, seperator = '') {
+    let first = true;
+    for (const e of objects) {
+      if (!first) {
+        this.buffer += seperator;
+      }
+      this.write(e);
+      first = false;
+    }
+  }
+
+  public writeLine(object: unknown = ''): void {
+    this.buffer += `${this.indents}${object}\n`;
+  }
+
+  public indent(amount = 0): number {
+    if (amount >= 0) {
+      this.indents += ' '.repeat(amount);
+    } else {
+      this.indents = this.indents.substring(-amount);
+    }
+    return this.indents.length;
+  }
+
+  public toString(): string {
+    return this.buffer;
+  }
+}
