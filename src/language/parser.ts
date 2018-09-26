@@ -1,5 +1,5 @@
-import { IToken } from './lexer';
 import { splitLines, unescapeString } from '../agnostic/strings';
+import { IToken } from './lexer';
 
 /**
  * Base class for anything in the syntax tree.
