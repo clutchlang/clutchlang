@@ -1,13 +1,29 @@
 import { StringBuffer } from '../../../agnostic/strings';
-import * as ast from '../../parser';
+import {
+  BinaryExpression,
+  IfExpression,
+  InvokeExpression,
+  LiteralBoolean,
+  LiteralNumber,
+  LiteralString,
+  SimpleName,
+  UnaryExpression,
+} from '../../parser';
+import { AstNode, FunctionDeclaration } from '../nodes';
+import {
+  JumpStatement,
+  StatementBlock,
+  VariableStatement,
+} from '../statements';
+import { AstVisitor } from './abstract';
 
-export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
+export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
   constructor(private readonly indent = 2) {
     super();
   }
 
   public visitBinaryExpression(
-    node: ast.BinaryExpression,
+    node: BinaryExpression,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -20,7 +36,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitIfExpression(
-    node: ast.IfExpression,
+    node: IfExpression,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -30,7 +46,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
       this.writeIndented('Body:', writer, () => {
         /* istanbul ignore next */
         const body =
-          node.body instanceof ast.StatementBlock
+          node.body instanceof StatementBlock
             ? node.body.statements
             : [node.body];
         body.forEach(e => e.accept(this, writer));
@@ -39,7 +55,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitInvokeExpression(
-    node: ast.InvokeExpression,
+    node: InvokeExpression,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -51,7 +67,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitLiteralBoolean(
-    node: ast.LiteralBoolean,
+    node: LiteralBoolean,
     writer = new StringBuffer()
   ): string {
     writer.writeLine(`<${node.value}>`);
@@ -59,7 +75,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitLiteralNumber(
-    node: ast.LiteralNumber,
+    node: LiteralNumber,
     writer = new StringBuffer()
   ): string {
     writer.writeLine(`<${node.value}>`);
@@ -67,7 +83,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitLiteralString(
-    node: ast.LiteralString,
+    node: LiteralString,
     writer = new StringBuffer()
   ): string {
     writer.writeLine(`<${node.value}>`);
@@ -75,7 +91,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitSimpleName(
-    node: ast.SimpleName,
+    node: SimpleName,
     writer = new StringBuffer()
   ): string {
     writer.writeLine(`<#${node.name}>`);
@@ -83,7 +99,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitUnaryExpression(
-    node: ast.UnaryExpression,
+    node: UnaryExpression,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -95,7 +111,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitJumpStatement(
-    node: ast.JumpStatement,
+    node: JumpStatement,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -106,7 +122,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitVariableStatement(
-    node: ast.VariableStatement,
+    node: VariableStatement,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -117,7 +133,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   public visitFunctionDeclaration(
-    node: ast.FunctionDeclaration,
+    node: FunctionDeclaration,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -128,7 +144,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
       this.writeIndented('Body:', writer, () => {
         /* istanbul ignore next */
         const body =
-          node.body instanceof ast.StatementBlock
+          node.body instanceof StatementBlock
             ? node.body.statements
             : [node.body];
         body.forEach(e => e.accept(this, writer));
@@ -137,7 +153,7 @@ export class PrintTreeVisitor extends ast.AstVisitor<string, StringBuffer> {
   }
 
   protected visitNode(
-    node: ast.AstNode,
+    node: AstNode,
     writer: StringBuffer,
     children: () => void
   ): string {
