@@ -214,3 +214,46 @@ restricted set of semantics.
 * Extremely strict, makes polymorphism incovenient.
 * Some users will likely still need to make their own `equals(...)` method.
 * Not clear if provides enough to be more useful than `===` on its own.
+
+### Enforce same-ness as part of equality checks
+
+That is, given:
+
+```
+compare (
+  a: Animal
+  b: Animal
+) => {
+  print(a == b)  // OK
+}
+```
+
+... compiles to:
+
+```js
+function $equals(a, b) {
+  return 
+    // Cheap-ish check for some primitives and null/undefined
+    (!a || !b)
+    ? a === b
+    // Cheap-ish check for classes with custom eqaulity.
+    : a.constructor === b.constructor && a.$equals(b);
+}
+
+function compare(a, b) {
+  print($equals(a, b))
+}
+```
+
+... and `===` could be inlined in other cases.
+
+**Upsides**:
+
+* Strictly enforces, at runtime, _reflexivity_ and _transitivity_ rules.
+* Relatively cheap without too demanding of a type system.
+
+**Downsides**:
+
+* Less optimal, makes `HashSet<Object>` potentially more expensive.
+* More or less removes the ability to define `==` as an extension method.
+* Worry that the more convenient operator (`==`) will be used most of the time.
