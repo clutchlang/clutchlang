@@ -41,24 +41,118 @@ start<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`topLevelElement*`<br>
 &nbsp;&nbsp;;
 
-*topLevelElement**<br>
+**topLevelElement**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`class`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`function`<br>
 &nbsp;&nbsp;;
 
-### Functions
+### Elements
 
 **function**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;... TBD ...<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`SimpleName`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`parameterList?`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"->"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `block` )<br>
 &nbsp;&nbsp;;
 
-### Classes
+**parameterList**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"("`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`identifier*`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`")"`<br>
+&nbsp;&nbsp;;
 
-**class**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;... TBD ...<br>
+**property**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"let"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`SimpleName`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"="`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+### Statements
+
+**block**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"{"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`statement*`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"}"`<br>
+&nbsp;&nbsp;;
+
+**statement**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`return`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`statement`<br>
+&nbsp;&nbsp;;
+
+**jump**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"return"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression?`<br>
 &nbsp;&nbsp;;
 
 ### Expressions
+
+**conditional**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"if"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `statementBlock` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"else"?`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `statementBlock` )<br>
+&nbsp;&nbsp;;
+
+**parenthesized**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"("`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`")"`<br>
+&nbsp;&nbsp;;
+
+**prefix**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"-"` | `"+"` | `"++"` | `"--"` | `"!"` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**postfix**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"++"` | `"--"` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**multiplicative**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"*"` |`"/"` | `"%"` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**additive**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"+"` |`"-"` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**comparison**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"<"` |`">"` | `"<="` | `">="` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**equality**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"=="` |`"!="` | `"==="` | `"!=="` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**conjunction**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"&&"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**disjunction**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"||"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**assignment**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"="` |`"+="` | `"-="` | `"*="` | `"/="` | `"%="` )<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
 
 #### Precedence
 
