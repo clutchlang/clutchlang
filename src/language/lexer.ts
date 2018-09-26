@@ -175,6 +175,12 @@ export class ClutchLexer {
             ? TokenKind.STAR_BY
             : TokenKind.STAR
         );
+      case Characters.$PERCENT: // "*" or "*="
+        return this.createToken(
+          this.program.match(Characters.$EQUALS)
+            ? TokenKind.MODULUS_BY
+            : TokenKind.MODULUS
+        );
       case Characters.$EQUALS: // "=" or "==" or "==="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
