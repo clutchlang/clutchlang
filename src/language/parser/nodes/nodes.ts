@@ -1,7 +1,7 @@
-import { IToken } from '../lexer';
+import { IToken } from '../../lexer';
+import { AstVisitor } from '../visitors';
 import { SimpleName } from './expressions';
 import { StatementBlock } from './statements';
-import { AstVisitor } from './visitors';
 
 /**
  * Base class for anything in the syntax tree.
@@ -11,6 +11,7 @@ export abstract class AstNode {
    * Try the node through the provided @param visitor.
    */
   public abstract accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R;
+  
   /**
    * The first token that was scanned to form this node.
    */
@@ -22,8 +23,35 @@ export abstract class AstNode {
   public abstract get lastToken(): IToken;
 }
 
+/**
+ * Root element in the AST.
+ */
+export class FileRoot extends AstNode {
+  constructor(public readonly topLevelElements: TopLevelElement[]) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitFileRoot(this, context);
+  }
+
+  public get firstToken(): IToken {
+    return this.topLevelElements[0].firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return this.topLevelElements[this.topLevelElements.length - 1].lastToken;
+  }
+}
+
+/**
+ * Represents an element that can live at the top-level of a file.
+ */
 export abstract class TopLevelElement extends AstNode {}
 
+/**
+ * Represents either a top-level, class-level, or local function.
+ */
 export class FunctionDeclaration extends TopLevelElement {
   constructor(
     public readonly name: SimpleName,

@@ -8,13 +8,16 @@ import {
   SimpleName,
   UnaryExpression,
 } from '../../parser';
-import { FunctionDeclaration } from '../nodes';
-import { JumpStatement, VariableStatement } from '../statements';
+import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
+import { JumpStatement, VariableStatement } from '../nodes/statements';
 
 /**
  * A pattern that may be used to visit an AST structure.
  */
 export abstract class AstVisitor<R, C> {
+  // Misc
+  public abstract visitFileRoot(node: FileRoot, context?: C): R;
+  
   // Expressions
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
   public abstract visitIfExpression(node: IfExpression, context?: C): R;

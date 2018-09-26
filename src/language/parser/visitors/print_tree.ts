@@ -9,17 +9,28 @@ import {
   SimpleName,
   UnaryExpression,
 } from '../../parser';
-import { AstNode, FunctionDeclaration } from '../nodes';
+import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
 import {
   JumpStatement,
   StatementBlock,
   VariableStatement,
-} from '../statements';
+} from '../nodes/statements';
 import { AstVisitor } from './abstract';
 
 export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
   constructor(private readonly indent = 2) {
     super();
+  }
+
+  public visitFileRoot(
+    node: FileRoot,
+    writer = new StringBuffer()
+  ): string {
+    return this.visitNode(node, writer, () => {
+      this.writeIndented('Elements:', writer, () => {
+        node.topLevelElements.forEach(e => e.accept(this, writer));
+      });
+    });
   }
 
   public visitBinaryExpression(
