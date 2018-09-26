@@ -25,8 +25,6 @@ export abstract class Expression extends AstNode implements Statement {}
  */
 export abstract class Statement extends AstNode {}
 
-export abstract class StatementBlock extends AstNode {}
-
 /**
  * An AST node that was formed from a single @interface IToken.
  */

@@ -1,6 +1,7 @@
 import { IToken } from '../lexer';
-import { Expression, SimpleNode, StatementBlock } from './nodes';
+import { Expression, SimpleNode } from './nodes';
 import { Operator } from './operators';
+import { StatementBlock } from './statements';
 
 /**
  * An expression formed with an @member operator and a @member target.
