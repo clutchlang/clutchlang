@@ -171,19 +171,23 @@ start<br>
 &nbsp;&nbsp;;
 
 **literalConstant**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;( `"true"` | `"false"` )<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`stringTemplate`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`LiteralBoolean`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralNumber`<br>
-&nbsp;&nbsp;;
-
-**stringTemplate**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`"'"`<br>
-&nbsp;&nbsp; &nbsp;&nbsp;`<any character other than "'">`<br>
-&nbsp;&nbsp; &nbsp;&nbsp;`"'"`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`LiteralString`<br>
 &nbsp;&nbsp;;
 
 ### Literals
 
+**LiteralBoolean**:
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"true"` | `"false"` )<br>
+&nbsp;&nbsp;;
+
 **LiteralNumber**: ~Roughly JavaScript (To be expanded).
+
+**LiteralString**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"'"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`<any character other than "'">`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"'"`<br>
+&nbsp;&nbsp;;
 
 **SimpleName**: ~Roughly JavaScript (To be expanded).

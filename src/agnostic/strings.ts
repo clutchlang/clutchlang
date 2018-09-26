@@ -134,3 +134,8 @@ export function splitLines(text: string): string[] {
   }
   return lines;
 }
+
+// TODO: Actually implement.
+export function unescapeString(raw: string): string {
+  return raw.replace('\\n', '\n');
+}
