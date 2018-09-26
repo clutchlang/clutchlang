@@ -3,6 +3,7 @@
  */
 export enum Precedence {
   Postfix,
+  Accessor,
   Prefix,
   Multiplicative,
   Additive,
@@ -20,7 +21,8 @@ export enum Precedence {
 export class Operator {
   public static readonly Increment = new Operator(Precedence.Postfix);
   public static readonly Decrement = new Operator(Precedence.Postfix);
-  public static readonly Accessor = new Operator(Precedence.Postfix);
+
+  public static readonly Accessor = new Operator(Precedence.Accessor);
 
   public static readonly UnaryNegative = new Operator(Precedence.Prefix);
   public static readonly UnaryPositive = new Operator(Precedence.Prefix);

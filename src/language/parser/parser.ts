@@ -32,7 +32,7 @@ export class ClutchParser {
         operator = this.peek(-1);
         expr = this.factory.createBinaryExpression(
           expr,
-          this.parseOperator(operator.lexeme),
+          this.parseBinaryOperator(operator.lexeme),
           operator,
           this.parseExpression(next)
         );
@@ -49,8 +49,8 @@ export class ClutchParser {
       if (this.match(...kinds)) {
         operator = this.peek(-1);
         return this.factory.createUnaryExpression(
-          expr,
-          this.parseOperator(operator.lexeme),
+          this.parseExpression(next),
+          this.parseUnaryOperator(operator.lexeme, prefix),
           operator,
           prefix
         );
@@ -115,12 +115,14 @@ export class ClutchParser {
             TokenKind.DECREMENT,
             TokenKind.NEGATE,
           ],
-          Precedence.Postfix
+          Precedence.Accessor
         );
+      case Precedence.Accessor:
+        return parseBinary([TokenKind.PERIOD], Precedence.Postfix);
       case Precedence.Postfix:
         return parseUnary(
           false,
-          [TokenKind.INCREMENT, TokenKind.DECREMENT, TokenKind.PERIOD],
+          [TokenKind.INCREMENT, TokenKind.DECREMENT],
           Precedence.Literal
         );
       default:
@@ -139,6 +141,8 @@ export class ClutchParser {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
     if (!this.match(TokenKind.IDENTIFIER)) {
+      // TODO: Test.
+      /* istanbul ignore next */
       throw new SyntaxError(
         `Expected literal got "${this.peek().lexeme}" (${this.peek().kind}).`
       );
@@ -147,12 +151,8 @@ export class ClutchParser {
     return this.factory.createSimpleName(token);
   }
 
-  private parseOperator(lexeme: string): Operator {
+  private parseBinaryOperator(lexeme: string): Operator {
     switch (lexeme) {
-      case '++':
-        return Operator.Increment;
-      case '--':
-        return Operator.Decrement;
       case '.':
         return Operator.Accessor;
       case '*':
@@ -198,6 +198,27 @@ export class ClutchParser {
       case '%=':
         return Operator.ModulusAssign;
       default:
+        // TODO: Test.
+        /* istanbul ignore next */
+        throw new SyntaxError(`Unexpected operator: "${lexeme}".`);
+    }
+  }
+
+  private parseUnaryOperator(lexeme: string, prefix: boolean): Operator {
+    switch (lexeme) {
+      case '++':
+        return prefix ? Operator.UnaryIncrement : Operator.Increment;
+      case '--':
+        return prefix ? Operator.UnaryDecrement : Operator.Decrement;
+      case '-':
+        return Operator.UnaryNegative;
+      case '+':
+        return Operator.UnaryPositive;
+      case '!':
+        return Operator.UnaryNegation;
+      default:
+        // TODO: Test.
+        /* istanbul ignore next */
         throw new SyntaxError(`Unexpected operator: "${lexeme}".`);
     }
   }

@@ -92,7 +92,8 @@ start<br>
 
 | Precedence | Title          | Symbols                           |
 |------------|----------------|-----------------------------------|
-| Highest    | Postfix        | `++`, `--`, `.`                   |
+| Highest    | Postfix        | `++`, `--`,                       |
+|            | Accessor       | `.`                               |
 |            | Prefix         | `-`, `+`, `++`, `--`, `!`         |
 |            | Multiplicative | `*`, `/`, `%`                     |
 |            | Additive       | `+`, `-`                          |

@@ -90,6 +90,16 @@ exports[`ClutchParser should parse and print binary a += b 1`] = `
 "
 `;
 
+exports[`ClutchParser should parse and print binary a . b 1`] = `
+"BinaryExpression:
+  Left:
+    <#a>
+  Operator: .
+  Right:
+    <#b>
+"
+`;
+
 exports[`ClutchParser should parse and print binary a / b 1`] = `
 "BinaryExpression:
   Left:
@@ -255,5 +265,45 @@ exports[`ClutchParser should parse and print literal fooBar 1`] = `
 
 exports[`ClutchParser should parse and print literal true 1`] = `
 "<#true>
+"
+`;
+
+exports[`ClutchParser should parse and print unary (prefix) ! a 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: !
+"
+`;
+
+exports[`ClutchParser should parse and print unary (prefix) + a 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: +
+"
+`;
+
+exports[`ClutchParser should parse and print unary (prefix) ++ a 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: ++
+"
+`;
+
+exports[`ClutchParser should parse and print unary (prefix) - a 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: -
+"
+`;
+
+exports[`ClutchParser should parse and print unary (prefix) -- a 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: --
 "
 `;

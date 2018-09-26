@@ -102,6 +102,8 @@ describe('tokenize', () => {
       TokenKind.MINUS_BY,
       TokenKind.STAR,
       TokenKind.STAR_BY,
+      TokenKind.MODULUS,
+      TokenKind.MODULUS_BY,
       TokenKind.ASSIGN,
       TokenKind.ARROW,
       TokenKind.EQUALS,

@@ -4,6 +4,7 @@ import {
   ClutchParser,
   Expression,
   PrintTreeVisitor,
+  UnaryExpression,
 } from '../../../src/language/parser';
 
 describe('ClutchParser', () => {
@@ -37,6 +38,7 @@ describe('ClutchParser', () => {
 
     describe('binary', () => {
       [
+        '.',
         '*',
         '/',
         '%',
@@ -61,8 +63,39 @@ describe('ClutchParser', () => {
       ].forEach(t => {
         const text = `a ${t} b`;
         it(text, () => {
-          const expr = parseExpression(`a ${t} b`);
+          const expr = parseExpression(text);
           expect(expr).toBeInstanceOf(BinaryExpression);
+          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+        });
+      });
+    });
+
+    describe('unary (prefix)', () => {
+      [
+        '++',
+        '--',
+        '-',
+        '+',
+        '!',
+      ].forEach(t => {
+        const text = `${t} a`;
+        it(text, () => {
+          const expr = parseExpression(text);
+          expect(expr).toBeInstanceOf(UnaryExpression);
+          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+        });
+      });
+    });
+
+    xdescribe('unary (postfix)', () => {
+      [
+        '++',
+        '--',
+      ].forEach(t => {
+        const text = `a ${t}`;
+        it(text, () => {
+          const expr = parseExpression(text);
+          expect(expr).toBeInstanceOf(UnaryExpression);
           expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
         });
       });
