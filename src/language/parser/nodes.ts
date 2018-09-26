@@ -1,4 +1,6 @@
 import { IToken } from '../lexer';
+import { SimpleName } from './expressions';
+import { StatementBlock } from './statements';
 
 /**
  * Base class for anything in the syntax tree.
@@ -15,15 +17,36 @@ export abstract class AstNode {
   public abstract get lastToken(): IToken;
 }
 
-/**
- * Base class for any expression.
- */
-export abstract class Expression extends AstNode implements Statement {}
+export abstract class TopLevelElement extends AstNode {}
+
+export class FunctionDeclaration extends TopLevelElement {
+  constructor(
+    public readonly name: SimpleName,
+    public readonly parameters: SimpleName[],
+    public readonly arrowToken: IToken,
+    public readonly body: Expression | StatementBlock
+  ) {
+    super();
+  }
+
+  public get firstToken(): IToken {
+    return this.name.firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return this.body.lastToken;
+  }
+}
 
 /**
  * Base class for any statement.
  */
 export abstract class Statement extends AstNode {}
+
+/**
+ * Base class for any expression.
+ */
+export abstract class Expression extends Statement {}
 
 /**
  * An AST node that was formed from a single @interface IToken.
