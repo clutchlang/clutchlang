@@ -88,6 +88,22 @@ start<br>
 
 ### Expressions
 
+#### Precedence
+
+| Precedence | Title          | Symbols               |
+|------------|----------------|-----------------------|
+| Highest    | Postfix        | ++, --, .             |
+|            | Prefix         | -, +, ++, --, !       |
+|            | Multiplicative | *, /, %               |
+|            | Additive       | +, -                  |
+|            | Comparison     | <, >, <=, >=          |
+|            | Equality       | ==, !=, ===, !==      |
+|            | Conjunction    | &&                    |
+|            | Disjunction    | ||                    |
+| Lowest     | Assignment     | =, +=, -=, *=, /=, %= |
+
+#### Rules
+
 **conditional**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`"if"`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
@@ -154,24 +170,20 @@ start<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
 &nbsp;&nbsp;;
 
-#### Precedence
+**literalConstant**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `"true"` | `"false"` )<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`stringTemplate`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`LiteralNumber`<br>
+&nbsp;&nbsp;;
 
-| Precedence | Title          | Symbols               |
-|------------|----------------|-----------------------|
-| Highest    | Postfix        | ++, --, .             |
-|            | Prefix         | -, +, ++, --, !       |
-|            | Multiplicative | *, /, %               |
-|            | Additive       | +, -                  |
-|            | Comparison     | <, >, <=, >=          |
-|            | Equality       | ==, !=, ===, !==      |
-|            | Conjunction    | &&                    |
-|            | Disjunction    | ||                    |
-| Lowest     | Assignment     | =, +=, -=, *=, /=, %= |
-
-#### Rules
-
-... TBD ...
+**stringTemplate**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"'"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`<any character other than "'">`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"'"`<br>
+&nbsp;&nbsp;;
 
 ### Literals
 
-... TBD ...
+**LiteralNumber**: ~Roughly JavaScript (To be expanded).
+
+**SimpleName**: ~Roughly JavaScript (To be expanded).
