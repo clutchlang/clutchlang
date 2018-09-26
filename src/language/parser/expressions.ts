@@ -1,16 +1,6 @@
 import { IToken } from '../lexer';
-import {
-  AstNode,
-  Operator,
-  SimpleNode,
-  Statement,
-  StatementBlock,
-} from '../parser';
-
-/**
- * Base class for any expression.
- */
-export abstract class Expression extends AstNode implements Statement {}
+import { Expression, SimpleNode, StatementBlock } from './nodes';
+import { Operator } from './operators';
 
 /**
  * An expression formed with an @member operator and a @member target.

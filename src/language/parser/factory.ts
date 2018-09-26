@@ -1,9 +1,8 @@
 import { splitLines, unescapeString } from '../../agnostic/strings';
 import { IToken } from '../lexer';
-import { Operator, StatementBlock } from '../parser';
+import { Expression, Operator, StatementBlock } from '../parser';
 import {
   BinaryExpression,
-  Expression,
   IfExpression,
   LiteralBoolean,
   LiteralNumber,
