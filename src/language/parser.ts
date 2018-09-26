@@ -87,12 +87,7 @@ export class LiteralString extends SimpleNode {
       return unescapeString(lines[0]);
     }
     const buffer: string[] = [];
-    let l = 0;
-    while (l++ < lines.length - 1) {
-      if (lines[l].trim().length > 0) {
-        break;
-      }
-    }
+    let l = 1;
     let line = unescapeString(lines[l]);
     const baseline = line.length - line.trimLeft().length;
     l--;
