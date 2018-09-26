@@ -174,11 +174,12 @@ start<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralBoolean`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralNumber`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralString`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`SimpleName`<br>
 &nbsp;&nbsp;;
 
 ### Literals
 
-**LiteralBoolean**:
+**LiteralBoolean**:<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;( `"true"` | `"false"` )<br>
 &nbsp;&nbsp;;
 
