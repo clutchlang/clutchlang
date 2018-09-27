@@ -20,7 +20,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parseAssignment(): Expression {
     return this.parseBinary(
-      () => this.parseDisjunction(),
+      () => this.parseConditional(),
       TokenKind.EQUALS,
       TokenKind.PLUS_EQUALS,
       TokenKind.MINUS_EQUALS,
@@ -30,11 +30,31 @@ export class ExpressionParser extends AbstractParser {
     );
   }
 
-  private parseDisjunction(): Expression {
-    return this.parseBinary(() => this.parseConjunction(), TokenKind.PIPE_PIPE);
+  private parseConditional(): Expression {
+    if (this.match(TokenKind.IF)) {
+      const ifToken = this.peek(-1);
+      const ifBody = this.parseLogicalOr();
+      const thenToken = this.advance();
+      const thenBody = this.parseLogicalOr();
+      const elseToken = this.match(TokenKind.ELSE) ? this.peek(-1) : undefined;
+      const elseBody = elseToken ? this.parseLogicalOr() : undefined;
+      return this.factory.createConditionalExpression(
+        ifToken,
+        ifBody,
+        thenToken,
+        thenBody,
+        elseToken,
+        elseBody
+      );
+    }
+    return this.parseLogicalOr();
   }
 
-  private parseConjunction(): Expression {
+  private parseLogicalOr(): Expression {
+    return this.parseBinary(() => this.parseLogicalAnd(), TokenKind.PIPE_PIPE);
+  }
+
+  private parseLogicalAnd(): Expression {
     return this.parseBinary(() => this.parseEquality(), TokenKind.AND_AND);
   }
 
@@ -50,11 +70,19 @@ export class ExpressionParser extends AbstractParser {
 
   private parseComparison(): Expression {
     return this.parseBinary(
-      () => this.parseAdditive(),
+      () => this.parseBitwiseShift(),
       TokenKind.LEFT_ANGLE,
       TokenKind.RIGHT_ANGLE,
       TokenKind.LEFT_ANGLE_EQUALS,
       TokenKind.RIGHT_ANGLE_EQUALS
+    );
+  }
+
+  private parseBitwiseShift(): Expression {
+    return this.parseBinary(
+      () => this.parseAdditive(),
+      TokenKind.LEFT_ANGLE_LEFT_ANGLE,
+      TokenKind.RIGHT_ANGLE_RIGHT_ANGLE
     );
   }
 
@@ -77,7 +105,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parseUnaryPrefix(): Expression {
     return this.parsePrefix(
-      () => this.parseAccessor(),
+      () => this.parseUnaryPostfix(),
       TokenKind.MINUS,
       TokenKind.PLUS,
       TokenKind.PLUS_PLUS,
@@ -86,47 +114,43 @@ export class ExpressionParser extends AbstractParser {
     );
   }
 
-  private parseAccessor(): Expression {
-    return this.parseBinary(() => this.parseUnaryPostfix(), TokenKind.PERIOD);
-  }
-
   private parseUnaryPostfix(): Expression {
     return this.parsePostfix(
-      () => this.parseInvocation(),
+      () => this.parseFunctionCall(),
       TokenKind.PLUS_PLUS,
       TokenKind.MINUS_MINUS
     );
   }
 
-  private parseInvocation(): Expression {
-    const operator = this.peek(1);
-    if (operator.lexeme === TokenKind.LEFT_PAREN) {
-      let expression = this.parseGroup();
-      // tslint:disable-next-line:no-constant-condition
-      while (true) {
-        if (this.match(TokenKind.LEFT_PAREN)) {
-          expression = this.finishInvocation(expression);
-        } else {
-          break;
-        }
+  private parseFunctionCall(): Expression {
+    let expression = this.parseMemberAccess();
+    // tslint:disable-next-line:no-constant-condition
+    while (true) {
+      if (this.match(TokenKind.LEFT_PAREN)) {
+        expression = this.finishFunctionCall(expression);
+      } else {
+        break;
       }
-      return expression;
     }
-    return this.parseGroup();
+    return expression;
   }
 
-  private finishInvocation(target: Expression): Expression {
+  private finishFunctionCall(target: Expression): Expression {
     const args: Expression[] = [];
     const leftParen = this.peek(-1);
     while (!this.match(TokenKind.RIGHT_PAREN)) {
       args.push(this.parseExpression());
     }
-    return this.factory.createInvokeExpression(
+    return this.factory.createFunctionCallExpression(
       target,
       leftParen,
       args,
       this.peek(-1)
     );
+  }
+
+  private parseMemberAccess(): Expression {
+    return this.parseBinary(() => this.parseGroup(), TokenKind.PERIOD);
   }
 
   private parseGroup(): Expression {
@@ -154,10 +178,12 @@ export class ExpressionParser extends AbstractParser {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
     if (this.match(TokenKind.IDENTIFIER)) {
-      return this.factory.createSimpleName(this.peek(-1));
+      return this.factory.createLiteralIdentifier(this.peek(-1));
     }
     /* istanbul ignore next */
-    throw new SyntaxError(`Unexpected token: "${this.peek().lexeme}".`);
+    throw new SyntaxError(
+      `Unexpected token: "${this.peek().lexeme}" @ ${this.peek().offset}.`
+    );
   }
 
   private parseBinary(

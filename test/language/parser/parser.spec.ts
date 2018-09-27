@@ -173,4 +173,18 @@ describe('ClutchParser', () => {
       expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
     });
   });
+
+  describe('conditional', () => {
+    it('simple', () => {
+      const text = 'if a then b';
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+
+    it('with else', () => {
+      const text = 'if a then b else c';
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+  });
 });

@@ -1,2 +1,2 @@
 export * from './visitors/abstract';
-export * from './visitors/print_tree';
+export * from './visitors/printer';

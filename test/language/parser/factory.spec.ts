@@ -11,14 +11,14 @@ describe('AstNodeFactory', () => {
   const factory = new AstNodeFactory();
   const visitor = new PrintTreeVisitor();
 
-  const a = factory.createSimpleName({
+  const a = factory.createLiteralIdentifier({
     comments: [],
     kind: TokenKind.IDENTIFIER,
     lexeme: 'a',
     offset: 0,
   });
 
-  const b = factory.createSimpleName({
+  const b = factory.createLiteralIdentifier({
     comments: [],
     kind: TokenKind.IDENTIFIER,
     lexeme: 'b',
@@ -148,8 +148,15 @@ describe('AstNodeFactory', () => {
         offset: 0,
       };
 
+      const $then = {
+        comments: [],
+        kind: TokenKind.THEN,
+        lexeme: 'if',
+        offset: 0,
+      };
+
       it('', () => {
-        const expr = factory.createIfExpression($if, a, b);
+        const expr = factory.createConditionalExpression($if, a, $then, b);
         expect(expr.body).toEqual(b);
         expect(expr.condition).toEqual(a);
         expect(expr.elseBody).toBeUndefined();
@@ -167,7 +174,14 @@ describe('AstNodeFactory', () => {
           lexeme: 'else',
           offset: 0,
         };
-        const expr = factory.createIfExpression($if, a, b, $else, a);
+        const expr = factory.createConditionalExpression(
+          $if,
+          a,
+          $then,
+          b,
+          $else,
+          a
+        );
         expect(expr.body).toEqual(b);
         expect(expr.condition).toEqual(a);
         expect(expr.elseBody).toEqual(a);
@@ -250,7 +264,7 @@ describe('AstNodeFactory', () => {
       lexeme: '(',
       offset: 0,
     };
-    const expr = factory.createInvokeExpression(a, $open, [], $close);
+    const expr = factory.createFunctionCallExpression(a, $open, [], $close);
     expect(expr.closeToken).toEqual($close);
     expect(expr.firstToken).toEqual(a.firstToken);
     expect(expr.lastToken).toEqual($close);
@@ -414,7 +428,7 @@ describe('AstNodeFactory', () => {
       lexeme: 'fooBar',
       offset: 0,
     };
-    const fooBar = factory.createSimpleName(token);
+    const fooBar = factory.createLiteralIdentifier(token);
     expect(fooBar.firstToken).toBe(token);
     expect(fooBar.lastToken).toBe(token);
     expect(fooBar.name).toBe('fooBar');

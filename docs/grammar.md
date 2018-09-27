@@ -93,6 +93,11 @@ start<br>
 | Precedence | Title                        | Symbols                           |
 |------------|------------------------------|-----------------------------------|
 | _Highest_  |                              |                                   |
+|            | _Literals_                   |                                   |
+|            | Number                       |                                   |
+|            | String                       |                                   |
+|            | Boolean                      |                                   |
+|            | Identifier                   |                                   |
 | 14         | Grouping                     | `( … )`                           |
 | 13         | Member Access                | `… . …`                           |
 | 12         | Function Call                | `… ( …* )`                        |

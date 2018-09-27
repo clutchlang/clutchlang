@@ -1,6 +1,6 @@
 import { IToken } from '../../lexer';
 import { AstVisitor } from '../visitors';
-import { SimpleName } from './expressions';
+import { LiteralIdentifier } from './expressions';
 import { StatementBlock } from './statements';
 
 /**
@@ -54,8 +54,8 @@ export abstract class TopLevelElement extends AstNode {}
  */
 export class FunctionDeclaration extends TopLevelElement {
   constructor(
-    public readonly name: SimpleName,
-    public readonly parameters: SimpleName[],
+    public readonly name: LiteralIdentifier,
+    public readonly parameters: LiteralIdentifier[],
     public readonly arrowToken: IToken,
     public readonly body: Expression | StatementBlock
   ) {

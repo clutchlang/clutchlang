@@ -1,13 +1,13 @@
 import { StringBuffer } from '../../../agnostic/strings';
 import {
   BinaryExpression,
+  ConditionalExpression,
   GroupExpression,
-  IfExpression,
   InvokeExpression,
   LiteralBoolean,
+  LiteralIdentifier,
   LiteralNumber,
   LiteralString,
-  SimpleName,
   UnaryExpression,
 } from '../../parser';
 import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
@@ -55,8 +55,8 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     });
   }
 
-  public visitIfExpression(
-    node: IfExpression,
+  public visitConditionalExpression(
+    node: ConditionalExpression,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
@@ -71,6 +71,16 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
             : [node.body];
         body.forEach(e => e.accept(this, writer));
       });
+      if (node.elseBody) {
+        this.writeIndented('Else:', writer, () => {
+          /* istanbul ignore next */
+          const body =
+            node.elseBody instanceof StatementBlock
+              ? node.elseBody.statements
+              : [node.elseBody];
+          body.forEach(e => e!.accept(this, writer));
+        });
+      }
     });
   }
 
@@ -113,7 +123,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
   }
 
   public visitSimpleName(
-    node: SimpleName,
+    node: LiteralIdentifier,
     writer = new StringBuffer()
   ): string {
     writer.writeLine(`SimpleName: ${node.name}`);

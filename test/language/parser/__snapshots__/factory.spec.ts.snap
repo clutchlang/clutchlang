@@ -18,7 +18,7 @@ exports[`AstNodeFactory <Expression> should create GroupExpression 1`] = `
 `;
 
 exports[`AstNodeFactory <Expression> should create IfExpression  1`] = `
-"IfExpression:
+"ConditionalExpression:
   If:
     SimpleName: a
   Body:
@@ -27,11 +27,13 @@ exports[`AstNodeFactory <Expression> should create IfExpression  1`] = `
 `;
 
 exports[`AstNodeFactory <Expression> should create IfExpression with else 1`] = `
-"IfExpression:
+"ConditionalExpression:
   If:
     SimpleName: a
   Body:
     SimpleName: b
+  Else:
+    SimpleName: a
 "
 `;
 
