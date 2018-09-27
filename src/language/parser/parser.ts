@@ -1,6 +1,6 @@
 import { IToken, TokenKind } from '../lexer';
 import { AstNodeFactory } from './factory';
-import { GroupExpression } from './nodes/expressions';
+import { GroupExpression, InvokeExpression } from './nodes/expressions';
 import { Expression } from './nodes/nodes';
 import { Operator, Precedence } from './nodes/operators';
 
@@ -48,8 +48,11 @@ export class ClutchParser {
       next?: Precedence
     ): Expression => {
       if (!prefix) {
-        // Special case postfix.
+        // Special case postfix and invocation.
         operator = this.peek(1);
+        if (operator.lexeme === TokenKind.LEFT_PAREN) {
+          return this.parseInvocation(this.parseExpression(next));
+        }
         if (kinds.some(e => e === operator.lexeme)) {
           return this.factory.createUnaryExpression(
             this.parseExpression(next),
@@ -163,15 +166,37 @@ export class ClutchParser {
     if (this.match(TokenKind.FALSE, TokenKind.TRUE)) {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
-    if (!this.match(TokenKind.IDENTIFIER)) {
-      // TODO: Test.
-      /* istanbul ignore next */
-      throw new SyntaxError(
-        `Expected literal got "${this.peek().lexeme}" (${this.peek().kind}).`
-      );
+    if (this.match(TokenKind.IDENTIFIER)) {
+      return this.factory.createSimpleName(this.peek(-1));
     }
-    const token = this.peek(-1);
-    return this.factory.createSimpleName(token);
+    /* istanbul ignore next */
+    throw new SyntaxError(`Unexpected token: ${this.peek()}`);
+  }
+
+  private parseInvocation(expression: Expression): Expression {
+    // tslint:disable-next-line:no-constant-condition
+    while (true) {
+      if (this.match(TokenKind.LEFT_PAREN)) {
+        expression = this.finishInvocation(expression);
+      } else {
+        break;
+      }
+    }
+    return expression;
+  }
+
+  private finishInvocation(target: Expression): Expression {
+    const args: Expression[] = [];
+    const leftParen = this.peek(-1);
+    while (!this.match(TokenKind.RIGHT_PAREN)) {
+      args.push(this.parseExpression());
+    }
+    return new InvokeExpression(
+      target,
+      leftParen,
+      args,
+      this.peek(-1),
+    );
   }
 
   private parseBinaryOperator(lexeme: string): Operator {
