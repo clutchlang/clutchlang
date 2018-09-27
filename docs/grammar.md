@@ -90,18 +90,52 @@ start<br>
 
 #### Precedence
 
-| Precedence | Title          | Symbols                           |
-|------------|----------------|-----------------------------------|
-| Highest    | Postfix        | `++`, `--`,                       |
-|            | Accessor       | `.`                               |
-|            | Prefix         | `-`, `+`, `++`, `--`, `!`         |
-|            | Multiplicative | `*`, `/`, `%`                     |
-|            | Additive       | `+`, `-`                          |
-|            | Comparison     | `<`, `>`, `<=`, `>=`              |
-|            | Equality       | `==`, `!=`, `===`, `!==`          |
-|            | Conjunction    | `&&`                              |
-|            | Disjunction    | <code>&#124;&#124;</code>         |
-| Lowest     | Assignment     | `=`, `+=`, `-=`, `*=`, `/=`, `%=` |
+| Precedence | Title                        | Symbols                           |
+|------------|------------------------------|-----------------------------------|
+| _Highest_  |                              |                                   |
+| 14         | Grouping                     | `( … )`                           |
+| 13         | Member Access                | `… . …`                           |
+| 12         | Function Call                | `… ( …* )`                        |
+| 11         | _Postfix_                    |                                   |
+|            | Postfix Increment            | `… ++`                            |
+|            | Postfix Decrement            | `… --`                            |
+| 10         | _Prefix_                     |                                   |
+|            | Logical Not                  | `! …`                             |
+|            | Bitwise Not                  | `~ …`                             |
+|            | Unary Positive               | `+ …`                             |
+|            | Unary Negative               | `- …`                             |
+|            | Prefix Increment             | `++ …`                            |
+|            | Prefix Decrement             | `-- …`                            |
+| 9          | _Multiplicative_             |                                   |
+|            | Mulitplication               | `… * …`                           |
+|            | Division                     | `… / …`                           |
+|            | Remainder                    | `… % …`                           |
+| 8          | _Additive_                   |                                   |
+|            | Addition                     | `… + …`                           |
+|            | Subtraction                  | `… - …`                           |
+| 7          | _Bitwise Shift_              |                                   |
+|            | Bitwise Left Shift           | `… << …`                          |
+|            | Bitwise Right Shift          | `… >> …`                          |
+| 6          | _Comparison_                 |                                   |
+|            | Less Than                    | `… < …`                           |
+|            | Less Than Or Equal           | `… <= …`                          |
+|            | Greater Than                 | `… > …`                           |
+|            | Greater Than Or Equal        | `… >= …`                          |
+| 5          | _Equality_                   |                                   |
+|            | Equality                     | `… == …`                          |
+|            | Inequality                   | `… != …`                          |
+|            | Identity                     | `… === …`                         |
+|            | Unidentity                   | `… !== …`                         |
+| 4          | Logical And                  | `… && …`                          |
+| 3          | Logical Or                   | <code>… &#124;&#124; …</code>     |
+| 2          | Conditional                  | `if … then …`                     |
+| 1          | _Assignment_                 |                                   |
+|            | Assign                       | `… = …`                           |
+|            | Assign Increased By          | `… += …`                          |
+|            | Assign Decreased By          | `… -= …`                          |
+|            | Assign Multiplied By         | `… *= …`                          |
+|            | Assign Divided By            | `… /= …`                          |
+|            | Assign Remainder By          | `… %= …`                          |
 
 #### Rules
 

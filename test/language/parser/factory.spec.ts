@@ -65,11 +65,16 @@ describe('AstNodeFactory', () => {
         lexeme: '+',
         offset: 0,
       };
-      const expr = factory.createBinaryExpression(a, Operator.Add, $plus, b);
+      const expr = factory.createBinaryExpression(
+        a,
+        Operator.Addition,
+        $plus,
+        b
+      );
       expect(expr.firstToken).toBe(a.firstToken);
       expect(expr.lastToken).toBe(b.lastToken);
       expect(expr.left).toBe(a);
-      expect(expr.operator).toBe(Operator.Add);
+      expect(expr.operator).toBe(Operator.Addition);
       expect(expr.right).toBe(b);
       expect(expr.target).toBe(a);
       expect(expr.accept(visitor)).toMatchSnapshot();
@@ -78,7 +83,7 @@ describe('AstNodeFactory', () => {
     it('should create prefix UnaryExpression', () => {
       const $negate = {
         comments: [],
-        kind: TokenKind.NEGATE,
+        kind: TokenKind.EXCLAIM,
         lexeme: '!',
         offset: 0,
       };
@@ -90,7 +95,7 @@ describe('AstNodeFactory', () => {
       );
       expect(expr.firstToken).toBe($negate);
       expect(expr.lastToken).toBe(a.lastToken);
-      expect(expr.operator).toEqual(Operator.UnaryNegation);
+      expect(expr.operator).toEqual(Operator.UnaryNegative);
       expect(expr.target).toBe(a);
       expect(expr.accept(visitor)).toMatchSnapshot();
     });
@@ -104,13 +109,13 @@ describe('AstNodeFactory', () => {
       };
       const expr = factory.createUnaryExpression(
         a,
-        Operator.Accessor,
+        Operator.MemberAccess,
         $accessor,
         false
       );
       expect(expr.firstToken).toBe(a.firstToken);
       expect(expr.lastToken).toBe($accessor);
-      expect(expr.operator).toEqual(Operator.Accessor);
+      expect(expr.operator).toEqual(Operator.MemberAccess);
       expect(expr.target).toBe(a);
       expect(expr.accept(visitor)).toMatchSnapshot();
     });
@@ -124,7 +129,7 @@ describe('AstNodeFactory', () => {
       };
       const $rp = {
         comments: [],
-        kind: TokenKind.RIGHT_SHIFT,
+        kind: TokenKind.RIGHT_ANGLE_RIGHT_ANGLE,
         lexeme: ')',
         offset: 0,
       };
@@ -218,7 +223,7 @@ describe('AstNodeFactory', () => {
       };
       const $eq = {
         comments: [],
-        kind: TokenKind.ASSIGN,
+        kind: TokenKind.EQUALS_EQUALS,
         lexeme: '=',
         offset: 0,
       };

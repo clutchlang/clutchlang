@@ -21,40 +21,40 @@ export class ExpressionParser extends AbstractParser {
   private parseAssignment(): Expression {
     return this.parseBinary(
       () => this.parseDisjunction(),
-      TokenKind.ASSIGN,
-      TokenKind.PLUS_BY,
-      TokenKind.MINUS_BY,
-      TokenKind.STAR_BY,
-      TokenKind.SLASH_BY,
-      TokenKind.MODULUS_BY
+      TokenKind.EQUALS,
+      TokenKind.PLUS_EQUALS,
+      TokenKind.MINUS_EQUALS,
+      TokenKind.STAR_EQUALS,
+      TokenKind.SLASH_EQUALS,
+      TokenKind.MODULUS_EQUALS
     );
   }
 
   private parseDisjunction(): Expression {
-    return this.parseBinary(() => this.parseConjunction(), TokenKind.OR);
+    return this.parseBinary(() => this.parseConjunction(), TokenKind.PIPE_PIPE);
   }
 
   private parseConjunction(): Expression {
-    return this.parseBinary(() => this.parseEquality(), TokenKind.AND);
+    return this.parseBinary(() => this.parseEquality(), TokenKind.AND_AND);
   }
 
   private parseEquality(): Expression {
     return this.parseBinary(
       () => this.parseComparison(),
-      TokenKind.EQUALS,
-      TokenKind.NOT_EQUALS,
-      TokenKind.IDENTICAL,
-      TokenKind.NOT_IDENTICAL
+      TokenKind.EQUALS_EQUALS,
+      TokenKind.EXCLAIM_EQUALS,
+      TokenKind.EQUALS_EQUALS_EQUALS,
+      TokenKind.EXCLAIM_EQUALS_EQUALS
     );
   }
 
   private parseComparison(): Expression {
     return this.parseBinary(
       () => this.parseAdditive(),
-      TokenKind.LESS_THAN,
-      TokenKind.GREATER_THAN,
-      TokenKind.LESS_THAN_OR_EQUAL,
-      TokenKind.GREATER_THAN_OR_EQUAL
+      TokenKind.LEFT_ANGLE,
+      TokenKind.RIGHT_ANGLE,
+      TokenKind.LEFT_ANGLE_EQUALS,
+      TokenKind.RIGHT_ANGLE_EQUALS
     );
   }
 
@@ -80,9 +80,9 @@ export class ExpressionParser extends AbstractParser {
       () => this.parseAccessor(),
       TokenKind.MINUS,
       TokenKind.PLUS,
-      TokenKind.INCREMENT,
-      TokenKind.DECREMENT,
-      TokenKind.NEGATE
+      TokenKind.PLUS_PLUS,
+      TokenKind.MINUS_MINUS,
+      TokenKind.EXCLAIM
     );
   }
 
@@ -93,8 +93,8 @@ export class ExpressionParser extends AbstractParser {
   private parseUnaryPostfix(): Expression {
     return this.parsePostfix(
       () => this.parseInvocation(),
-      TokenKind.INCREMENT,
-      TokenKind.DECREMENT
+      TokenKind.PLUS_PLUS,
+      TokenKind.MINUS_MINUS
     );
   }
 
@@ -212,49 +212,49 @@ export class ExpressionParser extends AbstractParser {
   private parseBinaryOp(token: IToken): Operator {
     switch (token.lexeme) {
       case '.':
-        return Operator.Accessor;
+        return Operator.MemberAccess;
       case '*':
-        return Operator.Multiply;
+        return Operator.Multiplication;
       case '/':
-        return Operator.Divide;
+        return Operator.Division;
       case '%':
-        return Operator.Modulus;
+        return Operator.Remainder;
       case '+':
-        return Operator.Add;
+        return Operator.Addition;
       case '-':
-        return Operator.Subtract;
+        return Operator.Subtraction;
       case '<':
-        return Operator.Less;
+        return Operator.LessThan;
       case '>':
-        return Operator.Greater;
+        return Operator.GreaterThan;
       case '<=':
-        return Operator.LessOrEqual;
+        return Operator.LessThanOrEqual;
       case '>=':
-        return Operator.GreaterOrEqual;
+        return Operator.GreaterThanOrEqual;
       case '==':
-        return Operator.Equal;
+        return Operator.Equality;
       case '!=':
-        return Operator.NotEqual;
+        return Operator.Inequality;
       case '===':
-        return Operator.Identical;
+        return Operator.Identity;
       case '!==':
-        return Operator.NotIdentical;
+        return Operator.Unidentity;
       case '&&':
-        return Operator.And;
+        return Operator.LogicalAnd;
       case '||':
-        return Operator.Or;
+        return Operator.LogicalOr;
       case '=':
         return Operator.Assign;
       case '+=':
-        return Operator.AddAssign;
+        return Operator.AssignIncreasedBy;
       case '-=':
-        return Operator.SubtractAssign;
+        return Operator.AssignDecreasedBy;
       case '*=':
-        return Operator.MultiplyAssign;
+        return Operator.AssignMultipliedBy;
       case '/=':
-        return Operator.DivideAssign;
+        return Operator.AssignDividedBy;
       case '%=':
-        return Operator.ModulusAssign;
+        return Operator.AssignRemainderBy;
       default:
         // TODO: Test.
         /* istanbul ignore next */
@@ -265,15 +265,15 @@ export class ExpressionParser extends AbstractParser {
   private parsePrefixOp(token: IToken): Operator {
     switch (token.lexeme) {
       case '++':
-        return Operator.UnaryIncrement;
+        return Operator.PrefixIncrement;
       case '--':
-        return Operator.UnaryDecrement;
+        return Operator.PrefixDecrement;
       case '-':
         return Operator.UnaryNegative;
       case '+':
         return Operator.UnaryPositive;
       case '!':
-        return Operator.UnaryNegation;
+        return Operator.UnaryNegative;
       default:
         // TODO: Test.
         /* istanbul ignore next */
@@ -284,9 +284,9 @@ export class ExpressionParser extends AbstractParser {
   private parsePostfixOp(token: IToken): Operator {
     switch (token.lexeme) {
       case '++':
-        return Operator.Increment;
+        return Operator.PostfixIncrement;
       case '--':
-        return Operator.Decrement;
+        return Operator.PostfixDecrement;
       default:
         // TODO: Test.
         /* istanbul ignore next */
