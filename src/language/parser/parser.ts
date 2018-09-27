@@ -191,12 +191,7 @@ export class ClutchParser {
     while (!this.match(TokenKind.RIGHT_PAREN)) {
       args.push(this.parseExpression());
     }
-    return new InvokeExpression(
-      target,
-      leftParen,
-      args,
-      this.peek(-1),
-    );
+    return new InvokeExpression(target, leftParen, args, this.peek(-1));
   }
 
   private parseBinaryOperator(lexeme: string): Operator {

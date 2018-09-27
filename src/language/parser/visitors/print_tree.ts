@@ -79,7 +79,9 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
-      this.writeIndented('Target:', writer, () => node.target.accept(this, writer));
+      this.writeIndented('Target:', writer, () =>
+        node.target.accept(this, writer)
+      );
       this.writeIndented('Parameters:', writer, () => {
         node.parameters.forEach(e => e.accept(this, writer));
       });

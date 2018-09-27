@@ -127,7 +127,6 @@ describe('ClutchParser', () => {
   });
 
   describe('invocation', () => {
-
     it('simple', () => {
       const text = `fn()`;
       const expr = parseExpression(text);
