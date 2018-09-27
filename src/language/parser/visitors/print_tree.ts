@@ -79,7 +79,9 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
-      this.writeIndented('Target:', writer, () => node.target);
+      this.writeIndented('Target:', writer, () =>
+        node.target.accept(this, writer)
+      );
       this.writeIndented('Parameters:', writer, () => {
         node.parameters.forEach(e => e.accept(this, writer));
       });
@@ -90,7 +92,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     node: LiteralBoolean,
     writer = new StringBuffer()
   ): string {
-    writer.writeLine(`<${node.value}>`);
+    writer.writeLine(`LiteralBoolean: ${node.value}`);
     return writer.toString();
   }
 
@@ -98,7 +100,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     node: LiteralNumber,
     writer = new StringBuffer()
   ): string {
-    writer.writeLine(`<${node.value}>`);
+    writer.writeLine(`LiteralNumber: ${node.value}`);
     return writer.toString();
   }
 
@@ -106,7 +108,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     node: LiteralString,
     writer = new StringBuffer()
   ): string {
-    writer.writeLine(`<${node.value}>`);
+    writer.writeLine(`LiteralString: '${node.value}'`);
     return writer.toString();
   }
 
@@ -114,7 +116,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     node: SimpleName,
     writer = new StringBuffer()
   ): string {
-    writer.writeLine(`<#${node.name}>`);
+    writer.writeLine(`SimpleName: ${node.name}`);
     return writer.toString();
   }
 

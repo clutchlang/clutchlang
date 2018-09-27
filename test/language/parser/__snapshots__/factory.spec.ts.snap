@@ -3,42 +3,42 @@
 exports[`AstNodeFactory <Expression> should create BinaryExpression 1`] = `
 "BinaryExpression:
   Left:
-    <#a>
+    SimpleName: a
   Operator: +
   Right:
-    <#b>
+    SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory <Expression> should create GroupExpression 1`] = `
 "GroupExpression:
   Expression:
-    <#a>
+    SimpleName: a
 "
 `;
 
 exports[`AstNodeFactory <Expression> should create IfExpression  1`] = `
 "IfExpression:
   If:
-    <#a>
+    SimpleName: a
   Body:
-    <#b>
+    SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory <Expression> should create IfExpression with else 1`] = `
 "IfExpression:
   If:
-    <#a>
+    SimpleName: a
   Body:
-    <#b>
+    SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory <Expression> should create postfix UnaryExpression 1`] = `
 "UnaryExpression:
   Target:
-    <#a>
+    SimpleName: a
   Operator: ! (Postfix)
 "
 `;
@@ -46,62 +46,62 @@ exports[`AstNodeFactory <Expression> should create postfix UnaryExpression 1`] =
 exports[`AstNodeFactory <Expression> should create prefix UnaryExpression 1`] = `
 "UnaryExpression:
   Target:
-    <#a>
+    SimpleName: a
   Operator: ! (Prefix)
 "
 `;
 
 exports[`AstNodeFactory LiteralBoolean should evaluate false 1`] = `
-"<false>
+"LiteralBoolean: false
 "
 `;
 
 exports[`AstNodeFactory LiteralBoolean should evaluate true 1`] = `
-"<true>
+"LiteralBoolean: true
 "
 `;
 
 exports[`AstNodeFactory LiteralNumber should evaluate exponential 1`] = `
-"<2000000>
+"LiteralNumber: 2000000
 "
 `;
 
 exports[`AstNodeFactory LiteralNumber should evaluate float 1`] = `
-"<1.5>
+"LiteralNumber: 1.5
 "
 `;
 
 exports[`AstNodeFactory LiteralNumber should evaluate hex 1`] = `
-"<4095>
+"LiteralNumber: 4095
 "
 `;
 
 exports[`AstNodeFactory LiteralNumber should evaluate int 1`] = `
-"<1>
+"LiteralNumber: 1
 "
 `;
 
 exports[`AstNodeFactory LiteralString should evaluate an empty string 1`] = `
-"<>
+"LiteralString: ''
 "
 `;
 
 exports[`AstNodeFactory SimpleName should implement AstNode 1`] = `
-"<#fooBar>
+"SimpleName: fooBar
 "
 `;
 
 exports[`AstNodeFactory Statement should create a let statement 1`] = `
 "VariableStatement:
   Assign:
-    <#b>
+    SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory Statement should create a return statement 1`] = `
 "JumpStatement:
   Return:
-    <#a>
+    SimpleName: a
 "
 `;
 
@@ -110,27 +110,28 @@ exports[`AstNodeFactory should create a file root 1`] = `
   Elements:
     FunctionDeclaration:
       Name:
-        <#a>
+        SimpleName: a
       Parameters:
       Body:
-        <#b>
+        SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory should create a function 1`] = `
 "FunctionDeclaration:
   Name:
-    <#a>
+    SimpleName: a
   Parameters:
-    <#b>
+    SimpleName: b
   Body:
-    <#b>
+    SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory should create an invoke expression 1`] = `
 "InvokeExpression:
   Target:
+    SimpleName: a
   Parameters:
 "
 `;
