@@ -1,8 +1,8 @@
 import { IToken, TokenKind } from '../lexer';
 import { AstNodeFactory } from './factory';
+import { GroupExpression } from './nodes/expressions';
 import { Expression } from './nodes/nodes';
 import { Operator, Precedence } from './nodes/operators';
-import { GroupExpression } from './nodes/expressions';
 
 export class ClutchParser {
   /**
