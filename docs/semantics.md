@@ -257,3 +257,67 @@ function compare(a, b) {
 * Less optimal, makes `HashSet<Object>` potentially more expensive.
 * More or less removes the ability to define `==` as an extension method.
 * Worry that the more convenient operator (`==`) will be used most of the time.
+
+## Constant Expressions
+
+Clutch may perform limited pre-computation of compile-time expressions:
+
+```
+main => print(1 + 2)
+```
+
+... may compile to:
+
+```js
+function main() {
+  print(3);
+}
+```
+
+**Open question**: How configurable/directed by the user? How extensible?
+
+C++ has [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr):
+
+```cpp
+constexpr int factorial(int n)
+{
+    return n <= 1 ? 1 : (n * factorial(n - 1));
+}
+```
+
+We could:
+
+* Start functions as constant, and require the user to annotate to opt-out.
+* Start functions as non-const, and require the user to opt-in (`const`).
+* Do nothing, and rely entirely on the compiler deciding what to evaluate.
+
+### Opt-out const
+
+The biggest effect of this choice would be `main` needs another annotation:
+
+```
+impure main => {
+  print('Hello World')
+}
+```
+
+### Opt-in const
+
+```
+// Throws a compile-time error if the function is not valid const.
+const factorial(n: Number): Number => {
+  if n <= 1
+    1
+  else
+    n * factorial(n - 1)
+}
+```
+
+```
+main => {
+  print(
+    // Throws a compile-time error if the expression is not valid const.
+    const (1 + 2)
+  )
+}
+```
