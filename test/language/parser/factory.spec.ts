@@ -115,6 +115,26 @@ describe('AstNodeFactory', () => {
       expect(expr.accept(visitor)).toMatchSnapshot();
     });
 
+    it('should create GroupExpression', () => {
+      const $lp = {
+        comments: [],
+        kind: TokenKind.LEFT_PAREN,
+        lexeme: '(',
+        offset: 0,
+      };
+      const $rp = {
+        comments: [],
+        kind: TokenKind.RIGHT_SHIFT,
+        lexeme: ')',
+        offset: 0,
+      };
+      const expr = factory.createGroupExpression($lp, $rp, a);
+      expect(expr.expression).toEqual(a);
+      expect(expr.firstToken).toEqual($lp);
+      expect(expr.lastToken).toEqual($rp);
+      expect(expr.accept(visitor)).toMatchSnapshot();
+    });
+
     describe('should create IfExpression', () => {
       const $if = {
         comments: [],

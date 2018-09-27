@@ -10,6 +10,13 @@ exports[`AstNodeFactory <Expression> should create BinaryExpression 1`] = `
 "
 `;
 
+exports[`AstNodeFactory <Expression> should create GroupExpression 1`] = `
+"GroupExpression:
+  Expression:
+    <#a>
+"
+`;
+
 exports[`AstNodeFactory <Expression> should create IfExpression  1`] = `
 "IfExpression:
   If:

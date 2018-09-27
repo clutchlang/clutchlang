@@ -2,6 +2,7 @@ import { IToken, TokenKind } from '../lexer';
 import { AstNodeFactory } from './factory';
 import { Expression } from './nodes/nodes';
 import { Operator, Precedence } from './nodes/operators';
+import { GroupExpression } from './nodes/expressions';
 
 export class ClutchParser {
   /**
@@ -126,8 +127,18 @@ export class ClutchParser {
           Precedence.Literal
         );
       default:
+        if (this.match(TokenKind.LEFT_PAREN)) {
+          return this.parseGroupExpression();
+        }
         return this.parseLiteral();
     }
+  }
+
+  private parseGroupExpression(): GroupExpression {
+    const leftParen = this.peek(-1);
+    const expression = this.parseExpression();
+    const rightParen = this.advance();
+    return new GroupExpression(leftParen, rightParen, expression);
   }
 
   private parseLiteral(): Expression {

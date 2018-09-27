@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ClutchParser parenthesized 1`] = `
+"GroupExpression:
+  Expression:
+    <#a>
+"
+`;
+
 exports[`ClutchParser should parse and print binary a != b 1`] = `
 "BinaryExpression:
   Left:

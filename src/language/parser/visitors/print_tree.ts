@@ -1,6 +1,7 @@
 import { StringBuffer } from '../../../agnostic/strings';
 import {
   BinaryExpression,
+  GroupExpression,
   IfExpression,
   InvokeExpression,
   LiteralBoolean,
@@ -39,6 +40,17 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
       writer.writeLine(`Operator: ${node.operatorToken.lexeme}`);
       this.writeIndented('Right:', writer, () =>
         node.right.accept(this, writer)
+      );
+    });
+  }
+
+  public visitGroupExpression(
+    node: GroupExpression,
+    writer = new StringBuffer()
+  ): string {
+    return this.visitNode(node, writer, () => {
+      this.writeIndented('Expression:', writer, () =>
+        node.expression.accept(this, writer)
       );
     });
   }
