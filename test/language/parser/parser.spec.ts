@@ -81,6 +81,7 @@ describe('ClutchParser', () => {
       });
     });
 
+    // TODO: Re-enable.
     xdescribe('unary (postfix)', () => {
       ['++', '--'].forEach(t => {
         const text = `a ${t}`;
@@ -91,5 +92,11 @@ describe('ClutchParser', () => {
         });
       });
     });
+  });
+
+  it('parenthesized', () => {
+    const text = `(a)`;
+    const expr = parseExpression(text);
+    expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
   });
 });

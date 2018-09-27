@@ -8,6 +8,7 @@ import {
   SimpleName,
   UnaryExpression,
 } from '../../parser';
+import { GroupExpression } from '../nodes/expressions';
 import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
 import { JumpStatement, VariableStatement } from '../nodes/statements';
 
@@ -20,6 +21,7 @@ export abstract class AstVisitor<R, C> {
 
   // Expressions
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
+  public abstract visitGroupExpression(node: GroupExpression, context?: C): R;
   public abstract visitIfExpression(node: IfExpression, context?: C): R;
   public abstract visitInvokeExpression(node: InvokeExpression, context?: C): R;
   public abstract visitLiteralBoolean(node: LiteralBoolean, context?: C): R;

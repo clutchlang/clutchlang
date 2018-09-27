@@ -3,6 +3,7 @@ import { IToken } from '../lexer';
 import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
+  GroupExpression,
   IfExpression,
   InvokeExpression,
   LiteralBoolean,
@@ -56,6 +57,14 @@ export class AstNodeFactory {
     right: Expression
   ): BinaryExpression {
     return new BinaryExpression(left, operator, operatorToken, right);
+  }
+
+  public createGroupExpression(
+    leftParen: IToken,
+    rightParen: IToken,
+    expression: Expression
+  ): GroupExpression {
+    return new GroupExpression(leftParen, rightParen, expression);
   }
 
   public createIfExpression(

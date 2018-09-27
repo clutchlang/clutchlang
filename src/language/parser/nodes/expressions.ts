@@ -70,6 +70,23 @@ export class BinaryExpression extends OperatorExpression {
 }
 
 /**
+ * Represents an expression wrapped in `(` `)`.
+ */
+export class GroupExpression extends Expression {
+  constructor(
+    public readonly firstToken: IToken,
+    public readonly lastToken: IToken,
+    public readonly expression: Expression
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitGroupExpression(this, context);
+  }
+}
+
+/**
  * Represents an `if` expression.
  */
 export class IfExpression extends Expression {
