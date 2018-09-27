@@ -275,11 +275,27 @@ exports[`ClutchParser should parse and print literal true 1`] = `
 "
 `;
 
+exports[`ClutchParser should parse and print unary (postfix) a ++ 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: ++ (Postfix)
+"
+`;
+
+exports[`ClutchParser should parse and print unary (postfix) a -- 1`] = `
+"UnaryExpression:
+  Target:
+    <#a>
+  Operator: -- (Postfix)
+"
+`;
+
 exports[`ClutchParser should parse and print unary (prefix) ! a 1`] = `
 "UnaryExpression:
   Target:
     <#a>
-  Operator: !
+  Operator: ! (Prefix)
 "
 `;
 
@@ -287,7 +303,7 @@ exports[`ClutchParser should parse and print unary (prefix) + a 1`] = `
 "UnaryExpression:
   Target:
     <#a>
-  Operator: +
+  Operator: + (Prefix)
 "
 `;
 
@@ -295,7 +311,7 @@ exports[`ClutchParser should parse and print unary (prefix) ++ a 1`] = `
 "UnaryExpression:
   Target:
     <#a>
-  Operator: ++
+  Operator: ++ (Prefix)
 "
 `;
 
@@ -303,7 +319,7 @@ exports[`ClutchParser should parse and print unary (prefix) - a 1`] = `
 "UnaryExpression:
   Target:
     <#a>
-  Operator: -
+  Operator: - (Prefix)
 "
 `;
 
@@ -311,6 +327,6 @@ exports[`ClutchParser should parse and print unary (prefix) -- a 1`] = `
 "UnaryExpression:
   Target:
     <#a>
-  Operator: --
+  Operator: -- (Prefix)
 "
 `;
