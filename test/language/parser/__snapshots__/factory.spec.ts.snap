@@ -39,7 +39,7 @@ exports[`AstNodeFactory <Expression> should create postfix UnaryExpression 1`] =
 "UnaryExpression:
   Target:
     <#a>
-  Operator: !
+  Operator: ! (Postfix)
 "
 `;
 
@@ -47,7 +47,7 @@ exports[`AstNodeFactory <Expression> should create prefix UnaryExpression 1`] = 
 "UnaryExpression:
   Target:
     <#a>
-  Operator: !
+  Operator: ! (Prefix)
 "
 `;
 

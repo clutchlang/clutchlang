@@ -81,8 +81,7 @@ describe('ClutchParser', () => {
       });
     });
 
-    // TODO: Re-enable.
-    xdescribe('unary (postfix)', () => {
+    describe('unary (postfix)', () => {
       ['++', '--'].forEach(t => {
         const text = `a ${t}`;
         it(text, () => {

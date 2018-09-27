@@ -126,7 +126,11 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
       this.writeIndented('Target:', writer, () =>
         node.target.accept(this, writer)
       );
-      writer.writeLine(`Operator: ${node.operatorToken.lexeme}`);
+      writer.writeLine(
+        `Operator: ${node.operatorToken.lexeme} ${
+          node.isPrefix ? '(Prefix)' : '(Postfix)'
+        }`
+      );
     });
   }
 

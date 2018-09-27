@@ -47,6 +47,18 @@ export class ClutchParser {
       kinds: TokenKind[],
       next?: Precedence
     ): Expression => {
+      if (!prefix) {
+        // Special case postfix.
+        operator = this.peek(1);
+        if (kinds.some(e => e === operator.lexeme)) {
+          return this.factory.createUnaryExpression(
+            this.parseExpression(next),
+            this.parseUnaryOperator(operator.lexeme, prefix),
+            operator,
+            prefix
+          );
+        }
+      }
       if (this.match(...kinds)) {
         operator = this.peek(-1);
         return this.factory.createUnaryExpression(

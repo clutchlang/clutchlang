@@ -25,7 +25,7 @@ export class UnaryExpression extends OperatorExpression {
     target: Expression,
     operator: Operator,
     public readonly operatorToken: IToken,
-    protected readonly isPrefix: boolean
+    public readonly isPrefix: boolean
   ) {
     super(target, operator, operatorToken);
   }
