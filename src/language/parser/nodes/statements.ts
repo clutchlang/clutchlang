@@ -1,6 +1,6 @@
 import { IToken } from '../../lexer';
 import { AstVisitor } from '../visitors';
-import { SimpleName } from './expressions';
+import { LiteralIdentifier } from './expressions';
 import { Expression, Statement } from './nodes';
 
 export class StatementBlock {
@@ -31,7 +31,7 @@ export class JumpStatement extends Statement {
 export class VariableStatement extends Statement {
   constructor(
     public readonly firstToken: IToken,
-    public readonly name: SimpleName,
+    public readonly name: LiteralIdentifier,
     public readonly assignToken: IToken,
     public readonly expression: Expression
   ) {

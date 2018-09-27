@@ -3,13 +3,13 @@ import { IToken } from '../lexer';
 import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
+  ConditionalExpression,
   GroupExpression,
-  IfExpression,
   InvokeExpression,
   LiteralBoolean,
+  LiteralIdentifier,
   LiteralNumber,
   LiteralString,
-  SimpleName,
   UnaryExpression,
 } from './nodes/expressions';
 import {
@@ -33,8 +33,8 @@ export class AstNodeFactory {
   }
 
   public createFunctionDeclaration(
-    name: SimpleName,
-    parameters: SimpleName[],
+    name: LiteralIdentifier,
+    parameters: LiteralIdentifier[],
     arrowToken: IToken,
     body: Expression | StatementBlock
   ): FunctionDeclaration {
@@ -67,17 +67,25 @@ export class AstNodeFactory {
     return new GroupExpression(leftParen, rightParen, expression);
   }
 
-  public createIfExpression(
+  public createConditionalExpression(
     ifToken: IToken,
     condition: Expression,
+    thenToken: IToken,
     body: Expression | StatementBlock,
     elseToken?: IToken,
     elseBody?: Expression | StatementBlock
-  ): IfExpression {
-    return new IfExpression(ifToken, condition, body, elseToken, elseBody);
+  ): ConditionalExpression {
+    return new ConditionalExpression(
+      ifToken,
+      condition,
+      thenToken,
+      body,
+      elseToken,
+      elseBody
+    );
   }
 
-  public createInvokeExpression(
+  public createFunctionCallExpression(
     target: Expression,
     openToken: IToken,
     parameters: Expression[],
@@ -100,15 +108,15 @@ export class AstNodeFactory {
 
   public createVariableStatement(
     start: IToken,
-    name: SimpleName,
+    name: LiteralIdentifier,
     assign: IToken,
     expression: Expression
   ) {
     return new VariableStatement(start, name, assign, expression);
   }
 
-  public createSimpleName(token: IToken): SimpleName {
-    return new SimpleName(token, token.lexeme);
+  public createLiteralIdentifier(token: IToken): LiteralIdentifier {
+    return new LiteralIdentifier(token, token.lexeme);
   }
 
   public createLiteralBoolean(token: IToken): LiteralBoolean {

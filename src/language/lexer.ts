@@ -42,6 +42,7 @@ export enum TokenKind {
   LET = 'let',
   RETURN = 'return',
   SUPER = 'super',
+  THEN = 'then',
   THIS = 'this',
   TRUE = 'true',
   WHILE = 'while',

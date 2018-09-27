@@ -1,7 +1,7 @@
 import { IToken } from '../../lexer';
 import { AstVisitor } from '../visitors';
 import { Expression, SimpleNode } from './nodes';
-import { Operator } from './operators';
+import { Operator } from './precedence';
 import { StatementBlock } from './statements';
 
 /**
@@ -89,13 +89,14 @@ export class GroupExpression extends Expression {
 /**
  * Represents an `if` expression.
  */
-export class IfExpression extends Expression {
+export class ConditionalExpression extends Expression {
   public readonly firstToken: IToken;
   public readonly lastToken: IToken;
 
   constructor(
     public readonly ifToken: IToken,
     public readonly condition: Expression,
+    public readonly thenToken: IToken,
     public readonly body: Expression | StatementBlock,
     public readonly elseToken?: IToken,
     public readonly elseBody?: Expression | StatementBlock
@@ -106,7 +107,7 @@ export class IfExpression extends Expression {
   }
 
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
-    return visitor.visitIfExpression(this, context);
+    return visitor.visitConditionalExpression(this, context);
   }
 }
 
@@ -190,7 +191,7 @@ export class LiteralString extends SimpleNode implements Expression {
 /**
  * Represents a reference to some identifier by name.
  */
-export class SimpleName extends SimpleNode implements Expression {
+export class LiteralIdentifier extends SimpleNode implements Expression {
   constructor(token: IToken, public readonly name: string) {
     super(token);
   }

@@ -1,11 +1,11 @@
 import {
   BinaryExpression,
-  IfExpression,
+  ConditionalExpression,
   InvokeExpression,
   LiteralBoolean,
+  LiteralIdentifier,
   LiteralNumber,
   LiteralString,
-  SimpleName,
   UnaryExpression,
 } from '../../parser';
 import { GroupExpression } from '../nodes/expressions';
@@ -22,12 +22,15 @@ export abstract class AstVisitor<R, C> {
   // Expressions
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
   public abstract visitGroupExpression(node: GroupExpression, context?: C): R;
-  public abstract visitIfExpression(node: IfExpression, context?: C): R;
+  public abstract visitConditionalExpression(
+    node: ConditionalExpression,
+    context?: C
+  ): R;
   public abstract visitInvokeExpression(node: InvokeExpression, context?: C): R;
   public abstract visitLiteralBoolean(node: LiteralBoolean, context?: C): R;
   public abstract visitLiteralNumber(node: LiteralNumber, context?: C): R;
   public abstract visitLiteralString(node: LiteralString, context?: C): R;
-  public abstract visitSimpleName(node: SimpleName, context?: C): R;
+  public abstract visitSimpleName(node: LiteralIdentifier, context?: C): R;
   public abstract visitUnaryExpression(node: UnaryExpression, context?: C): R;
 
   // Statements

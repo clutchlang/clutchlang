@@ -1,36 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ClutchParser invocation accessor 1`] = `
-"BinaryExpression:
-  Left:
+exports[`ClutchParser conditional simple 1`] = `
+"ConditionalExpression:
+  If:
     SimpleName: a
-  Operator: .
-  Right:
-    InvokeExpression:
-      Target:
-        SimpleName: fn
-      Parameters:
+  Body:
+    SimpleName: b
 "
 `;
 
-exports[`ClutchParser invocation accessor and chained 1`] = `
-"BinaryExpression:
-  Left:
+exports[`ClutchParser conditional with else 1`] = `
+"ConditionalExpression:
+  If:
+    SimpleName: a
+  Body:
+    SimpleName: b
+  Else:
+    SimpleName: c
+"
+`;
+
+exports[`ClutchParser invocation accessor 1`] = `
+"InvokeExpression:
+  Target:
     BinaryExpression:
       Left:
         SimpleName: a
       Operator: .
       Right:
-        InvokeExpression:
-          Target:
-            SimpleName: fn
-          Parameters:
-  Operator: .
-  Right:
-    InvokeExpression:
-      Target:
-        SimpleName: b
-      Parameters:
+        SimpleName: fn
+  Parameters:
+"
+`;
+
+exports[`ClutchParser invocation accessor and chained 1`] = `
+"InvokeExpression:
+  Target:
+    BinaryExpression:
+      Left:
+        SimpleName: a
+      Operator: .
+      Right:
+        SimpleName: fn
+  Parameters:
 "
 `;
 
@@ -60,15 +72,15 @@ exports[`ClutchParser invocation complex 1`] = `
       Operator: +
       Right:
         LiteralNumber: 1
-    BinaryExpression:
-      Left:
-        SimpleName: b
-      Operator: .
-      Right:
-        InvokeExpression:
-          Target:
+    InvokeExpression:
+      Target:
+        BinaryExpression:
+          Left:
+            SimpleName: b
+          Operator: .
+          Right:
             SimpleName: c
-          Parameters:
+      Parameters:
 "
 `;
 
