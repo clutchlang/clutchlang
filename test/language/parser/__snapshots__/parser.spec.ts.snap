@@ -1,9 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ClutchParser parenthesized 1`] = `
+exports[`ClutchParser parenthesized extra parens 1`] = `
+"GroupExpression:
+  Expression:
+    GroupExpression:
+      Expression:
+        <#a>
+"
+`;
+
+exports[`ClutchParser parenthesized simple 1`] = `
 "GroupExpression:
   Expression:
     <#a>
+"
+`;
+
+exports[`ClutchParser parenthesized with a binary expression 1`] = `
+"GroupExpression:
+  Expression:
+    BinaryExpression:
+      Left:
+        <#a>
+      Operator: +
+      Right:
+        <#b>
+"
+`;
+
+exports[`ClutchParser parenthesized with a postfix expression 1`] = `
+"GroupExpression:
+  Expression:
+    UnaryExpression:
+      Target:
+        <#a>
+      Operator: -- (Postfix)
+"
+`;
+
+exports[`ClutchParser parenthesized with a prefix expression 1`] = `
+"UnaryExpression:
+  Target:
+    GroupExpression:
+      Expression:
+        UnaryExpression:
+          Target:
+            <#a>
+          Operator: -- (Prefix)
+  Operator: -- (Postfix)
 "
 `;
 

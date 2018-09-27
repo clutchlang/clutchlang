@@ -93,9 +93,35 @@ describe('ClutchParser', () => {
     });
   });
 
-  it('parenthesized', () => {
-    const text = `(a)`;
-    const expr = parseExpression(text);
-    expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+  describe('parenthesized', () => {
+    it('simple', () => {
+      const text = `(a)`;
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+
+    it('extra parens', () => {
+      const text = `((a))`;
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+
+    it('with a binary expression', () => {
+      const text = `(a + b)`;
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+
+    it('with a prefix expression', () => {
+      const text = `(--a)`;
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
+
+    it('with a postfix expression', () => {
+      const text = `(a--)`;
+      const expr = parseExpression(text);
+      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+    });
   });
 });
