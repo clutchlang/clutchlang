@@ -56,35 +56,35 @@ export enum TokenKind {
   // Operators
   PERIOD = '.',
   PLUS = '+',
-  PLUS_BY = '+=',
+  PLUS_EQUALS = '+=',
   MINUS = '-',
-  MINUS_BY = '-=',
+  MINUS_EQUALS = '-=',
   STAR = '*',
-  STAR_BY = '*=',
+  STAR_EQUALS = '*=',
   SLASH = '/',
-  SLASH_BY = '/=',
+  SLASH_EQUALS = '/=',
   MODULUS = '%',
-  MODULUS_BY = '%=',
-  ASSIGN = '=',
-  EQUALS = '==',
-  NOT_EQUALS = '!=',
-  IDENTICAL = '===',
-  NOT_IDENTICAL = '!==',
-  GREATER_THAN = '>',
-  GREATER_THAN_OR_EQUAL = '>=',
-  LESS_THAN = '<',
-  LESS_THAN_OR_EQUAL = '<=',
-  LOGICAL_OR = '|',
-  OR = '||',
-  LOGICAL_AND = '&',
-  AND = '&&',
-  LOGICAL_XOR = '^',
-  NEGATE = '!',
-  LOGICAL_NOT = '~',
-  INCREMENT = '++',
-  DECREMENT = '--',
-  LEFT_SHIFT = '<<',
-  RIGHT_SHIFT = '>>',
+  MODULUS_EQUALS = '%=',
+  EQUALS = '=',
+  EQUALS_EQUALS = '==',
+  EXCLAIM_EQUALS = '!=',
+  EQUALS_EQUALS_EQUALS = '===',
+  EXCLAIM_EQUALS_EQUALS = '!==',
+  RIGHT_ANGLE = '>',
+  RIGHT_ANGLE_EQUALS = '>=',
+  LEFT_ANGLE = '<',
+  LEFT_ANGLE_EQUALS = '<=',
+  PIPE = '|',
+  PIPE_PIPE = '||',
+  AND = '&',
+  AND_AND = '&&',
+  CARET = '^',
+  EXCLAIM = '!',
+  TILDE = '~',
+  PLUS_PLUS = '++',
+  MINUS_MINUS = '--',
+  LEFT_ANGLE_LEFT_ANGLE = '<<',
+  RIGHT_ANGLE_RIGHT_ANGLE = '>>',
 
   // Misc
   EOF = '<EOF>',
@@ -152,9 +152,9 @@ export class ClutchLexer {
       case Characters.$PLUS: // "+" or "+=" or "++"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.PLUS_BY
+            ? TokenKind.PLUS_EQUALS
             : this.program.match(Characters.$PLUS)
-              ? TokenKind.INCREMENT
+              ? TokenKind.PLUS_PLUS
               : TokenKind.PLUS
         );
       case Characters.$MINUS: // "-" or "--" or "-=" or "->"
@@ -162,9 +162,9 @@ export class ClutchLexer {
           this.program.match(Characters.$RANGLE)
             ? TokenKind.ARROW
             : this.program.match(Characters.$EQUALS)
-              ? TokenKind.MINUS_BY
+              ? TokenKind.MINUS_EQUALS
               : this.program.match(Characters.$MINUS)
-                ? TokenKind.DECREMENT
+                ? TokenKind.MINUS_MINUS
                 : TokenKind.MINUS
           // Code coverage considers the `);` to be a missed line :(
           /* istanbul ignore next */
@@ -172,38 +172,38 @@ export class ClutchLexer {
       case Characters.$STAR: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.STAR_BY
+            ? TokenKind.STAR_EQUALS
             : TokenKind.STAR
         );
       case Characters.$PERCENT: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.MODULUS_BY
+            ? TokenKind.MODULUS_EQUALS
             : TokenKind.MODULUS
         );
       case Characters.$EQUALS: // "=" or "==" or "==="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? TokenKind.IDENTICAL
-              : TokenKind.EQUALS
-            : TokenKind.ASSIGN
+              ? TokenKind.EQUALS_EQUALS_EQUALS
+              : TokenKind.EQUALS_EQUALS
+            : TokenKind.EQUALS
         );
       case Characters.$LANGLE: // "<" or "<=" or "<<"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.LESS_THAN_OR_EQUAL
+            ? TokenKind.LEFT_ANGLE_EQUALS
             : this.program.match(Characters.$LANGLE)
-              ? TokenKind.LEFT_SHIFT
-              : TokenKind.LESS_THAN
+              ? TokenKind.LEFT_ANGLE_LEFT_ANGLE
+              : TokenKind.LEFT_ANGLE
         );
       case Characters.$RANGLE: // ">" or ">=" or ">>"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.GREATER_THAN_OR_EQUAL
+            ? TokenKind.RIGHT_ANGLE_EQUALS
             : this.program.match(Characters.$RANGLE)
-              ? TokenKind.RIGHT_SHIFT
-              : TokenKind.GREATER_THAN
+              ? TokenKind.RIGHT_ANGLE_RIGHT_ANGLE
+              : TokenKind.RIGHT_ANGLE
         );
       case Characters.$SLASH: // "/" or "//" or "/="
         return this.scanSlash();
@@ -212,26 +212,26 @@ export class ClutchLexer {
       case Characters.$PIPE: // "|" or "||"
         return this.createToken(
           this.program.match(Characters.$PIPE)
-            ? TokenKind.OR
-            : TokenKind.LOGICAL_OR
+            ? TokenKind.PIPE_PIPE
+            : TokenKind.PIPE
         );
       case Characters.$AND: // "&" or "&&"
         return this.createToken(
           this.program.match(Characters.$AND)
-            ? TokenKind.AND
-            : TokenKind.LOGICAL_AND
+            ? TokenKind.AND_AND
+            : TokenKind.AND
         );
       case Characters.$TILDE: // "~"
-        return this.createToken(TokenKind.LOGICAL_NOT);
+        return this.createToken(TokenKind.TILDE);
       case Characters.$CARET: // "^"
-        return this.createToken(TokenKind.LOGICAL_XOR);
+        return this.createToken(TokenKind.CARET);
       case Characters.$EXCLAIM: // "!" or "!=" or "!==""
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? TokenKind.NOT_IDENTICAL
-              : TokenKind.NOT_EQUALS
-            : TokenKind.NEGATE
+              ? TokenKind.EXCLAIM_EQUALS_EQUALS
+              : TokenKind.EXCLAIM_EQUALS
+            : TokenKind.EXCLAIM
         );
       default:
         if (isWhiteSpace(character)) {
@@ -346,7 +346,7 @@ export class ClutchLexer {
     // "/" or "/="
     return this.createToken(
       this.program.match(Characters.$EQUALS)
-        ? TokenKind.SLASH_BY
+        ? TokenKind.SLASH_EQUALS
         : TokenKind.SLASH
     );
   }

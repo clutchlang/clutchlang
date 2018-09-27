@@ -65,8 +65,8 @@ describe('ClutchParser', () => {
         const text = `a ${t} b`;
         it(text, () => {
           const expr = parseExpression(text);
-          expect(expr).toBeInstanceOf(BinaryExpression);
           expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+          expect(expr).toBeInstanceOf(BinaryExpression);
         });
       });
     });
