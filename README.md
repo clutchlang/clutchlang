@@ -10,7 +10,7 @@
 
 # Clutch
 
-_Clutch_ is a compile-to-JS expression-oriented and object-oriented modern programming.
+_Clutch_ is an expression-oriented and object-oriented modern programming that compiles to JavaScript.
 
 ```
 main => print('Hello World)
@@ -21,6 +21,13 @@ _Clutch_'s goals:
 * Make functional programming a delight but keep aproachable to traditional use
 * Defaults that prefer immutability and optimizations
 * Low overhead compilation and interpoability to and with JavaScript
+
+**STATUS**: _Highly experimental_. Currently is a [CoffeScript][1]-like tool
+that does a 1:1 transpilation of most of Clutch's syntax to the equivalent in
+JavaScript. The goal, of course, is to become a complete static language, so we
+are pretty far from that!
+
+[1]: https://coffeescript.org/
 
 ## Running
 
