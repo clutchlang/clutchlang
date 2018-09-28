@@ -1,5 +1,6 @@
 import { IToken, TokenKind } from '../../lexer';
 import { Operator } from '../../parser';
+import { LiteralIdentifier } from '../nodes/expressions';
 import { Expression } from '../nodes/nodes';
 import { AbstractParser } from './abstract';
 
@@ -16,6 +17,16 @@ export class ExpressionParser extends AbstractParser {
    */
   public parseExpression(): Expression {
     return this.parseAssignment();
+  }
+
+  public parseIdentifier(): LiteralIdentifier {
+    if (this.match(TokenKind.IDENTIFIER)) {
+      return this.factory.createLiteralIdentifier(this.peek(-1));
+    }
+    /* istanbul ignore next */
+    throw new SyntaxError(
+      `Unexpected token: "${this.peek().lexeme}" @ ${this.peek().offset}.`
+    );
   }
 
   private parseAssignment(): Expression {
@@ -177,13 +188,7 @@ export class ExpressionParser extends AbstractParser {
     if (this.match(TokenKind.FALSE, TokenKind.TRUE)) {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
-    if (this.match(TokenKind.IDENTIFIER)) {
-      return this.factory.createLiteralIdentifier(this.peek(-1));
-    }
-    /* istanbul ignore next */
-    throw new SyntaxError(
-      `Unexpected token: "${this.peek().lexeme}" @ ${this.peek().offset}.`
-    );
+    return this.parseIdentifier();
   }
 
   private parseBinary(

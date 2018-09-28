@@ -94,14 +94,15 @@ exports[`AstNodeFactory SimpleName should implement AstNode 1`] = `
 `;
 
 exports[`AstNodeFactory Statement should create a let statement 1`] = `
-"VariableStatement:
+"VariableDeclarationStatement:
+  Name: a
   Assign:
     SimpleName: b
 "
 `;
 
 exports[`AstNodeFactory Statement should create a return statement 1`] = `
-"JumpStatement:
+"ReturnStatement:
   Return:
     SimpleName: a
 "

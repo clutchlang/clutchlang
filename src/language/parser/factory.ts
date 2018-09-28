@@ -19,9 +19,9 @@ import {
   TopLevelElement,
 } from './nodes/nodes';
 import {
-  JumpStatement,
+  ReturnStatement,
   StatementBlock,
-  VariableStatement,
+  VariableDeclarationStatement,
 } from './nodes/statements';
 
 /**
@@ -102,17 +102,17 @@ export class AstNodeFactory {
     return new StatementBlock(start, statements, end);
   }
 
-  public createJumpStatement(keyword: IToken, expression: Expression) {
-    return new JumpStatement(keyword, expression);
+  public createReturnStatement(keyword: IToken, expression?: Expression) {
+    return new ReturnStatement(keyword, expression);
   }
 
-  public createVariableStatement(
+  public createVariableDeclarationStatement(
     start: IToken,
     name: LiteralIdentifier,
     assign: IToken,
     expression: Expression
   ) {
-    return new VariableStatement(start, name, assign, expression);
+    return new VariableDeclarationStatement(start, name, assign, expression);
   }
 
   public createLiteralIdentifier(token: IToken): LiteralIdentifier {

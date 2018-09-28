@@ -1,4 +1,4 @@
-import { tokenize } from '../../../src/language/lexer';
+import { tokenize } from '../../../../src/language/lexer';
 import {
   BinaryExpression,
   ClutchParser,
@@ -6,7 +6,7 @@ import {
   InvokeExpression,
   PrintTreeVisitor,
   UnaryExpression,
-} from '../../../src/language/parser';
+} from '../../../../src/language/parser';
 
 describe('ClutchParser', () => {
   function parseExpression(expression: string): Expression {
