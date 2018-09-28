@@ -1,4 +1,4 @@
-import { IToken, TokenKind } from '../../lexer';
+import { IToken } from '../../lexer';
 import { AstVisitor } from '../visitors';
 import { LiteralIdentifier } from './expressions';
 import { Expression, Statement } from './nodes';
@@ -30,29 +30,22 @@ export class StatementBlock {
 }
 
 /**
- * Represenst a _jump_ from the current location in the program.
+ * Represenst a `return` from the current location in the program.
  */
-export class JumpStatement extends Statement {
+export class ReturnStatement extends Statement {
   constructor(
     public readonly firstToken: IToken,
-    public readonly expression: Expression
+    public readonly expression?: Expression
   ) {
     super();
   }
 
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
-    return visitor.visitJumpStatement(this, context);
+    return visitor.visitReturnStatement(this, context);
   }
 
   public get lastToken(): IToken {
-    return this.expression.lastToken;
-  }
-
-  /**
-   * Whether this represents a `return` statement.
-   */
-  public get isReturn(): boolean {
-    return this.firstToken.lexeme === TokenKind.RETURN;
+    return this.expression ? this.expression.lastToken : this.firstToken;
   }
 }
 
@@ -70,7 +63,7 @@ export class VariableDeclarationStatement extends Statement {
   }
 
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
-    return visitor.visitVariableStatement(this, context);
+    return visitor.visitVariableDeclarationStatement(this, context);
   }
 
   public get lastToken(): IToken {

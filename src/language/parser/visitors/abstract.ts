@@ -11,7 +11,7 @@ import {
 import { GroupExpression } from '../nodes/expressions';
 import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
 import {
-  JumpStatement,
+  ReturnStatement,
   VariableDeclarationStatement,
 } from '../nodes/statements';
 
@@ -37,8 +37,8 @@ export abstract class AstVisitor<R, C> {
   public abstract visitUnaryExpression(node: UnaryExpression, context?: C): R;
 
   // Statements
-  public abstract visitJumpStatement(node: JumpStatement, context?: C): R;
-  public abstract visitVariableStatement(
+  public abstract visitReturnStatement(node: ReturnStatement, context?: C): R;
+  public abstract visitVariableDeclarationStatement(
     node: VariableDeclarationStatement,
     context?: C
   ): R;

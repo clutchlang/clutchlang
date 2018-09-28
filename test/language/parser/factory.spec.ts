@@ -221,7 +221,7 @@ describe('AstNodeFactory', () => {
         lexeme: 'return',
         offset: 0,
       };
-      const stmt = factory.createJumpStatement($return, a);
+      const stmt = factory.createReturnStatement($return, a);
       expect(stmt.expression).toEqual(a);
       expect(stmt.firstToken).toEqual($return);
       expect(stmt.lastToken).toEqual(a.lastToken);
@@ -241,7 +241,7 @@ describe('AstNodeFactory', () => {
         lexeme: '=',
         offset: 0,
       };
-      const stmt = factory.createVariableStatement($let, a, $eq, b);
+      const stmt = factory.createVariableDeclarationStatement($let, a, $eq, b);
       expect(stmt.assignToken).toEqual($eq);
       expect(stmt.expression).toEqual(b);
       expect(stmt.firstToken).toEqual($let);

@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClutchParser should parse statement should parse a basic program 1`] = `
+"FileRoot:
+  Elements:
+    FunctionDeclaration:
+      Name:
+        SimpleName: main
+      Parameters:
+      Body:
+        InvokeExpression:
+          Target:
+            SimpleName: print
+          Parameters:
+            LiteralString: 'Hello World'
+"
+`;
+
+exports[`ClutchParser should parse statement should parse a basic program with a function with parameters 1`] = `
+"FileRoot:
+  Elements:
+    FunctionDeclaration:
+      Name:
+        SimpleName: fib
+      Parameters:
+        SimpleName: n
+      Body:
+        ConditionalExpression:
+          If:
+            BinaryExpression:
+              Left:
+                SimpleName: n
+              Operator: <=
+              Right:
+                LiteralNumber: 2
+          Body:
+            InvokeExpression:
+              Target:
+                SimpleName: fib
+              Parameters:
+                BinaryExpression:
+                  Left:
+                    SimpleName: n
+                  Operator: -
+                  Right:
+                    LiteralNumber: 1
+          Else:
+            InvokeExpression:
+              Target:
+                SimpleName: fib
+              Parameters:
+                BinaryExpression:
+                  Left:
+                    SimpleName: n
+                  Operator: -
+                  Right:
+                    LiteralNumber: 2
+"
+`;
+
+exports[`ClutchParser should parse statement should parse a basic program with a function with statements 1`] = `
+"FileRoot:
+  Elements:
+    FunctionDeclaration:
+      Name:
+        SimpleName: main
+      Parameters:
+      Body:
+        VariableDeclarationStatement:
+          Name: messgae
+          Assign:
+            LiteralString: 'Hello'
+        InvokeExpression:
+          Target:
+            SimpleName: print
+          Parameters:
+            SimpleName: message
+"
+`;

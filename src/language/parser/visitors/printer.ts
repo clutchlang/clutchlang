@@ -12,7 +12,7 @@ import {
 } from '../../parser';
 import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
 import {
-  JumpStatement,
+  ReturnStatement,
   StatementBlock,
   VariableDeclarationStatement,
 } from '../nodes/statements';
@@ -146,22 +146,25 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     });
   }
 
-  public visitJumpStatement(
-    node: JumpStatement,
+  public visitReturnStatement(
+    node: ReturnStatement,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
-      this.writeIndented('Return:', writer, () =>
-        node.expression.accept(this, writer)
-      );
+      if (node.expression) {
+        this.writeIndented('Return:', writer, () => {
+          node.expression!.accept(this, writer)
+        });
+      }
     });
   }
 
-  public visitVariableStatement(
+  public visitVariableDeclarationStatement(
     node: VariableDeclarationStatement,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
+      writer.writeLine(`Name: ${node.name.name}`)
       this.writeIndented('Assign:', writer, () =>
         node.expression.accept(this, writer)
       );

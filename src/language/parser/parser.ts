@@ -1,3 +1,3 @@
-import { ExpressionParser } from './parse/expressions';
+import { FileParser } from './parse/file';
 
-export class ClutchParser extends ExpressionParser {}
+export class ClutchParser extends FileParser {}
