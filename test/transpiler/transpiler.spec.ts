@@ -27,6 +27,13 @@ describe('JsOutputTranspiler', () => {
         foobar
         method(false)
         f(1 2)
+        -1
+        +1
+        !true
+        --1
+        1++
+        true && false
+        false || true
       }
       explicit -> {
         return true
@@ -55,7 +62,6 @@ describe('JsOutputTranspiler', () => {
     const program = parse(`
       example -> {
         (true)
-        (false)
       }
     `);
     const visitor = new SimpleJsTranspiler();

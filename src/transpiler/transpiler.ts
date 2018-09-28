@@ -29,7 +29,8 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
     context = new StringBuffer()
   ): StringBuffer {
     node.left.accept(this, context);
-    context.write(`${node.operatorToken.lexeme}`);
+    context.write(` ${node.operatorToken.lexeme} `);
+    node.right.accept(this, context);
     return context;
   }
 
@@ -49,10 +50,10 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
   ): StringBuffer {
     // TODO: Support statement blocks?
     node.condition.accept(this, context);
-    context.write('?');
+    context.write(' ? ');
     (node.body as ast.Expression).accept(this, context);
     if (node.elseToken) {
-      context.write(':');
+      context.write(' : ');
       (node.elseBody as ast.Expression).accept(this, context);
     }
     return context;
@@ -126,7 +127,7 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
     node: ast.ReturnStatement,
     context = new StringBuffer()
   ): StringBuffer {
-    context.write('return');
+    context.write('return ');
     if (node.expression) {
       node.expression.accept(this, context);
     }
@@ -137,9 +138,9 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
     node: ast.VariableDeclarationStatement,
     context = new StringBuffer()
   ): StringBuffer {
-    context.write('let');
+    context.write('let ');
     node.name.accept(this, context);
-    context.write('=');
+    context.write(' = ');
     node.expression.accept(this, context);
     return context;
   }
@@ -159,20 +160,23 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
       }
     });
     context.write(') ');
-    context.writeLine('{');
     context.indent(2);
+    context.writeLine('{');
     if (node.body instanceof ast.StatementBlock) {
       node.body.statements.forEach((e, i, a) => {
         const last = i === a.length - 1;
         if (last && e instanceof ast.Expression) {
-          context.write('return');
+          context.writeIndented('return ');
+        } else {
+          context.writeIndented();
         }
         e.accept(this, context);
-        context.writeLine(';');
+        context.write(';\n');
       });
     } else {
+      context.writeIndented('return ');
       node.body.accept(this, context);
-      context.writeLine(';');
+      context.write(';\n');
     }
     context.indent(-2);
     context.writeLine('}');

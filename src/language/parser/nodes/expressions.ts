@@ -1,6 +1,6 @@
 import { IToken } from '../../lexer';
 import { AstVisitor } from '../visitors';
-import { Expression, SimpleNode } from './nodes';
+import { Expression } from './nodes';
 import { Operator } from './precedence';
 import { StatementBlock } from './statements';
 
@@ -134,10 +134,24 @@ export class InvokeExpression extends Expression {
   }
 }
 
+export abstract class LiteralExpression extends Expression {
+  constructor(private readonly token: IToken) {
+    super();
+  }
+
+  public get firstToken() {
+    return this.token;
+  }
+
+  public get lastToken() {
+    return this.token;
+  }
+}
+
 /**
  * A literal boolean compatible with JavaScript.
  */
-export class LiteralBoolean extends SimpleNode implements Expression {
+export class LiteralBoolean extends LiteralExpression {
   constructor(token: IToken, public readonly value: boolean) {
     super(token);
   }
@@ -150,7 +164,7 @@ export class LiteralBoolean extends SimpleNode implements Expression {
 /**
  * A literal number compatible with JavaScript.
  */
-export class LiteralNumber extends SimpleNode implements Expression {
+export class LiteralNumber extends LiteralExpression {
   constructor(token: IToken, public readonly value: number) {
     super(token);
   }
@@ -178,7 +192,7 @@ export class LiteralNumber extends SimpleNode implements Expression {
  * 'Hello\n  World!'
  * ```
  */
-export class LiteralString extends SimpleNode implements Expression {
+export class LiteralString extends LiteralExpression {
   constructor(token: IToken, public readonly value: string) {
     super(token);
   }
@@ -191,7 +205,7 @@ export class LiteralString extends SimpleNode implements Expression {
 /**
  * Represents a reference to some identifier by name.
  */
-export class LiteralIdentifier extends SimpleNode implements Expression {
+export class LiteralIdentifier extends LiteralExpression {
   constructor(token: IToken, public readonly name: string) {
     super(token);
   }

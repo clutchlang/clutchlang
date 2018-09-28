@@ -230,12 +230,14 @@ export class ExpressionParser extends AbstractParser {
   ): Expression {
     const operator = this.peek(1);
     if (kinds.some(e => e === operator.lexeme)) {
-      return this.factory.createUnaryExpression(
+      const expr = this.factory.createUnaryExpression(
         parseNext(),
         this.parsePostfixOp(operator),
         operator,
         false
       );
+      this.advance();
+      return expr;
     }
     return parseNext();
   }

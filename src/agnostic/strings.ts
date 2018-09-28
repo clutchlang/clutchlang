@@ -150,6 +150,10 @@ export class StringBuffer {
   constructor(private buffer = '') {}
 
   public write(object: unknown): void {
+    this.buffer += `${object}`;
+  }
+
+  public writeIndented(object: unknown = ''): void {
     this.buffer += `${this.indents}${object}`;
   }
 
