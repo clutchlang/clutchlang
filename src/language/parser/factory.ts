@@ -21,7 +21,7 @@ import {
 import {
   JumpStatement,
   StatementBlock,
-  VariableStatement,
+  VariableDeclarationStatement,
 } from './nodes/statements';
 
 /**
@@ -112,7 +112,7 @@ export class AstNodeFactory {
     assign: IToken,
     expression: Expression
   ) {
-    return new VariableStatement(start, name, assign, expression);
+    return new VariableDeclarationStatement(start, name, assign, expression);
   }
 
   public createLiteralIdentifier(token: IToken): LiteralIdentifier {

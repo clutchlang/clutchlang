@@ -14,7 +14,7 @@ import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
 import {
   JumpStatement,
   StatementBlock,
-  VariableStatement,
+  VariableDeclarationStatement,
 } from '../nodes/statements';
 import { AstVisitor } from './abstract';
 
@@ -158,7 +158,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
   }
 
   public visitVariableStatement(
-    node: VariableStatement,
+    node: VariableDeclarationStatement,
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {

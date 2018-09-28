@@ -10,7 +10,7 @@ import {
 } from '../../parser';
 import { GroupExpression } from '../nodes/expressions';
 import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
-import { JumpStatement, VariableStatement } from '../nodes/statements';
+import { JumpStatement, VariableDeclarationStatement } from '../nodes/statements';
 
 /**
  * A pattern that may be used to visit an AST structure.
@@ -36,7 +36,7 @@ export abstract class AstVisitor<R, C> {
   // Statements
   public abstract visitJumpStatement(node: JumpStatement, context?: C): R;
   public abstract visitVariableStatement(
-    node: VariableStatement,
+    node: VariableDeclarationStatement,
     context?: C
   ): R;
 
