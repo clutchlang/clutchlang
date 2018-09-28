@@ -153,7 +153,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     return this.visitNode(node, writer, () => {
       if (node.expression) {
         this.writeIndented('Return:', writer, () => {
-          node.expression!.accept(this, writer)
+          node.expression!.accept(this, writer);
         });
       }
     });
@@ -164,7 +164,7 @@ export class PrintTreeVisitor extends AstVisitor<string, StringBuffer> {
     writer = new StringBuffer()
   ): string {
     return this.visitNode(node, writer, () => {
-      writer.writeLine(`Name: ${node.name.name}`)
+      writer.writeLine(`Name: ${node.name.name}`);
       this.writeIndented('Assign:', writer, () =>
         node.expression.accept(this, writer)
       );

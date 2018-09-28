@@ -67,13 +67,16 @@ exports[`ClutchParser should parse statement should parse a basic program with a
       Parameters:
       Body:
         VariableDeclarationStatement:
-          Name: messgae
+          Name: message
           Assign:
             LiteralString: 'Hello'
         InvokeExpression:
           Target:
             SimpleName: print
           Parameters:
+            SimpleName: message
+        ReturnStatement:
+          Return:
             SimpleName: message
 "
 `;
