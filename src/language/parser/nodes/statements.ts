@@ -5,16 +5,16 @@ import { Expression, Statement } from './nodes';
 
 /**
  * Represents a collection of @see Statement or @see Expression elements:
- * 
+ *
  * ```
  * {
  *   (statement | expression)*
  * }
  * ```
- * 
+ *
  * **NOTE**: If the last element is an @see Expression then there is an implicit
  * `return` statement returing the value of that expression:
- * 
+ *
  * ```
  * {
  *   1 // implicit return

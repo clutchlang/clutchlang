@@ -10,7 +10,10 @@ import {
 } from '../../parser';
 import { GroupExpression } from '../nodes/expressions';
 import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
-import { JumpStatement, VariableDeclarationStatement } from '../nodes/statements';
+import {
+  JumpStatement,
+  VariableDeclarationStatement,
+} from '../nodes/statements';
 
 /**
  * A pattern that may be used to visit an AST structure.
