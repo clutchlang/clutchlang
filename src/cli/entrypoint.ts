@@ -99,9 +99,10 @@ export function run(options: IOptions): void {
       process.stdout.write(`${output}\n`);
       return;
     }
-    fs.writeFileSync(options.output!, output);
+    const data = output.toString();
+    fs.writeFileSync(options.output!, data);
     process.stdout.write(
-      `Wrote ${output.length} bytes to ${options.output}.\n`
+      `Wrote ${data.length} bytes to ${options.output}.\n`
     );
   }
 }
