@@ -32,7 +32,7 @@ describe('ClutchParser', () => {
       ].forEach(t => {
         it(t, () => {
           const expr = parseExpression(t);
-          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
         });
       });
     });
@@ -65,7 +65,7 @@ describe('ClutchParser', () => {
         const text = `a ${t} b`;
         it(text, () => {
           const expr = parseExpression(text);
-          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
           expect(expr).toBeInstanceOf(BinaryExpression);
         });
       });
@@ -77,7 +77,7 @@ describe('ClutchParser', () => {
         it(text, () => {
           const expr = parseExpression(text);
           expect(expr).toBeInstanceOf(UnaryExpression);
-          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
         });
       });
     });
@@ -88,7 +88,7 @@ describe('ClutchParser', () => {
         it(text, () => {
           const expr = parseExpression(text);
           expect(expr).toBeInstanceOf(UnaryExpression);
-          expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
         });
       });
     });
@@ -98,31 +98,31 @@ describe('ClutchParser', () => {
     it('simple', () => {
       const text = `(a)`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('extra parens', () => {
       const text = `((a))`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with a binary expression', () => {
       const text = `(a + b)`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with a prefix expression', () => {
       const text = `(--a)`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with a postfix expression', () => {
       const text = `(a--)`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
 
@@ -131,46 +131,46 @@ describe('ClutchParser', () => {
       const text = `fn()`;
       const expr = parseExpression(text);
       expect(expr).toBeInstanceOf(InvokeExpression);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('simple with parameter', () => {
       const text = `fn(a)`;
       const expr = parseExpression(text);
       expect(expr).toBeInstanceOf(InvokeExpression);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('simple with multiple parameters', () => {
       const text = `fn(a b)`;
       const expr = parseExpression(text);
       expect(expr).toBeInstanceOf(InvokeExpression);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('chained', () => {
       const text = `fn()()`;
       const expr = parseExpression(text);
       expect(expr).toBeInstanceOf(InvokeExpression);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('accessor', () => {
       const text = `a.fn()`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('accessor and chained', () => {
       const text = `a.fn().b()`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('complex', () => {
       const text = `fn(a() 1 + 1 b.c())`;
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
 
@@ -178,13 +178,13 @@ describe('ClutchParser', () => {
     it('simple', () => {
       const text = 'if a then b';
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with else', () => {
       const text = 'if a then b else c';
       const expr = parseExpression(text);
-      expect(expr.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
 });

@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import { JsOutputTranspiler } from '../output/transpiler';
-import { parse } from '../parser/parse';
-import { PrintTreeVisitor } from '../parser/source/ast/visitor';
+import { tokenize } from '../language/lexer';
+import { ClutchParser } from '../language/parser/parser';
+import { PrintTreeVisitor } from '../language/parser/visitors/printer';
+import { SimpleJsTranspiler } from '../transpiler/transpiler';
 
 export interface IOptions {
   format: 'parse' | 'js';
@@ -53,7 +54,7 @@ export function parseOptions(args: string[]): IOptions {
  */
 export function run(options: IOptions): void {
   const visitor =
-    options.format === 'parse' ? PrintTreeVisitor : JsOutputTranspiler;
+    options.format === 'parse' ? PrintTreeVisitor : SimpleJsTranspiler;
   if (options.worker) {
     process.stdin.setEncoding('utf8');
     let buffer = '';
@@ -61,9 +62,11 @@ export function run(options: IOptions): void {
       buffer += chunk;
       if (buffer.endsWith('\n\n')) {
         try {
-          const output = parse(buffer).visit(new visitor());
-          // tslint:disable-next-line:no-any
-          process.stdout.write(output as any);
+          const tokens = tokenize(buffer);
+          const output = new ClutchParser(tokens)
+            .parseFileRoot()
+            .accept(new visitor());
+          process.stdout.write(output.toString());
           process.stdout.write('\n');
         } catch (e) {
           if (e instanceof SyntaxError) {
@@ -88,8 +91,10 @@ export function run(options: IOptions): void {
       process.exit(1);
     }
     const input = fs.readFileSync(options.input!, 'utf8');
-    // tslint:disable-next-line:no-any
-    const output = parse(input).visit(new visitor()) as any;
+    const tokens = tokenize(input);
+    const output = new ClutchParser(tokens)
+      .parseFileRoot()
+      .accept(new visitor());
     if (options.format === 'parse') {
       process.stdout.write(`${output}\n`);
       return;

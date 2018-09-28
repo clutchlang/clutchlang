@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JsOutputTranspiler should support "Hello World" 1`] = `
+"function main() {
+  return  print  (  '  Hello World  '  )  ;
+}
+"
+`;
+
+exports[`JsOutputTranspiler should support functions with parameters 1`] = `
+"function print2(a, b) {
+  print  (  a  )  ;
+  return  print  (  b  )  ;
+}
+"
+`;
+
+exports[`JsOutputTranspiler should support most ast nodes 1`] = `
+"function example() {
+  true  ;
+  1  ;
+  '  Hello  '  ;
+  foobar  ;
+  method  (  false  )  ;
+  return  f  (  1  ,   2  )  ;
+}
+function explicit() {
+  return  true  ;
+}
+function implicit() {
+  true  ;
+}
+function noReturn() {
+  let  variable  =  5  ;
+}
+function withIf() {
+  true  ?  1  ;
+}
+function withIfElse() {
+  true  ?  1  :  2  ;
+}
+function withIfStatement() {
+  return  true  ?  print  (  1  )  :  print  (  2  )  ;
+}
+function ternary(a, b, c) {
+  a  ?  b  :  c  ;
+}
+"
+`;
+
+exports[`JsOutputTranspiler should support parenthesized ast nodes 1`] = `
+"function example() {
+  return  (  true  )  (  false  )  ;
+}
+"
+`;

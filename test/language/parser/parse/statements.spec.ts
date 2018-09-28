@@ -17,19 +17,19 @@ describe('ClutchParser should parse statement', () => {
     it('', () => {
       const stmt = parseStatement('return');
       expect(stmt).toBeInstanceOf(ReturnStatement);
-      expect(stmt.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with an expression', () => {
       const stmt = parseStatement('return a');
       expect(stmt).toBeInstanceOf(ReturnStatement);
-      expect(stmt.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
 
     it('with a parenthesized expression', () => {
       const stmt = parseStatement('return (a)');
       expect(stmt).toBeInstanceOf(ReturnStatement);
-      expect(stmt.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
 
@@ -37,7 +37,7 @@ describe('ClutchParser should parse statement', () => {
     it('', () => {
       const stmt = parseStatement('let a = b');
       expect(stmt).toBeInstanceOf(VariableDeclarationStatement);
-      expect(stmt.accept(new PrintTreeVisitor())).toMatchSnapshot();
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
 });
