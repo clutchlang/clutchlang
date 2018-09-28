@@ -32,7 +32,9 @@ describe('ClutchParser', () => {
       ].forEach(t => {
         it(t, () => {
           const expr = parseExpression(t);
-          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+          expect(
+            expr.accept(new PrintTreeVisitor()).toString()
+          ).toMatchSnapshot();
         });
       });
     });
@@ -65,7 +67,9 @@ describe('ClutchParser', () => {
         const text = `a ${t} b`;
         it(text, () => {
           const expr = parseExpression(text);
-          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+          expect(
+            expr.accept(new PrintTreeVisitor()).toString()
+          ).toMatchSnapshot();
           expect(expr).toBeInstanceOf(BinaryExpression);
         });
       });
@@ -77,7 +81,9 @@ describe('ClutchParser', () => {
         it(text, () => {
           const expr = parseExpression(text);
           expect(expr).toBeInstanceOf(UnaryExpression);
-          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+          expect(
+            expr.accept(new PrintTreeVisitor()).toString()
+          ).toMatchSnapshot();
         });
       });
     });
@@ -88,7 +94,9 @@ describe('ClutchParser', () => {
         it(text, () => {
           const expr = parseExpression(text);
           expect(expr).toBeInstanceOf(UnaryExpression);
-          expect(expr.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+          expect(
+            expr.accept(new PrintTreeVisitor()).toString()
+          ).toMatchSnapshot();
         });
       });
     });
