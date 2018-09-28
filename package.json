@@ -15,15 +15,13 @@
     "lint:fix": "tslint --fix --project .",
     "test": "jest --coverage --no-cache"
   },
-  "dependencies": {
-    "@types/prettier": "^1.13.2",
-    "prettier": "^1.14.3"
-  },
   "devDependencies": {
     "@types/jest": "^23.3.1",
     "@types/node": "^10.10.2",
+    "@types/prettier": "^1.13.2",
     "coveralls": "^3.0.2",
     "jest": "^23.5.0",
+    "prettier": "^1.14.3",
     "prettier-check": "^2.0.0",
     "ts-jest": "^23.1.4",
     "ts-node": "^7.0.1",

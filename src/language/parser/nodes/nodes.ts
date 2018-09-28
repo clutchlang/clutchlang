@@ -84,20 +84,3 @@ export abstract class Statement extends AstNode {}
  * Base class for any expression.
  */
 export abstract class Expression extends Statement {}
-
-/**
- * An AST node that was formed from a single @interface IToken.
- */
-export abstract class SimpleNode extends AstNode {
-  constructor(private readonly token: IToken) {
-    super();
-  }
-
-  public get firstToken() {
-    return this.token;
-  }
-
-  public get lastToken() {
-    return this.token;
-  }
-}

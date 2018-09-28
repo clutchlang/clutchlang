@@ -37,7 +37,7 @@ describe('AstNodeFactory', () => {
     expect(fileRoot.firstToken).toEqual($function.firstToken);
     expect(fileRoot.lastToken).toEqual($function.lastToken);
     expect(fileRoot.topLevelElements).toEqual([$function]);
-    expect(fileRoot.accept(visitor)).toMatchSnapshot();
+    expect(fileRoot.accept(visitor).toString()).toMatchSnapshot();
   });
 
   it('should create a function', () => {
@@ -54,7 +54,7 @@ describe('AstNodeFactory', () => {
     expect($function.lastToken).toEqual(b.lastToken);
     expect($function.name).toEqual(a);
     expect($function.parameters).toEqual([b]);
-    expect($function.accept(visitor)).toMatchSnapshot();
+    expect($function.accept(visitor).toString()).toMatchSnapshot();
   });
 
   describe('<Expression>', () => {
@@ -77,7 +77,7 @@ describe('AstNodeFactory', () => {
       expect(expr.operator).toBe(Operator.Addition);
       expect(expr.right).toBe(b);
       expect(expr.target).toBe(a);
-      expect(expr.accept(visitor)).toMatchSnapshot();
+      expect(expr.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should create prefix UnaryExpression', () => {
@@ -97,7 +97,7 @@ describe('AstNodeFactory', () => {
       expect(expr.lastToken).toBe(a.lastToken);
       expect(expr.operator).toEqual(Operator.UnaryNegative);
       expect(expr.target).toBe(a);
-      expect(expr.accept(visitor)).toMatchSnapshot();
+      expect(expr.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should create postfix UnaryExpression', () => {
@@ -117,7 +117,7 @@ describe('AstNodeFactory', () => {
       expect(expr.lastToken).toBe($accessor);
       expect(expr.operator).toEqual(Operator.MemberAccess);
       expect(expr.target).toBe(a);
-      expect(expr.accept(visitor)).toMatchSnapshot();
+      expect(expr.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should create GroupExpression', () => {
@@ -137,7 +137,7 @@ describe('AstNodeFactory', () => {
       expect(expr.expression).toEqual(a);
       expect(expr.firstToken).toEqual($lp);
       expect(expr.lastToken).toEqual($rp);
-      expect(expr.accept(visitor)).toMatchSnapshot();
+      expect(expr.accept(visitor).toString()).toMatchSnapshot();
     });
 
     describe('should create IfExpression', () => {
@@ -164,7 +164,7 @@ describe('AstNodeFactory', () => {
         expect(expr.firstToken).toEqual($if);
         expect(expr.ifToken).toBe($if);
         expect(expr.lastToken).toBe(b.lastToken);
-        expect(expr.accept(visitor)).toMatchSnapshot();
+        expect(expr.accept(visitor).toString()).toMatchSnapshot();
       });
 
       it('with else', () => {
@@ -189,7 +189,7 @@ describe('AstNodeFactory', () => {
         expect(expr.firstToken).toEqual($if);
         expect(expr.ifToken).toBe($if);
         expect(expr.lastToken).toBe(a.lastToken);
-        expect(expr.accept(visitor)).toMatchSnapshot();
+        expect(expr.accept(visitor).toString()).toMatchSnapshot();
       });
     });
   });
@@ -225,7 +225,7 @@ describe('AstNodeFactory', () => {
       expect(stmt.expression).toEqual(a);
       expect(stmt.firstToken).toEqual($return);
       expect(stmt.lastToken).toEqual(a.lastToken);
-      expect(stmt.accept(visitor)).toMatchSnapshot();
+      expect(stmt.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should create a let statement', () => {
@@ -247,7 +247,7 @@ describe('AstNodeFactory', () => {
       expect(stmt.firstToken).toEqual($let);
       expect(stmt.lastToken).toEqual(b.lastToken);
       expect(stmt.name).toEqual(a);
-      expect(stmt.accept(visitor)).toMatchSnapshot();
+      expect(stmt.accept(visitor).toString()).toMatchSnapshot();
     });
   });
 
@@ -271,7 +271,7 @@ describe('AstNodeFactory', () => {
     expect(expr.openToken).toEqual($open);
     expect(expr.parameters).toEqual([]);
     expect(expr.target).toEqual(a);
-    expect(expr.accept(visitor)).toMatchSnapshot();
+    expect(expr.accept(visitor).toString()).toMatchSnapshot();
   });
 
   describe('LiteralBoolean', () => {
@@ -286,7 +286,7 @@ describe('AstNodeFactory', () => {
       expect($true.firstToken).toBe(token);
       expect($true.lastToken).toBe(token);
       expect($true.value).toBe(true);
-      expect($true.accept(visitor)).toMatchSnapshot();
+      expect($true.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should evaluate false', () => {
@@ -300,7 +300,7 @@ describe('AstNodeFactory', () => {
       expect($false.firstToken).toBe(token);
       expect($false.lastToken).toBe(token);
       expect($false.value).toBe(false);
-      expect($false.accept(visitor)).toMatchSnapshot();
+      expect($false.accept(visitor).toString()).toMatchSnapshot();
     });
   });
 
@@ -316,7 +316,7 @@ describe('AstNodeFactory', () => {
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
       expect($1.value).toBe(1);
-      expect($1.accept(visitor)).toMatchSnapshot();
+      expect($1.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should evaluate float', () => {
@@ -330,7 +330,7 @@ describe('AstNodeFactory', () => {
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
       expect($1.value).toBe(1.5);
-      expect($1.accept(visitor)).toMatchSnapshot();
+      expect($1.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should evaluate hex', () => {
@@ -344,7 +344,7 @@ describe('AstNodeFactory', () => {
       expect($0xFFF.firstToken).toBe(token);
       expect($0xFFF.lastToken).toBe(token);
       expect($0xFFF.value).toBe(0xfff);
-      expect($0xFFF.accept(visitor)).toMatchSnapshot();
+      expect($0xFFF.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should evaluate exponential', () => {
@@ -358,7 +358,7 @@ describe('AstNodeFactory', () => {
       expect($2e6.firstToken).toBe(token);
       expect($2e6.lastToken).toBe(token);
       expect($2e6.value).toBe(2e6);
-      expect($2e6.accept(visitor)).toMatchSnapshot();
+      expect($2e6.accept(visitor).toString()).toMatchSnapshot();
     });
   });
 
@@ -374,7 +374,7 @@ describe('AstNodeFactory', () => {
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
       expect(empty.value).toBe('');
-      expect(empty.accept(visitor)).toMatchSnapshot();
+      expect(empty.accept(visitor).toString()).toMatchSnapshot();
     });
 
     it('should evaluate a single-line string', () => {
@@ -432,6 +432,6 @@ describe('AstNodeFactory', () => {
     expect(fooBar.firstToken).toBe(token);
     expect(fooBar.lastToken).toBe(token);
     expect(fooBar.name).toBe('fooBar');
-    expect(fooBar.accept(visitor)).toMatchSnapshot();
+    expect(fooBar.accept(visitor).toString()).toMatchSnapshot();
   });
 });
