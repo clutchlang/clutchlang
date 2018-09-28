@@ -101,9 +101,7 @@ export function run(options: IOptions): void {
     }
     const data = output.toString();
     fs.writeFileSync(options.output!, data);
-    process.stdout.write(
-      `Wrote ${data.length} bytes to ${options.output}.\n`
-    );
+    process.stdout.write(`Wrote ${data.length} bytes to ${options.output}.\n`);
   }
 }
 
