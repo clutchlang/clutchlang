@@ -159,9 +159,8 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
         context.write(', ');
       }
     });
-    context.write(') ');
+    context.write(') {\n');
     context.indent(2);
-    context.writeLine('{');
     if (node.body instanceof ast.StatementBlock) {
       node.body.statements.forEach((e, i, a) => {
         const last = i === a.length - 1;
