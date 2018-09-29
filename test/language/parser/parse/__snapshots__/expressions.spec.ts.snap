@@ -426,7 +426,7 @@ exports[`ClutchParser should parse and print literal fooBar 1`] = `
 `;
 
 exports[`ClutchParser should parse and print literal true 1`] = `
-"SimpleName: true
+"LiteralBoolean: true
 "
 `;
 

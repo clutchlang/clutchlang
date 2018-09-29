@@ -162,6 +162,13 @@ describe('tokenize', () => {
     ]);
   });
 
+  it('should scan booleans', () => {
+    expect(tokenize('true false').map(t => [t.kind, t.lexeme])).toEqual([
+      [TokenKind.TRUE, 'true'],
+      [TokenKind.FALSE, 'false'],
+    ])
+  });
+
   it('should scan strings', () => {
     expect(
       tokenize(`
