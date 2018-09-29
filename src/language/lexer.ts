@@ -107,6 +107,7 @@ export class ClutchLexer {
     return: TokenKind.RETURN,
     super: TokenKind.SUPER,
     this: TokenKind.THIS,
+    true: TokenKind.TRUE,
     while: TokenKind.WHILE,
   };
 

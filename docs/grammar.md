@@ -76,12 +76,7 @@ start<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`"}"`<br>
 &nbsp;&nbsp;;
 
-**statement**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`return`<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`statement`<br>
-&nbsp;&nbsp;;
-
-**jump**<br>
+**return**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`"return"`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`expression?`<br>
 &nbsp;&nbsp;;
@@ -214,7 +209,7 @@ start<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralBoolean`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralNumber`<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`LiteralString`<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`SimpleName`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`LiteralIdentifier`<br>
 &nbsp;&nbsp;;
 
 ### Literals
@@ -231,4 +226,4 @@ start<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`"'"`<br>
 &nbsp;&nbsp;;
 
-**SimpleName**: ~Roughly JavaScript (To be expanded).
+**LiteralIdentifier**: ~Roughly JavaScript (To be expanded).
