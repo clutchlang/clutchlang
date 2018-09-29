@@ -12,8 +12,11 @@
 
 _Clutch_ is an expression-oriented and object-oriented modern programming that compiles to JavaScript.
 
-```
-main => print('Hello World)
+```js
+// fib(n) -> if n < 2 then n else fib(n - 1) + fib(n - 2)
+function fib(n) {
+  return n < 2 ? n : fib(n - 1) + fib(n - 2);
+}
 ```
 
 _Clutch_'s goals:
