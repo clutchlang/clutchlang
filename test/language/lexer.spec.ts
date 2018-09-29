@@ -166,6 +166,7 @@ describe('tokenize', () => {
     expect(tokenize('true false').map(t => [t.kind, t.lexeme])).toEqual([
       [TokenKind.TRUE, 'true'],
       [TokenKind.FALSE, 'false'],
+      [TokenKind.EOF, ''],
     ]);
   });
 
