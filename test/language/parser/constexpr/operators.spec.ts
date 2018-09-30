@@ -1,14 +1,22 @@
 // tslint:disable:no-magic-numbers
-import {tokenize} from '../../../../src/language/lexer';
-import {ClutchParser, LiteralBoolean, LiteralNumber, LiteralString,} from '../../../../src/language/parser';
-import {evaluateConstExpression} from '../../../../src/language/parser/evaluator/constexpr';
+import { tokenize } from '../../../../src/language/lexer';
+import {
+  ClutchParser,
+  LiteralBoolean,
+  LiteralNumber,
+  LiteralString,
+} from '../../../../src/language/parser';
+import { evaluateConstExpression } from '../../../../src/language/parser/evaluator/constexpr';
 
-function evaluate(source: string): Object {
+function evaluate(source: string): number | boolean | string {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseExpression();
   const node = evaluateConstExpression(expression);
-  if (node instanceof LiteralNumber || node instanceof LiteralBoolean ||
-      node instanceof LiteralString) {
+  if (
+    node instanceof LiteralNumber ||
+    node instanceof LiteralBoolean ||
+    node instanceof LiteralString
+  ) {
     return node.value;
   }
   throw new Error('Not a value');
@@ -79,7 +87,7 @@ describe('ConstExpr', () => {
   });
 
   it('strings', () => {
-    const table: Array<[string, string]> = [['\'hello\'', 'hello']];
+    const table: Array<[string, string]> = [["'hello'", 'hello']];
     for (const [question, answer] of table) {
       expect(evaluate(question)).toEqual(answer);
     }
