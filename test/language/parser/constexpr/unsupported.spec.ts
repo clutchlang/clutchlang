@@ -6,29 +6,29 @@ import { evaluateConstExpression } from '../../../../src/language/parser/evaluat
 function expr(source: string): void {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseExpression();
-  evaluateConstExpression(expression);
+  evaluateConstExpression(expression, new Map());
 }
 
 function statement(source: string): void {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseStatement();
-  evaluateConstExpression(expression);
+  evaluateConstExpression(expression, new Map());
 }
 
 function file(source: string): void {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseFileRoot();
-  evaluateConstExpression(expression);
+  evaluateConstExpression(expression, new Map());
 }
 
 function declare(source: string): void {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseFileRoot();
-  evaluateConstExpression(expression.topLevelElements[0]);
+  evaluateConstExpression(expression.topLevelElements[0], new Map());
 }
 
 describe('ConstExpr', () => {
-  it('conditional expressions unsupported', () => {
+  it('conditional expression type error', () => {
     expect(() => expr("if ('true') then 4 else 5")).toThrow();
   });
 
@@ -36,7 +36,7 @@ describe('ConstExpr', () => {
     expect(() => statement('if (1 > 2) { 4 } else { 5 }')).toThrow();
   });
 
-  it('function invocation unsupported', () => {
+  it('undefined function invocation unsupported', () => {
     expect(() => expr('fib(2)')).toThrow();
   });
 
