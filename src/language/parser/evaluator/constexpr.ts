@@ -1,27 +1,20 @@
-import { IToken } from '../../lexer';
-import {
-  BinaryExpression,
-  ConditionalExpression,
-  GroupExpression,
-  InvokeExpression,
-  LiteralBoolean,
-  LiteralIdentifier,
-  LiteralNumber,
-  LiteralString,
-  ReturnStatement,
-  UnaryExpression,
-  VariableDeclarationStatement,
-} from '../../parser';
-import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
-import { Operator } from '../nodes/precedence';
-import { AstVisitor } from '../visitors/abstract';
+import {IToken, TokenKind} from '../../lexer';
+import {BinaryExpression, ConditionalExpression, GroupExpression, InvokeExpression, LiteralBoolean, LiteralIdentifier, LiteralNumber, LiteralString, ReturnStatement, UnaryExpression, VariableDeclarationStatement,} from '../../parser';
+import {AstNode, FileRoot, FunctionDeclaration} from '../nodes/nodes';
+import {Operator} from '../nodes/precedence';
+import {AstVisitor} from '../visitors/abstract';
 
 export function evaluateConstExpression(node: AstNode): AstNode {
   return node.accept(new ConstExpressionVisitor(), {});
 }
 
-// defeat typescript checking.
-let token: IToken;
+// default token for synthetic nodes.
+const token: IToken = {
+  kind: TokenKind.EOF,
+  lexeme: '',
+  comments: [],
+  offset: -1,
+};
 
 enum ConstExprErrorMessage {
   DEFAULT_ERROR_STRING = 'Unsupported constexpr',
@@ -35,17 +28,13 @@ enum ConstExprErrorMessage {
   RETURN_STATEMENT_ERROR = 'Cannot early return',
 }
 
-interface Context {}
 
-class ConstExpressionVisitor extends AstVisitor<AstNode, Context> {
-  public visitFileRoot(_: FileRoot, __: Context): AstNode {
+class ConstExpressionVisitor extends AstVisitor<AstNode, {}> {
+  public visitFileRoot(_: FileRoot, __: {}): AstNode {
     throw new Error(ConstExprErrorMessage.FILE_ROOT_UNSUPPORTED);
   }
 
-  public visitBinaryExpression(
-    node: BinaryExpression,
-    context: Context
-  ): AstNode {
+  public visitBinaryExpression(node: BinaryExpression, context: {}): AstNode {
     const left: AstNode = node.left.accept(this, context);
     const right: AstNode = node.right.accept(this, context);
     if (left instanceof LiteralNumber && right instanceof LiteralNumber) {
@@ -61,7 +50,7 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, Context> {
         case Operator.Remainder:
           return new LiteralNumber(token, left.value % right.value);
         case Operator.Equality:
-          return new LiteralBoolean(token, left.value == right.value);
+          return new LiteralBoolean(token, left.value === right.value);
         case Operator.GreaterThan:
           return new LiteralBoolean(token, left.value > right.value);
         case Operator.GreaterThanOrEqual:
@@ -71,30 +60,25 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, Context> {
         case Operator.LessThanOrEqual:
           return new LiteralBoolean(token, left.value <= right.value);
         case Operator.Inequality:
-          return new LiteralBoolean(token, left.value != right.value);
+          return new LiteralBoolean(token, left.value !== right.value);
       }
     } else if (
-      left instanceof LiteralBoolean &&
-      right instanceof LiteralBoolean
-    ) {
+        left instanceof LiteralBoolean && right instanceof LiteralBoolean) {
       switch (node.operator) {
         case Operator.LogicalAnd:
           return new LiteralBoolean(token, left.value && right.value);
         case Operator.LogicalOr:
           return new LiteralBoolean(token, left.value || right.value);
         case Operator.Equality:
-          return new LiteralBoolean(token, left.value == right.value);
+          return new LiteralBoolean(token, left.value === right.value);
         case Operator.Inequality:
-          return new LiteralBoolean(token, left.value != right.value);
+          return new LiteralBoolean(token, left.value !== right.value);
       }
     }
     throw new Error(ConstExprErrorMessage.DEFAULT_ERROR_STRING);
   }
 
-  public visitUnaryExpression(
-    node: UnaryExpression,
-    context: Context
-  ): AstNode {
+  public visitUnaryExpression(node: UnaryExpression, context: {}): AstNode {
     const target: AstNode = node.target.accept(this, context);
     if (target instanceof LiteralNumber) {
       const value: number = target.value;
@@ -119,47 +103,40 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, Context> {
     throw new Error(ConstExprErrorMessage.DEFAULT_ERROR_STRING);
   }
 
-  public visitGroupExpression(
-    node: GroupExpression,
-    context: Context
-  ): AstNode {
+  public visitGroupExpression(node: GroupExpression, context: {}): AstNode {
     return node.expression.accept(this, context);
   }
 
-  public visitConditionalExpression(
-    _: ConditionalExpression,
-    __: Context
-  ): AstNode {
+  public visitConditionalExpression(_: ConditionalExpression, __: {}): AstNode {
     throw new Error(ConstExprErrorMessage.CONDITIONAL_UNSUPPORTED);
   }
 
-  public visitInvokeExpression(_: InvokeExpression, __: Context): AstNode {
+  public visitInvokeExpression(_: InvokeExpression, __: {}): AstNode {
     throw new Error(ConstExprErrorMessage.INVOKE_UNSUPPORTED);
   }
 
-  public visitLiteralBoolean(node: LiteralBoolean, __: Context): AstNode {
+  public visitLiteralBoolean(node: LiteralBoolean, __: {}): AstNode {
     return node;
   }
 
-  public visitLiteralNumber(node: LiteralNumber, __: Context): AstNode {
+  public visitLiteralNumber(node: LiteralNumber, __: {}): AstNode {
     return node;
   }
 
-  public visitLiteralString(node: LiteralString, __: Context): AstNode {
+  public visitLiteralString(node: LiteralString, __: {}): AstNode {
     return node;
   }
 
-  public visitSimpleName(_: LiteralIdentifier, __: Context): AstNode {
+  public visitSimpleName(_: LiteralIdentifier, __: {}): AstNode {
     throw new Error(ConstExprErrorMessage.IDENTIFIER_UNSUPPORTED);
   }
 
-  public visitReturnStatement(_: ReturnStatement, __: Context): AstNode {
+  public visitReturnStatement(_: ReturnStatement, __: {}): AstNode {
     throw new Error(ConstExprErrorMessage.RETURN_STATEMENT_ERROR);
   }
 
-  public visitVariableDeclarationStatement(
-    _: VariableDeclarationStatement
-  ): AstNode {
+  public visitVariableDeclarationStatement(_: VariableDeclarationStatement):
+      AstNode {
     // Cannot declare variables.
     throw new Error(ConstExprErrorMessage.VARIABLE_DECLARATION_UNSUPPORTED);
   }

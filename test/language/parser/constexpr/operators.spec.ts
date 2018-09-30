@@ -1,22 +1,14 @@
 // tslint:disable:no-magic-numbers
-import { tokenize } from '../../../../src/language/lexer';
-import {
-  ClutchParser,
-  LiteralBoolean,
-  LiteralNumber,
-  LiteralString,
-} from '../../../../src/language/parser';
-import { evaluateConstExpression } from '../../../../src/language/parser/evaluator/constexpr';
+import {tokenize} from '../../../../src/language/lexer';
+import {ClutchParser, LiteralBoolean, LiteralNumber, LiteralString,} from '../../../../src/language/parser';
+import {evaluateConstExpression} from '../../../../src/language/parser/evaluator/constexpr';
 
 function evaluate(source: string): Object {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseExpression();
   const node = evaluateConstExpression(expression);
-  if (
-    node instanceof LiteralNumber ||
-    node instanceof LiteralBoolean ||
-    node instanceof LiteralString
-  ) {
+  if (node instanceof LiteralNumber || node instanceof LiteralBoolean ||
+      node instanceof LiteralString) {
     return node.value;
   }
   throw new Error('Not a value');
@@ -24,7 +16,7 @@ function evaluate(source: string): Object {
 
 describe('ConstExpr', () => {
   it('arithmetic', () => {
-    const table: [string, number][] = [
+    const table: Array<[string, number]> = [
       ['1 + 1', 2],
       ['100 + -5', 95],
       ['1 - 1', 0],
@@ -48,7 +40,7 @@ describe('ConstExpr', () => {
   });
 
   it('numeric comparison', () => {
-    const table: [string, boolean][] = [
+    const table: Array<[string, boolean]> = [
       ['1 == 1', true],
       ['1 == 2', false],
       ['1 != 1', false],
@@ -71,7 +63,7 @@ describe('ConstExpr', () => {
   });
 
   it('boolean logic', () => {
-    const table: [string, boolean][] = [
+    const table: Array<[string, boolean]> = [
       ['true && true', true],
       ['true && false', false],
       ['true || false', true],
@@ -87,7 +79,7 @@ describe('ConstExpr', () => {
   });
 
   it('strings', () => {
-    const table: [string, string][] = [["'hello'", 'hello']];
+    const table: Array<[string, string]> = [['\'hello\'', 'hello']];
     for (const [question, answer] of table) {
       expect(evaluate(question)).toEqual(answer);
     }
