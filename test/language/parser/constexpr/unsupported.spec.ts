@@ -1,7 +1,7 @@
-import {tokenize} from '../../../../src/language/lexer';
-import {ClutchParser} from '../../../../src/language/parser';
-import {evaluateConstExpression} from '../../../../src/language/parser/evaluator/constexpr';
-
+// tslint:disable:no-magic-numbers
+import { tokenize } from '../../../../src/language/lexer';
+import { ClutchParser } from '../../../../src/language/parser';
+import { evaluateConstExpression } from '../../../../src/language/parser/evaluator/constexpr';
 
 function expression(source: string): void {
   const tokens = tokenize(source);
@@ -40,9 +40,9 @@ describe('ConstExpr', () => {
   });
 
   it('function declarations unsupported', () => {
-    expect(
-        () => declare('fib(n) -> if n < 2 then n else fib(n - 1) + fib(n - 2)'))
-        .toThrow();
+    expect(() =>
+      declare('fib(n) -> if n < 2 then n else fib(n - 1) + fib(n - 2)')
+    ).toThrow();
   });
 
   it('boolean type error', () => {
@@ -78,7 +78,7 @@ describe('ConstExpr', () => {
   });
 
   it('numeric unary type error', () => {
-    expect(() => expression('-\'1232\'')).toThrow();
+    expect(() => expression("-'1232'")).toThrow();
   });
 
   it('simple name unsupported', () => {
@@ -86,7 +86,7 @@ describe('ConstExpr', () => {
   });
 
   it('variable declarations unsupported', () => {
-    expect(() => statement('let message = \'Hello\'')).toThrow();
+    expect(() => statement("let message = 'Hello'")).toThrow();
   });
 
   it('return statement unsupported', () => {
@@ -95,5 +95,5 @@ describe('ConstExpr', () => {
 
   it('file root unsupported', () => {
     expect(() => file('main() -> {}')).toThrow();
-  })
+  });
 });
