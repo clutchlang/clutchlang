@@ -57,7 +57,8 @@ export class FunctionDeclaration extends TopLevelElement {
     public readonly name: LiteralIdentifier,
     public readonly parameters: LiteralIdentifier[],
     public readonly arrowToken: IToken,
-    public readonly body: Expression | StatementBlock
+    public readonly body: Expression | StatementBlock,
+    public readonly isConstexpr: boolean
   ) {
     super();
   }

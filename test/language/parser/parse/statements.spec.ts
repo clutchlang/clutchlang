@@ -40,4 +40,12 @@ describe('ClutchParser should parse statement', () => {
       expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
+
+  describe('constant', () => {
+    it('', () => {
+      const stmt = parseStatement('const a = b');
+      expect(stmt).toBeInstanceOf(VariableDeclarationStatement);
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+    });
+  });
 });

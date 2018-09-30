@@ -20,11 +20,16 @@ export class FileParser extends StatementParser {
 
   private parseFunctionDeclaration(): FunctionDeclaration {
     // TODO: Assert tokens are valid.
+    let isConstexpr = false;
+    if (this.match(TokenKind.CONSTEXPR)) {
+      isConstexpr = true;
+    }
     return this.factory.createFunctionDeclaration(
       this.parseIdentifier(),
       this.parseParameterList(),
       this.advance(),
-      this.parseBody()
+      this.parseBody(),
+      isConstexpr
     );
   }
 

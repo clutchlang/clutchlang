@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ClutchParser should parse statement constant  1`] = `
+"VariableDeclarationStatement:
+  Name: a
+  Assign:
+    SimpleName: b
+"
+`;
+
 exports[`ClutchParser should parse statement return  1`] = `
 "ReturnStatement:
 "

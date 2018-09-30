@@ -16,6 +16,49 @@ exports[`ClutchParser should parse statement should parse a basic program 1`] = 
 "
 `;
 
+exports[`ClutchParser should parse statement should parse a basic program with a constexpr function with parameters 1`] = `
+"FileRoot:
+  Elements:
+    FunctionDeclaration:
+      Name:
+        SimpleName: fib
+      Constexpr:
+      Parameters:
+        SimpleName: n
+      Body:
+        ConditionalExpression:
+          If:
+            BinaryExpression:
+              Left:
+                SimpleName: n
+              Operator: <=
+              Right:
+                LiteralNumber: 2
+          Body:
+            InvokeExpression:
+              Target:
+                SimpleName: fib
+              Parameters:
+                BinaryExpression:
+                  Left:
+                    SimpleName: n
+                  Operator: -
+                  Right:
+                    LiteralNumber: 1
+          Else:
+            InvokeExpression:
+              Target:
+                SimpleName: fib
+              Parameters:
+                BinaryExpression:
+                  Left:
+                    SimpleName: n
+                  Operator: -
+                  Right:
+                    LiteralNumber: 2
+"
+`;
+
 exports[`ClutchParser should parse statement should parse a basic program with a function with parameters 1`] = `
 "FileRoot:
   Elements:

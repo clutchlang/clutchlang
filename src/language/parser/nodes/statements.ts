@@ -57,7 +57,8 @@ export class VariableDeclarationStatement extends Statement {
     public readonly firstToken: IToken,
     public readonly name: LiteralIdentifier,
     public readonly assignToken: IToken,
-    public readonly expression: Expression
+    public readonly expression: Expression,
+    public readonly isConst: boolean
   ) {
     super();
   }

@@ -11,7 +11,7 @@ export class StatementParser extends ExpressionParser {
     if (this.match(TokenKind.RETURN)) {
       return this.parseReturn();
     }
-    if (this.match(TokenKind.LET)) {
+    if (this.match(TokenKind.LET) || this.match(TokenKind.CONST)) {
       return this.parseVariable();
     }
     return this.parseExpression();

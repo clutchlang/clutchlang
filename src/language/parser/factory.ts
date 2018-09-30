@@ -1,5 +1,5 @@
 import { splitLines, unescapeString } from '../../agnostic/strings';
-import { IToken } from '../lexer';
+import { IToken, TokenKind } from '../lexer';
 import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
@@ -36,9 +36,16 @@ export class AstNodeFactory {
     name: LiteralIdentifier,
     parameters: LiteralIdentifier[],
     arrowToken: IToken,
-    body: Expression | StatementBlock
+    body: Expression | StatementBlock,
+    isConstexpr: boolean
   ): FunctionDeclaration {
-    return new FunctionDeclaration(name, parameters, arrowToken, body);
+    return new FunctionDeclaration(
+      name,
+      parameters,
+      arrowToken,
+      body,
+      isConstexpr
+    );
   }
 
   public createUnaryExpression(
@@ -112,7 +119,13 @@ export class AstNodeFactory {
     assign: IToken,
     expression: Expression
   ) {
-    return new VariableDeclarationStatement(start, name, assign, expression);
+    return new VariableDeclarationStatement(
+      start,
+      name,
+      assign,
+      expression,
+      start.lexeme === TokenKind.CONST
+    );
   }
 
   public createLiteralIdentifier(token: IToken): LiteralIdentifier {
