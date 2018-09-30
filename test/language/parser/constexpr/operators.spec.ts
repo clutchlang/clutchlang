@@ -92,4 +92,14 @@ describe('ConstExpr', () => {
       expect(evaluate(question)).toEqual(answer);
     }
   });
+
+  it('conditionals', () => {
+    const table: Array<[string, number | string]> = [
+      ['if (1 > 2) then 3 else 4', 4],
+      ["if (true == (1 > 0)) then '5' else '6'", '5'],
+    ];
+    for (const [question, answer] of table) {
+      expect(evaluate(question)).toEqual(answer);
+    }
+  });
 });

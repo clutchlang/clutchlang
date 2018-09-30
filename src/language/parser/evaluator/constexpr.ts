@@ -12,8 +12,14 @@ import {
   UnaryExpression,
   VariableDeclarationStatement,
 } from '../../parser';
-import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
+import {
+  AstNode,
+  Expression,
+  FileRoot,
+  FunctionDeclaration,
+} from '../nodes/nodes';
 import { Operator } from '../nodes/precedence';
+import { StatementBlock } from '../nodes/statements';
 import { AstVisitor } from '../visitors/abstract';
 
 export function evaluateConstExpression(node: AstNode): AstNode {
@@ -35,7 +41,7 @@ enum ConstExprErrorMessage {
   IDENTIFIER_UNSUPPORTED = 'Identifiers not supported',
   VARIABLE_DECLARATION_UNSUPPORTED = 'Cannot declare variables',
   FUNCTION_DECLARATION_UNSUPPORTED = 'Cannot declare functions',
-  CONDITIONAL_UNSUPPORTED = 'Cannot evaluate conditionals',
+  CONDITIONAL_UNSUPPORTED = 'Cannot evaluate conditional',
   INVOKE_UNSUPPORTED = 'Cannot invoke functions',
   RETURN_STATEMENT_ERROR = 'Cannot early return',
 }
@@ -120,7 +126,19 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, {}> {
     return node.expression.accept(this, context);
   }
 
-  public visitConditionalExpression(_: ConditionalExpression, __: {}): AstNode {
+  public visitConditionalExpression(
+    node: ConditionalExpression,
+    __: {}
+  ): AstNode {
+    const condition: AstNode = node.condition.accept(this);
+    if (condition instanceof LiteralBoolean) {
+      const body: Expression | StatementBlock | undefined =
+        condition.value === true ? node.body : node.elseBody;
+      if (body === undefined || body instanceof StatementBlock) {
+        throw new Error(ConstExprErrorMessage.CONDITIONAL_UNSUPPORTED);
+      }
+      return body.accept(this);
+    }
     throw new Error(ConstExprErrorMessage.CONDITIONAL_UNSUPPORTED);
   }
 

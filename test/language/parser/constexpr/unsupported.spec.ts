@@ -29,12 +29,13 @@ function declare(source: string): void {
 
 describe('ConstExpr', () => {
   it('conditional expressions unsupported', () => {
-    expect(() => expr('if (1 > 2) { 4 } else { 5 }')).toThrow();
+    expect(() => expr("if ('true') then 4 else 5")).toThrow();
   });
 
-  it('conditional statement unsupported', () => {
+  it('conditional expression type', () => {
     expect(() => statement('if (1 > 2) { 4 } else { 5 }')).toThrow();
   });
+
   it('function invocation unsupported', () => {
     expect(() => expr('fib(2)')).toThrow();
   });
