@@ -11,7 +11,7 @@ import { evaluateConstExpression } from '../../../../src/language/parser/evaluat
 function evaluate(source: string): number | boolean | string {
   const tokens = tokenize(source);
   const expression = new ClutchParser(tokens).parseExpression();
-  const node = evaluateConstExpression(expression);
+  const node = evaluateConstExpression(expression, new Map());
   if (
     node instanceof LiteralNumber ||
     node instanceof LiteralBoolean ||
