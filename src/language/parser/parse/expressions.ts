@@ -306,7 +306,7 @@ export class ExpressionParser extends AbstractParser {
       case '+':
         return Operator.UnaryPositive;
       case '!':
-        return Operator.UnaryNegative;
+        return Operator.LogicalNot;
       default:
         // TODO: Test.
         /* istanbul ignore next */
