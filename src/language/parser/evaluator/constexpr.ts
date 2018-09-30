@@ -1,8 +1,20 @@
-import {IToken, TokenKind} from '../../lexer';
-import {BinaryExpression, ConditionalExpression, GroupExpression, InvokeExpression, LiteralBoolean, LiteralIdentifier, LiteralNumber, LiteralString, ReturnStatement, UnaryExpression, VariableDeclarationStatement,} from '../../parser';
-import {AstNode, FileRoot, FunctionDeclaration} from '../nodes/nodes';
-import {Operator} from '../nodes/precedence';
-import {AstVisitor} from '../visitors/abstract';
+import { IToken, TokenKind } from '../../lexer';
+import {
+  BinaryExpression,
+  ConditionalExpression,
+  GroupExpression,
+  InvokeExpression,
+  LiteralBoolean,
+  LiteralIdentifier,
+  LiteralNumber,
+  LiteralString,
+  ReturnStatement,
+  UnaryExpression,
+  VariableDeclarationStatement,
+} from '../../parser';
+import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
+import { Operator } from '../nodes/precedence';
+import { AstVisitor } from '../visitors/abstract';
 
 export function evaluateConstExpression(node: AstNode): AstNode {
   return node.accept(new ConstExpressionVisitor(), {});
@@ -62,7 +74,9 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, {}> {
           return new LiteralBoolean(token, left.value !== right.value);
       }
     } else if (
-        left instanceof LiteralBoolean && right instanceof LiteralBoolean) {
+      left instanceof LiteralBoolean &&
+      right instanceof LiteralBoolean
+    ) {
       switch (node.operator) {
         case Operator.LogicalAnd:
           return new LiteralBoolean(token, left.value && right.value);
@@ -134,8 +148,9 @@ class ConstExpressionVisitor extends AstVisitor<AstNode, {}> {
     throw new Error(ConstExprErrorMessage.RETURN_STATEMENT_ERROR);
   }
 
-  public visitVariableDeclarationStatement(_: VariableDeclarationStatement):
-      AstNode {
+  public visitVariableDeclarationStatement(
+    _: VariableDeclarationStatement
+  ): AstNode {
     // Cannot declare variables.
     throw new Error(ConstExprErrorMessage.VARIABLE_DECLARATION_UNSUPPORTED);
   }
