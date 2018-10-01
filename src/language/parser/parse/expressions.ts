@@ -127,18 +127,18 @@ export class ExpressionParser extends AbstractParser {
 
   private parseUnaryPostfix(): Expression {
     return this.parsePostfix(
-      () => this.parseFunctionCall(),
+      () => this.parseFunctionCall(false),
       TokenKind.PLUS_PLUS,
       TokenKind.MINUS_MINUS
     );
   }
 
-  private parseFunctionCall(): Expression {
+  private parseFunctionCall(constInvocation: boolean): Expression {
     let expression = this.parseMemberAccess();
     // tslint:disable-next-line:no-constant-condition
     while (true) {
       if (this.match(TokenKind.LEFT_PAREN)) {
-        expression = this.finishFunctionCall(expression);
+        expression = this.finishFunctionCall(expression, constInvocation);
       } else {
         break;
       }
@@ -146,7 +146,10 @@ export class ExpressionParser extends AbstractParser {
     return expression;
   }
 
-  private finishFunctionCall(target: Expression): Expression {
+  private finishFunctionCall(
+    target: Expression,
+    constInvocation: boolean
+  ): Expression {
     const args: Expression[] = [];
     const leftParen = this.peek(-1);
     while (!this.match(TokenKind.RIGHT_PAREN)) {
@@ -156,7 +159,8 @@ export class ExpressionParser extends AbstractParser {
       target,
       leftParen,
       args,
-      this.peek(-1)
+      this.peek(-1),
+      constInvocation
     );
   }
 
@@ -187,6 +191,9 @@ export class ExpressionParser extends AbstractParser {
     }
     if (this.match(TokenKind.FALSE, TokenKind.TRUE)) {
       return this.factory.createLiteralBoolean(this.peek(-1));
+    }
+    if (this.match(TokenKind.CONST)) {
+      return this.parseFunctionCall(true);
     }
     return this.parseIdentifier();
   }

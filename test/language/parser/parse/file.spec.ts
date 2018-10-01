@@ -27,7 +27,7 @@ describe('ClutchParser should parse statement', () => {
 
   it('should parse a basic program with a constexpr function with parameters', () => {
     const file = parseFile(`
-      constexpr fib(n) -> if n <= 2 then fib(n - 1) else fib(n - 2)
+      const fib(n) -> if n <= 2 then fib(n - 1) else fib(n - 2)
     `);
     expect(file.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
   });
