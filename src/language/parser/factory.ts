@@ -90,16 +90,9 @@ export class AstNodeFactory {
     target: Expression,
     openToken: IToken,
     parameters: Expression[],
-    closeToken: IToken,
-    constInvocation: boolean
+    closeToken: IToken
   ): InvokeExpression {
-    return new InvokeExpression(
-      target,
-      openToken,
-      parameters,
-      closeToken,
-      constInvocation
-    );
+    return new InvokeExpression(target, openToken, parameters, closeToken);
   }
 
   public createStatementBlock(
@@ -118,9 +111,16 @@ export class AstNodeFactory {
     start: IToken,
     name: LiteralIdentifier,
     assign: IToken,
-    expression: Expression
+    expression: Expression,
+    isConst: boolean
   ) {
-    return new VariableDeclarationStatement(start, name, assign, expression);
+    return new VariableDeclarationStatement(
+      start,
+      name,
+      assign,
+      expression,
+      isConst
+    );
   }
 
   public createLiteralIdentifier(token: IToken): LiteralIdentifier {

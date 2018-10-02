@@ -116,8 +116,7 @@ export class InvokeExpression extends Expression {
     public readonly target: Expression,
     public readonly openToken: IToken,
     public readonly parameters: Expression[],
-    public readonly closeToken: IToken,
-    public readonly constInvocation: boolean
+    public readonly closeToken: IToken
   ) {
     super();
   }

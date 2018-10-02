@@ -30,7 +30,7 @@ A const function allows limited compile-time computation of values. The set of a
 const fib(n) -> if n < 2 then n else fib(n - 1) + fib(n - 2)
 
 // invoke a const function.
-let value = const fib(3)
+let const value = fib(3)
 ```
 
 This will be compiled to
