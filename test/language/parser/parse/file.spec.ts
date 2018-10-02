@@ -22,6 +22,7 @@ describe('ClutchParser should parse statement', () => {
     const file = parseFile(`
       fib(n) -> if n <= 2 then fib(n - 1) else fib(n - 2)
     `);
+    expect(file.topLevelElements[0]).toHaveProperty('isConst', false);
     expect(file.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
   });
 
@@ -29,6 +30,7 @@ describe('ClutchParser should parse statement', () => {
     const file = parseFile(`
       const fib(n) -> if n <= 2 then fib(n - 1) else fib(n - 2)
     `);
+    expect(file.topLevelElements[0]).toHaveProperty('isConst', true);
     expect(file.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
   });
 

@@ -180,8 +180,8 @@ export class PrintTreeVisitor extends AstVisitor<StringBuffer, StringBuffer> {
   ): StringBuffer {
     return this.visitNode(node, writer, () => {
       this.writeIndented('Name:', writer, () => node.name.accept(this, writer));
-      if (node.isConstexpr) {
-        writer.writeLine('Constexpr:');
+      if (node.isConst) {
+        writer.writeLine('Const:');
       }
       this.writeIndented('Parameters:', writer, () => {
         node.parameters.forEach(e => e.accept(this, writer));

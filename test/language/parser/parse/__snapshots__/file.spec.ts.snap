@@ -22,6 +22,7 @@ exports[`ClutchParser should parse statement should parse a basic program with a
     FunctionDeclaration:
       Name:
         SimpleName: fib
+      Const:
       Parameters:
         SimpleName: n
       Body:
