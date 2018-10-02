@@ -46,6 +46,7 @@ export enum TokenKind {
   THIS = 'this',
   TRUE = 'true',
   WHILE = 'while',
+  CONST = 'const',
 
   // Symbols
   ARROW = '->',
@@ -99,6 +100,7 @@ export class ClutchLexer {
     [index: string]: TokenKind;
   } = {
     class: TokenKind.CLASS,
+    const: TokenKind.CONST,
     else: TokenKind.ELSE,
     false: TokenKind.FALSE,
     for: TokenKind.FOR,

@@ -25,12 +25,14 @@ export class StatementParser extends ExpressionParser {
   }
 
   private parseVariable(): VariableDeclarationStatement {
+    const isConst = this.match(TokenKind.CONST);
     // TODO: Add assertions to check token contents.
     return this.factory.createVariableDeclarationStatement(
       this.peek(-1),
       this.parseIdentifier(),
       this.advance(),
-      this.parseExpression()
+      this.parseExpression(),
+      isConst
     );
   }
 }

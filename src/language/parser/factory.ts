@@ -36,9 +36,10 @@ export class AstNodeFactory {
     name: LiteralIdentifier,
     parameters: LiteralIdentifier[],
     arrowToken: IToken,
-    body: Expression | StatementBlock
+    body: Expression | StatementBlock,
+    isConst: boolean
   ): FunctionDeclaration {
-    return new FunctionDeclaration(name, parameters, arrowToken, body);
+    return new FunctionDeclaration(name, parameters, arrowToken, body, isConst);
   }
 
   public createUnaryExpression(
@@ -110,9 +111,16 @@ export class AstNodeFactory {
     start: IToken,
     name: LiteralIdentifier,
     assign: IToken,
-    expression: Expression
+    expression: Expression,
+    isConst: boolean
   ) {
-    return new VariableDeclarationStatement(start, name, assign, expression);
+    return new VariableDeclarationStatement(
+      start,
+      name,
+      assign,
+      expression,
+      isConst
+    );
   }
 
   public createLiteralIdentifier(token: IToken): LiteralIdentifier {

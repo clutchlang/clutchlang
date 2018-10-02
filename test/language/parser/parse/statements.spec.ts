@@ -37,6 +37,16 @@ describe('ClutchParser should parse statement', () => {
     it('', () => {
       const stmt = parseStatement('let a = b');
       expect(stmt).toBeInstanceOf(VariableDeclarationStatement);
+      expect(stmt).toHaveProperty('isConst', false);
+      expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
+    });
+  });
+
+  describe('constant', () => {
+    it('', () => {
+      const stmt = parseStatement('let const a = fn()');
+      expect(stmt).toBeInstanceOf(VariableDeclarationStatement);
+      expect(stmt).toHaveProperty('isConst', true);
       expect(stmt.accept(new PrintTreeVisitor()).toString()).toMatchSnapshot();
     });
   });
