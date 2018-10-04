@@ -221,13 +221,13 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     node: FunctionDeclaration,
     scope: TypeScope
   ): Type {
-    if (node.returnType === undefined) {
-      throw new Error('Type inference not supported');
-    }
+    const returnType =
+      node.returnType === undefined
+        ? VOID_TYPE
+        : node.returnType.accept(this, scope);
     const typeParameters = node.parameters.map(param =>
       param.accept(this, scope)
     );
-    const returnType = node.returnType.accept(this, scope);
     const functionType = new FunctionType(typeParameters, returnType);
     scope.store(node.name.name, functionType);
     /* istanbul ignore if */
@@ -238,12 +238,12 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
       for (let i = 0; i < typeParameters.length; i++) {
         childScope.store(node.parameters[i].name.name, typeParameters[i]);
       }
-      const inferedReturnType = node.body.accept(this, childScope);
-      if (!returnType.isAssignableTo(inferedReturnType)) {
+      const actualReturnType = node.body.accept(this, childScope);
+      if (!returnType.isAssignableTo(actualReturnType)) {
         throw new Error(
           `Return type error: ${node.name} declares a return type of ${
             returnType.name
-          } but actually returns ${inferedReturnType.name}`
+          } but actually returns ${actualReturnType.name}`
         );
       }
     }

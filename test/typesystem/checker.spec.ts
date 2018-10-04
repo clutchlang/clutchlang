@@ -144,15 +144,16 @@ describe('typechecker', () => {
       ).toThrow();
     });
 
-    it('does not handle missing return', () => {
+    it('only infers void return type', () => {
       const scope = new TypeScope(null);
+      scope.store('print', new FunctionType([NUMBER_TYPE], VOID_TYPE));
       scope.store('Number', NUMBER_TYPE);
-      expect(() =>
-        checkFile(
-          'fib(n: Number) -> if n <= 2 then fib(n - 1) else fib(n - 2)',
-          scope
-        )
-      ).toThrow();
+      checkFile('foob(n: Number) -> print(n)', scope);
+      expect(
+        scope
+          .lookup('foob')!
+          .isAssignableTo(new FunctionType([NUMBER_TYPE], VOID_TYPE))
+      );
     });
 
     it('does not handle mistyped annotations', () => {
