@@ -224,7 +224,10 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
   }
 
   /* istanbul ignore next */
-  public visitParameterDeclaration(_: ParameterDeclaration, __: TypeScope): Type {
+  public visitParameterDeclaration(
+    _: ParameterDeclaration,
+    __: TypeScope
+  ): Type {
     throw new Error('Not supported');
   }
 }
