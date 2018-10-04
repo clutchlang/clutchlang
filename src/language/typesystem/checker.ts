@@ -45,9 +45,8 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
 
   /* istanbul ignore next */
   public visitFileRoot(node: FileRoot, context: TypeScope): Type {
-    const scope = new TypeScope(context);
     for (const element of node.topLevelElements) {
-      element.accept(this, scope);
+      element.accept(this, context);
     }
     return VOID_TYPE;
   }
@@ -218,17 +217,53 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     return VOID_TYPE;
   }
 
-  /* istanbul ignore next */
-  public visitFunctionDeclaration(_: FunctionDeclaration, __: TypeScope): Type {
-    throw new Error('Not supported');
+  public visitFunctionDeclaration(
+    node: FunctionDeclaration,
+    scope: TypeScope
+  ): Type {
+    if (node.returnType === undefined) {
+      throw new Error('Type inference not supported');
+    }
+    const typeParameters = node.parameters.map(param =>
+      param.accept(this, scope)
+    );
+    const returnType = node.returnType.accept(this, scope);
+    const functionType = new FunctionType(typeParameters, returnType);
+    scope.store(node.name.name, functionType);
+    /* istanbul ignore if */
+    if (node.body instanceof StatementBlock) {
+      throw new Error('Unsupported error');
+    } else {
+      const childScope = new TypeScope(scope);
+      for (let i = 0; i < typeParameters.length; i++) {
+        childScope.store(node.parameters[i].name.name, typeParameters[i]);
+      }
+      const inferedReturnType = node.body.accept(this, childScope);
+      if (!returnType.isAssignableTo(inferedReturnType)) {
+        throw new Error(
+          `Return type error: ${node.name} declares a return type of ${
+            returnType.name
+          } but actually returns ${inferedReturnType.name}`
+        );
+      }
+    }
+    return functionType;
   }
 
-  /* istanbul ignore next */
   public visitParameterDeclaration(
-    _: ParameterDeclaration,
-    __: TypeScope
+    node: ParameterDeclaration,
+    scope: TypeScope
   ): Type {
-    throw new Error('Not supported');
+    if (node.type === undefined) {
+      throw new Error(
+        `Missing Parameter Type: No type for parameter ${node.name}`
+      );
+    }
+    const type = scope.lookup(node.type.name);
+    if (type === null) {
+      throw new Error(`Unknown Type: No type named ${node.type.name}`);
+    }
+    return type;
   }
 }
 
