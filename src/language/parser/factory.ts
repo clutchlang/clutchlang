@@ -36,16 +36,16 @@ export class AstNodeFactory {
   public createFunctionDeclaration(
     name: LiteralIdentifier,
     parameters: ParameterDeclaration[],
-    arrowToken: IToken,
     type: LiteralIdentifier | undefined,
+    arrowToken: IToken,
     body: Expression | StatementBlock,
     isConst: boolean
   ): FunctionDeclaration {
     return new FunctionDeclaration(
       name,
       parameters,
-      arrowToken,
       type,
+      arrowToken,
       body,
       isConst
     );
