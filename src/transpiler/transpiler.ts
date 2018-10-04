@@ -145,6 +145,13 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
     return context;
   }
 
+  public visitParameterDeclaration(
+    node: ast.ParameterDeclaration,
+    context = new StringBuffer()
+  ): StringBuffer {
+    return node.name.accept(this, context);
+  }
+
   public visitFunctionDeclaration(
     node: ast.FunctionDeclaration,
     context = new StringBuffer()

@@ -70,7 +70,7 @@ describe('JsOutputTranspiler', () => {
 
   it('should support functions with parameters', () => {
     const program = parse(`
-      print2(a b) -> {
+      print2(a: String b: String): void -> {
         print(a)
         print(b)
       }

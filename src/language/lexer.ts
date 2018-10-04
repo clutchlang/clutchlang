@@ -50,6 +50,7 @@ export enum TokenKind {
 
   // Symbols
   ARROW = '->',
+  COLON = ':',
   LEFT_PAREN = '(',
   RIGHT_PAREN = ')',
   LEFT_CURLY = '{',
@@ -151,6 +152,8 @@ export class ClutchLexer {
         return this.createToken(TokenKind.LEFT_CURLY);
       case Characters.$RCURLY: // "}"
         return this.createToken(TokenKind.RIGHT_CURLY);
+      case Characters.$COLON: // ":"
+        return this.createToken(TokenKind.COLON);
       case Characters.$PERIOD: // "."
         return this.createToken(TokenKind.PERIOD);
       case Characters.$PLUS: // "+" or "+=" or "++"

@@ -1,9 +1,9 @@
 import { TokenKind } from '../../lexer';
-import { LiteralIdentifier } from '../nodes/expressions';
 import {
   Expression,
   FileRoot,
   FunctionDeclaration,
+  ParameterDeclaration,
   Statement,
 } from '../nodes/nodes';
 import { StatementBlock } from '../nodes/statements';
@@ -27,6 +27,7 @@ export class FileParser extends StatementParser {
     return this.factory.createFunctionDeclaration(
       this.parseIdentifier(),
       this.parseParameterList(),
+      this.match(TokenKind.COLON) ? this.parseIdentifier() : undefined,
       this.advance(),
       this.parseBody(),
       isConst
@@ -50,11 +51,16 @@ export class FileParser extends StatementParser {
     return this.parseExpression();
   }
 
-  private parseParameterList(): LiteralIdentifier[] {
+  private parseParameterList(): ParameterDeclaration[] {
     if (this.match(TokenKind.LEFT_PAREN)) {
-      const parameters: LiteralIdentifier[] = [];
+      const parameters: ParameterDeclaration[] = [];
       while (!this.match(TokenKind.RIGHT_PAREN)) {
-        parameters.push(this.parseIdentifier());
+        parameters.push(
+          this.factory.createParameterDeclaration(
+            this.parseIdentifier(),
+            this.match(TokenKind.COLON) ? this.parseIdentifier() : undefined
+          )
+        );
       }
       return parameters;
     }

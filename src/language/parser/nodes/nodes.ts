@@ -55,7 +55,8 @@ export abstract class TopLevelElement extends AstNode {}
 export class FunctionDeclaration extends TopLevelElement {
   constructor(
     public readonly name: LiteralIdentifier,
-    public readonly parameters: LiteralIdentifier[],
+    public readonly parameters: ParameterDeclaration[],
+    public readonly returnType: LiteralIdentifier | undefined,
     public readonly arrowToken: IToken,
     public readonly body: Expression | StatementBlock,
     public readonly isConst: boolean
@@ -73,6 +74,27 @@ export class FunctionDeclaration extends TopLevelElement {
 
   public get lastToken(): IToken {
     return this.body.lastToken;
+  }
+}
+
+export class ParameterDeclaration extends AstNode {
+  constructor(
+    public readonly name: LiteralIdentifier,
+    public readonly type?: LiteralIdentifier
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R {
+    return visitor.visitParameterDeclaration(this, context);
+  }
+
+  public get firstToken(): IToken {
+    return this.name.firstToken;
+  }
+
+  public get lastToken(): IToken {
+    return (this.type || this.name).lastToken;
   }
 }
 
