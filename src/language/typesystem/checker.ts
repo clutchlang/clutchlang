@@ -14,6 +14,7 @@ import {
   UnaryExpression,
   VariableDeclarationStatement,
 } from '../parser';
+import { ParameterDeclaration } from '../parser/nodes/nodes';
 import { StatementBlock } from '../parser/nodes/statements';
 import {
   BOOLEAN_DECLARATION,
@@ -219,6 +220,11 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
 
   /* istanbul ignore next */
   public visitFunctionDeclaration(_: FunctionDeclaration, __: TypeScope): Type {
+    throw new Error('Not supported');
+  }
+
+  /* istanbul ignore next */
+  public visitParameterDeclaration(_: ParameterDeclaration, __: TypeScope): Type {
     throw new Error('Not supported');
   }
 }
