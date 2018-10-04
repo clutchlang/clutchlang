@@ -16,7 +16,7 @@ matrix:
   fast_finish: true
   include:
     - name: "Check"
-      script: yarn tsc -p tsconfig.json
+      script: npm run tscheck
     - name: "Lint"
       script: npm run lint
     - name: "Format"
