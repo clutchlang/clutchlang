@@ -15,6 +15,7 @@ import {
 import {
   FileRoot,
   FunctionDeclaration,
+  ParameterDeclaration,
   Statement,
   TopLevelElement,
 } from './nodes/nodes';
@@ -34,12 +35,27 @@ export class AstNodeFactory {
 
   public createFunctionDeclaration(
     name: LiteralIdentifier,
-    parameters: LiteralIdentifier[],
+    parameters: ParameterDeclaration[],
     arrowToken: IToken,
+    type: LiteralIdentifier | undefined,
     body: Expression | StatementBlock,
     isConst: boolean
   ): FunctionDeclaration {
-    return new FunctionDeclaration(name, parameters, arrowToken, body, isConst);
+    return new FunctionDeclaration(
+      name,
+      parameters,
+      arrowToken,
+      type,
+      body,
+      isConst
+    );
+  }
+
+  public createParameterDeclaration(
+    name: LiteralIdentifier,
+    type: LiteralIdentifier | undefined
+  ): ParameterDeclaration {
+    return new ParameterDeclaration(name, type);
   }
 
   public createUnaryExpression(

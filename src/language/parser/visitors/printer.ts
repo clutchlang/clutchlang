@@ -10,7 +10,12 @@ import {
   LiteralString,
   UnaryExpression,
 } from '../../parser';
-import { AstNode, FileRoot, FunctionDeclaration } from '../nodes/nodes';
+import {
+  AstNode,
+  FileRoot,
+  FunctionDeclaration,
+  ParameterDeclaration,
+} from '../nodes/nodes';
 import {
   ReturnStatement,
   StatementBlock,
@@ -171,6 +176,20 @@ export class PrintTreeVisitor extends AstVisitor<StringBuffer, StringBuffer> {
       this.writeIndented('Assign:', writer, () =>
         node.expression.accept(this, writer)
       );
+    });
+  }
+
+  public visitParameterDeclaration(
+    node: ParameterDeclaration,
+    writer = new StringBuffer()
+  ): StringBuffer {
+    return this.visitNode(node, writer, () => {
+      this.writeIndented('Name:', writer, () => node.name.accept(this, writer));
+      if (node.type) {
+        this.writeIndented('Type:', writer, () =>
+          node.type!.accept(this, writer)
+        );
+      }
     });
   }
 

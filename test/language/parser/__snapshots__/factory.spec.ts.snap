@@ -125,7 +125,9 @@ exports[`AstNodeFactory should create a function 1`] = `
   Name:
     SimpleName: a
   Parameters:
-    SimpleName: b
+    ParameterDeclaration:
+      Name:
+        SimpleName: b
   Body:
     SimpleName: b
 "

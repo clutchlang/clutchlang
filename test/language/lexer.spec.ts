@@ -56,6 +56,21 @@ describe('tokenize', () => {
     ]);
   });
 
+  it('should scan a colon', () => {
+    expect(
+      tokenizeKinds(`
+        (foo: Foo)
+      `)
+    ).toEqual([
+      TokenKind.LEFT_PAREN,
+      TokenKind.IDENTIFIER,
+      TokenKind.COLON,
+      TokenKind.IDENTIFIER,
+      TokenKind.RIGHT_PAREN,
+      TokenKind.EOF,
+    ]);
+  });
+
   it('should scan operators', () => {
     expect(
       tokenizeKinds(`

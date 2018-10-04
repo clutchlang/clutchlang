@@ -24,7 +24,9 @@ exports[`ClutchParser should parse statement should parse a basic program with a
         SimpleName: fib
       Const:
       Parameters:
-        SimpleName: n
+        ParameterDeclaration:
+          Name:
+            SimpleName: n
       Body:
         ConditionalExpression:
           If:
@@ -66,7 +68,11 @@ exports[`ClutchParser should parse statement should parse a basic program with a
       Name:
         SimpleName: fib
       Parameters:
-        SimpleName: n
+        ParameterDeclaration:
+          Name:
+            SimpleName: n
+          Type:
+            SimpleName: Number
       Body:
         ConditionalExpression:
           If:

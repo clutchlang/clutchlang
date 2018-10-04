@@ -4,6 +4,7 @@ import { TokenKind } from '../../../src/language/lexer';
 import {
   AstNodeFactory,
   Operator,
+  ParameterDeclaration,
   PrintTreeVisitor,
 } from '../../../src/language/parser';
 
@@ -32,7 +33,14 @@ describe('AstNodeFactory', () => {
       lexeme: '->',
       offset: 0,
     };
-    const $function = factory.createFunctionDeclaration(a, [], $arrow, b);
+    const $function = factory.createFunctionDeclaration(
+      a,
+      [],
+      undefined,
+      $arrow,
+      b,
+      false
+    );
     const fileRoot = factory.createFileRoot([$function]);
     expect(fileRoot.firstToken).toEqual($function.firstToken);
     expect(fileRoot.lastToken).toEqual($function.lastToken);
@@ -47,13 +55,20 @@ describe('AstNodeFactory', () => {
       lexeme: '->',
       offset: 0,
     };
-    const $function = factory.createFunctionDeclaration(a, [b], $arrow, b);
+    const $function = factory.createFunctionDeclaration(
+      a,
+      [new ParameterDeclaration(b)],
+      undefined,
+      $arrow,
+      b,
+      false
+    );
     expect($function.arrowToken).toEqual($arrow);
     expect($function.body).toEqual(b);
     expect($function.firstToken).toEqual(a.firstToken);
     expect($function.lastToken).toEqual(b.lastToken);
     expect($function.name).toEqual(a);
-    expect($function.parameters).toEqual([b]);
+    expect($function.parameters).toEqual([new ParameterDeclaration(b)]);
     expect($function.accept(visitor).toString()).toMatchSnapshot();
   });
 
@@ -241,7 +256,13 @@ describe('AstNodeFactory', () => {
         lexeme: '=',
         offset: 0,
       };
-      const stmt = factory.createVariableDeclarationStatement($let, a, $eq, b);
+      const stmt = factory.createVariableDeclarationStatement(
+        $let,
+        a,
+        $eq,
+        b,
+        false
+      );
       expect(stmt.assignToken).toEqual($eq);
       expect(stmt.expression).toEqual(b);
       expect(stmt.firstToken).toEqual($let);

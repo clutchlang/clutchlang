@@ -17,6 +17,7 @@ import {
   Expression,
   FileRoot,
   FunctionDeclaration,
+  ParameterDeclaration,
 } from '../nodes/nodes';
 import { Operator } from '../nodes/precedence';
 import { StatementBlock } from '../nodes/statements';
@@ -208,7 +209,7 @@ class ConstExpressionVisitor extends AstVisitor<
     for (let index = 0; index < declaration.parameters.length; index++) {
       const argument = node.parameters[index]!.accept(this, context)!;
       const parameter = declaration.parameters[index]!;
-      this.store(parameter.name, argument, context);
+      this.store(parameter.name.name, argument, context);
     }
     const result = (declaration.body as Expression).accept(this, context);
     this.popScope(context);
@@ -266,6 +267,13 @@ class ConstExpressionVisitor extends AstVisitor<
     __: IConstExpressionContext
   ): AstNode {
     throw new Error(ConstExprErrorMessage.FUNCTION_DECLARATION_UNSUPPORTED);
+  }
+
+  public visitParameterDeclaration(
+    _: ParameterDeclaration,
+    __: IConstExpressionContext
+  ): AstNode {
+    throw new Error(ConstExprErrorMessage.VARIABLE_DECLARATION_UNSUPPORTED);
   }
 
   /**

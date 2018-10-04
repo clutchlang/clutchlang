@@ -9,7 +9,11 @@ import {
   UnaryExpression,
 } from '../../parser';
 import { GroupExpression } from '../nodes/expressions';
-import { FileRoot, FunctionDeclaration } from '../nodes/nodes';
+import {
+  FileRoot,
+  FunctionDeclaration,
+  ParameterDeclaration,
+} from '../nodes/nodes';
 import {
   ReturnStatement,
   VariableDeclarationStatement,
@@ -46,6 +50,12 @@ export abstract class AstVisitor<R, C> {
   // Top Level
   public abstract visitFunctionDeclaration(
     node: FunctionDeclaration,
+    context?: C
+  ): R;
+
+  // Misc
+  public abstract visitParameterDeclaration(
+    node: ParameterDeclaration,
     context?: C
   ): R;
 }
