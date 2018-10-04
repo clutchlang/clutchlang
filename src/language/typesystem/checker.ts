@@ -42,6 +42,7 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     [NUMBER_TYPE, NUMBER_DECLARATION],
   ]);
 
+  /* istanbul ignore next */
   public visitFileRoot(node: FileRoot, context: TypeScope): Type {
     const scope = new TypeScope(context);
     for (const element of node.topLevelElements) {
@@ -63,6 +64,7 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
         `No such method: No method ${node.operator.name} found on ${left.name}`
       );
     }
+    /* istanbul ignore if */
     if (method.parameterTypes.length !== BINARY_OPERATOR_LENGTH) {
       throw new Error(
         `Mismatched parameters: requires: ${method.parameterTypes
@@ -95,6 +97,8 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     }
     let ifBranchType: Type;
     let elseBranchType: Type;
+    // not currently supported.
+    /* istanbul ignore next */
     if (node.body instanceof StatementBlock) {
       ifBranchType = node.body.statements.map(stmt =>
         stmt.accept(this, context)
@@ -102,8 +106,12 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     } else {
       ifBranchType = node.body.accept(this, context);
     }
+    // not currently supported.
+    /* istanbul ignore next */
     if (node.elseBody === null || node.elseBody === undefined) {
       elseBranchType = VOID_TYPE;
+      // not currently supported.
+      /* istanbul ignore next */
     } else if (node.elseBody instanceof StatementBlock) {
       elseBranchType = node.elseBody.statements.map(stmt =>
         stmt.accept(this, context)
@@ -117,7 +125,7 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     throw new Error(
       `Incompatible branch types: if branch returned ${
         ifBranchType.name
-      } but else branch returned ${elseBranchType}`
+      } but else branch returned ${elseBranchType.name}`
     );
   }
 
@@ -131,10 +139,10 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
         param.accept(this, context)
       );
       if (parameterTypes.length !== result.parameterTypes.length) {
+        const required = result.parameterTypes.map(p => p.name).join(', ');
+        const provided = parameterTypes.map(p => p.name).join(', ');
         throw new Error(
-          `Mismatched parameters: requires: ${result.parameterTypes
-            .map(p => p.name)
-            .join(', ')} found ${parameterTypes.map(p => p.name).join(', ')}`
+          `Mismatched parameters: requires: ${required} found ${provided}`
         );
       }
       for (let i = 0; i < parameterTypes.length; i++) {
@@ -182,6 +190,7 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
         }`
       );
     }
+    /* istanbul ignore if */
     if (method.parameterTypes.length !== UNARY_OPERATOR_LENGTH) {
       throw new Error(
         `Mismatched parameters: requires: ${method.parameterTypes
@@ -208,6 +217,7 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     return VOID_TYPE;
   }
 
+  /* istanbul ignore next */
   public visitFunctionDeclaration(_: FunctionDeclaration, __: TypeScope): Type {
     throw new Error('Not supported');
   }
@@ -222,6 +232,7 @@ export class TypeScope {
     if (type !== null && type !== undefined) {
       return type;
     }
+    /* istanbul ignore next */
     if (this.parent !== null && this.parent !== undefined) {
       return this.parent.lookup(id);
     }
