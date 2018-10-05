@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as ast from '../../../ast';
 import { AstVisitor } from '../visitors';
 import { Expression } from './nodes';
 import { Operator } from './precedence';
@@ -11,7 +11,7 @@ export abstract class OperatorExpression extends Expression {
   constructor(
     public readonly target: Expression,
     public readonly operator: Operator,
-    protected readonly operatorToken: tokens.Token
+    protected readonly operatorToken: ast.Token
   ) {
     super();
   }
@@ -24,7 +24,7 @@ export class UnaryExpression extends OperatorExpression {
   constructor(
     target: Expression,
     operator: Operator,
-    public readonly operatorToken: tokens.Token,
+    public readonly operatorToken: ast.Token,
     public readonly isPrefix: boolean
   ) {
     super(target, operator, operatorToken);
@@ -34,11 +34,11 @@ export class UnaryExpression extends OperatorExpression {
     return visitor.visitUnaryExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.isPrefix ? this.operatorToken : this.target.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return this.isPrefix ? this.target.lastToken : this.operatorToken;
   }
 }
@@ -50,7 +50,7 @@ export class BinaryExpression extends OperatorExpression {
   constructor(
     public readonly left: Expression,
     operator: Operator,
-    public readonly operatorToken: tokens.Token,
+    public readonly operatorToken: ast.Token,
     public readonly right: Expression
   ) {
     super(left, operator, operatorToken);
@@ -60,11 +60,11 @@ export class BinaryExpression extends OperatorExpression {
     return visitor.visitBinaryExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.left.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return this.right.lastToken;
   }
 }
@@ -74,8 +74,8 @@ export class BinaryExpression extends OperatorExpression {
  */
 export class GroupExpression extends Expression {
   constructor(
-    public readonly firstToken: tokens.Token,
-    public readonly lastToken: tokens.Token,
+    public readonly firstToken: ast.Token,
+    public readonly lastToken: ast.Token,
     public readonly expression: Expression
   ) {
     super();
@@ -90,15 +90,15 @@ export class GroupExpression extends Expression {
  * Represents an `if` expression.
  */
 export class ConditionalExpression extends Expression {
-  public readonly firstToken: tokens.Token;
-  public readonly lastToken: tokens.Token;
+  public readonly firstToken: ast.Token;
+  public readonly lastToken: ast.Token;
 
   constructor(
-    public readonly ifToken: tokens.Token,
+    public readonly ifToken: ast.Token,
     public readonly condition: Expression,
-    public readonly thenToken: tokens.Token,
+    public readonly thenToken: ast.Token,
     public readonly body: Expression | StatementBlock,
-    public readonly elseToken?: tokens.Token,
+    public readonly elseToken?: ast.Token,
     public readonly elseBody?: Expression | StatementBlock
   ) {
     super();
@@ -114,9 +114,9 @@ export class ConditionalExpression extends Expression {
 export class InvokeExpression extends Expression {
   constructor(
     public readonly target: Expression,
-    public readonly openToken: tokens.Token,
+    public readonly openToken: ast.Token,
     public readonly parameters: Expression[],
-    public readonly closeToken: tokens.Token
+    public readonly closeToken: ast.Token
   ) {
     super();
   }
@@ -125,17 +125,17 @@ export class InvokeExpression extends Expression {
     return visitor.visitInvokeExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.target.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return this.closeToken;
   }
 }
 
 export abstract class LiteralExpression extends Expression {
-  constructor(private readonly token: tokens.Token) {
+  constructor(private readonly token: ast.Token) {
     super();
   }
 
@@ -152,7 +152,7 @@ export abstract class LiteralExpression extends Expression {
  * A literal boolean compatible with JavaScript.
  */
 export class LiteralBoolean extends LiteralExpression {
-  constructor(token: tokens.Token, public readonly value: boolean) {
+  constructor(token: ast.Token, public readonly value: boolean) {
     super(token);
   }
 
@@ -165,7 +165,7 @@ export class LiteralBoolean extends LiteralExpression {
  * A literal number compatible with JavaScript.
  */
 export class LiteralNumber extends LiteralExpression {
-  constructor(token: tokens.Token, public readonly value: number) {
+  constructor(token: ast.Token, public readonly value: number) {
     super(token);
   }
 
@@ -193,7 +193,7 @@ export class LiteralNumber extends LiteralExpression {
  * ```
  */
 export class LiteralString extends LiteralExpression {
-  constructor(token: tokens.Token, public readonly value: string) {
+  constructor(token: ast.Token, public readonly value: string) {
     super(token);
   }
 
@@ -206,7 +206,7 @@ export class LiteralString extends LiteralExpression {
  * Represents a reference to some identifier by name.
  */
 export class LiteralIdentifier extends LiteralExpression {
-  constructor(token: tokens.Token, public readonly name: string) {
+  constructor(token: ast.Token, public readonly name: string) {
     super(token);
   }
 
