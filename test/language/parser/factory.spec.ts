@@ -289,12 +289,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate a single-line string with escaped newlines', () => {
-      const token = new ast.Token(
-        0,
-        ast.$String,
-        [],
-        String.raw`Hello\nWorld`
-      );
+      const token = new ast.Token(0, ast.$String, [], String.raw`Hello\nWorld`);
       const empty = factory.createLiteralString(token);
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
