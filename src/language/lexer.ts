@@ -6,6 +6,7 @@ import {
   isLetter,
   isWhiteSpace,
 } from '../agnostic/strings';
+import * as tokens from './ast/token';
 
 function isIdentifier(character: number): boolean {
   return isIdentifierStart(character) || isDigit(character);
@@ -18,7 +19,10 @@ function isIdentifierStart(character: number): boolean {
 /**
  * Tokenizes and returns @param program as a series of @see Token.
  */
-export function tokenize(program: string, onError?: ErrorReporter): Token[] {
+export function tokenize(
+  program: string,
+  onError?: ErrorReporter
+): tokens.Token[] {
   return new ClutchLexer().scanProgram(new StringScanner(program), onError);
 }
 
@@ -27,97 +31,29 @@ export function tokenize(program: string, onError?: ErrorReporter): Token[] {
  */
 export type ErrorReporter = (span: ISourceSpan, error: string) => void;
 
-export enum TokenKind {
-  // Literals
-  IDENTIFIER = 'Identifier',
-  STRING = 'String',
-  NUMBER = 'Number',
-
-  // Keywords
-  CLASS = 'class',
-  ELSE = 'else',
-  FALSE = 'false',
-  FOR = 'for',
-  IF = 'if',
-  LET = 'let',
-  RETURN = 'return',
-  SUPER = 'super',
-  THEN = 'then',
-  THIS = 'this',
-  TRUE = 'true',
-  WHILE = 'while',
-  CONST = 'const',
-
-  // Symbols
-  ARROW = '->',
-  COLON = ':',
-  LEFT_PAREN = '(',
-  RIGHT_PAREN = ')',
-  LEFT_CURLY = '{',
-  RIGHT_CURLY = '}',
-
-  // Operators
-  PERIOD = '.',
-  PLUS = '+',
-  PLUS_EQUALS = '+=',
-  MINUS = '-',
-  MINUS_EQUALS = '-=',
-  STAR = '*',
-  STAR_EQUALS = '*=',
-  SLASH = '/',
-  SLASH_EQUALS = '/=',
-  MODULUS = '%',
-  MODULUS_EQUALS = '%=',
-  EQUALS = '=',
-  EQUALS_EQUALS = '==',
-  EXCLAIM_EQUALS = '!=',
-  EQUALS_EQUALS_EQUALS = '===',
-  EXCLAIM_EQUALS_EQUALS = '!==',
-  RIGHT_ANGLE = '>',
-  RIGHT_ANGLE_EQUALS = '>=',
-  LEFT_ANGLE = '<',
-  LEFT_ANGLE_EQUALS = '<=',
-  PIPE = '|',
-  PIPE_PIPE = '||',
-  AND = '&',
-  AND_AND = '&&',
-  CARET = '^',
-  EXCLAIM = '!',
-  TILDE = '~',
-  PLUS_PLUS = '++',
-  MINUS_MINUS = '--',
-  LEFT_ANGLE_LEFT_ANGLE = '<<',
-  RIGHT_ANGLE_RIGHT_ANGLE = '>>',
-
-  // Misc
-  EOF = '<EOF>',
-}
-
 /**
  * A language-level lexer that yields tokens understood by the grammar.
  */
 export class ClutchLexer {
   public static readonly keywords: {
-    [index: string]: TokenKind;
+    [index: string]: tokens.IKeywordTokenType;
   } = {
-    class: TokenKind.CLASS,
-    const: TokenKind.CONST,
-    else: TokenKind.ELSE,
-    false: TokenKind.FALSE,
-    for: TokenKind.FOR,
-    if: TokenKind.IF,
-    let: TokenKind.LET,
-    return: TokenKind.RETURN,
-    super: TokenKind.SUPER,
-    this: TokenKind.THIS,
-    true: TokenKind.TRUE,
-    while: TokenKind.WHILE,
+    const: tokens.$Const,
+    else: tokens.$Else,
+    external: tokens.$External,
+    false: tokens.$False,
+    if: tokens.$If,
+    let: tokens.$Let,
+    return: tokens.$Return,
+    then: tokens.$Then,
+    true: tokens.$True,
+    type: tokens.$Type,
   };
 
   private program!: StringScanner;
   private onError!: ErrorReporter;
   private position!: number;
-  private lastComments: IComment[] = [];
+  private lastComments: tokens.Token[] = [];
 
   public scanProgram(
     program: StringScanner,
@@ -126,91 +62,91 @@ export class ClutchLexer {
         `${message} "${span.text}" at ${span.line}:${span.column}`
       );
     }
-  ): Token[] {
+  ): tokens.Token[] {
     this.position = 0;
     this.program = program;
     this.onError = onError;
-    const tokens: Token[] = [];
+    const scanned: tokens.Token[] = [];
     while (program.hasNext()) {
       const token = this.scanToken();
       if (token) {
-        tokens.push(token);
+        scanned.push(token);
       }
     }
-    tokens.push(this.createToken(TokenKind.EOF, ''));
-    return tokens;
+    scanned.push(this.createToken(tokens.$EOF, ''));
+    return scanned;
   }
 
-  private scanToken(): Token | undefined {
+  private scanToken(): tokens.Token | undefined {
     const character = this.program.advance();
     switch (character) {
       case Characters.$LPAREN: // "("
-        return this.createToken(TokenKind.LEFT_PAREN);
+        return this.createToken(tokens.$LeftParen);
       case Characters.$RPAREN: // ")"
-        return this.createToken(TokenKind.RIGHT_PAREN);
+        return this.createToken(tokens.$RightParen);
       case Characters.$LCURLY: // "{"
-        return this.createToken(TokenKind.LEFT_CURLY);
+        return this.createToken(tokens.$LeftCurly);
       case Characters.$RCURLY: // "}"
-        return this.createToken(TokenKind.RIGHT_CURLY);
+        return this.createToken(tokens.$RightCurly);
       case Characters.$COLON: // ":"
-        return this.createToken(TokenKind.COLON);
+        return this.createToken(tokens.$Colon);
       case Characters.$PERIOD: // "."
-        return this.createToken(TokenKind.PERIOD);
+        return this.createToken(tokens.$Period);
       case Characters.$PLUS: // "+" or "+=" or "++"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.PLUS_EQUALS
+            ? tokens.$PlusEquals
             : this.program.match(Characters.$PLUS)
-              ? TokenKind.PLUS_PLUS
-              : TokenKind.PLUS
+              ? tokens.$PlusPlus
+              : tokens.$Plus
         );
       case Characters.$MINUS: // "-" or "--" or "-=" or "->"
         return this.createToken(
           this.program.match(Characters.$RANGLE)
-            ? TokenKind.ARROW
+            ? tokens.$DashRightAngle
             : this.program.match(Characters.$EQUALS)
-              ? TokenKind.MINUS_EQUALS
+              ? tokens.$DashEquals
               : this.program.match(Characters.$MINUS)
-                ? TokenKind.MINUS_MINUS
-                : TokenKind.MINUS
+                ? tokens.$DashDash
+                : tokens.$Dash
           // Code coverage considers the `);` to be a missed line :(
           /* istanbul ignore next */
         );
       case Characters.$STAR: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.STAR_EQUALS
-            : TokenKind.STAR
+            ? tokens.$StarEquals
+            : tokens.$Star
         );
       case Characters.$PERCENT: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.MODULUS_EQUALS
-            : TokenKind.MODULUS
+            ? tokens.$PercentEquals
+            : tokens.$Percent
         );
       case Characters.$EQUALS: // "=" or "==" or "==="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? TokenKind.EQUALS_EQUALS_EQUALS
-              : TokenKind.EQUALS_EQUALS
-            : TokenKind.EQUALS
+              ? tokens.$EqualsEqualsEquals
+              : tokens.$EqualsEquals
+            : tokens.$Equals
         );
       case Characters.$LANGLE: // "<" or "<=" or "<<"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.LEFT_ANGLE_EQUALS
+            ? tokens.$LeftAngleEquals
             : this.program.match(Characters.$LANGLE)
-              ? TokenKind.LEFT_ANGLE_LEFT_ANGLE
-              : TokenKind.LEFT_ANGLE
+              ? tokens.$LeftAngleLeftAngle
+              : tokens.$LeftAngle
         );
       case Characters.$RANGLE: // ">" or ">=" or ">>"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? TokenKind.RIGHT_ANGLE_EQUALS
+            ? tokens.$RightAngleEquals
             : this.program.match(Characters.$RANGLE)
-              ? TokenKind.RIGHT_ANGLE_RIGHT_ANGLE
-              : TokenKind.RIGHT_ANGLE
+              ? tokens.$RightAngleRightAngle
+              : tokens.$RightAngle
         );
       case Characters.$SLASH: // "/" or "//" or "/="
         return this.scanSlash();
@@ -218,27 +154,23 @@ export class ClutchLexer {
         return this.scanString();
       case Characters.$PIPE: // "|" or "||"
         return this.createToken(
-          this.program.match(Characters.$PIPE)
-            ? TokenKind.PIPE_PIPE
-            : TokenKind.PIPE
+          this.program.match(Characters.$PIPE) ? tokens.$PipePipe : tokens.$Pipe
         );
       case Characters.$AND: // "&" or "&&"
         return this.createToken(
-          this.program.match(Characters.$AND)
-            ? TokenKind.AND_AND
-            : TokenKind.AND
+          this.program.match(Characters.$AND) ? tokens.$AndAnd : tokens.$And
         );
       case Characters.$TILDE: // "~"
-        return this.createToken(TokenKind.TILDE);
+        return this.createToken(tokens.$Tilde);
       case Characters.$CARET: // "^"
-        return this.createToken(TokenKind.CARET);
+        return this.createToken(tokens.$Caret);
       case Characters.$EXCLAIM: // "!" or "!=" or "!==""
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? TokenKind.EXCLAIM_EQUALS_EQUALS
-              : TokenKind.EXCLAIM_EQUALS
-            : TokenKind.EXCLAIM
+              ? tokens.$ExclaimEqualsEquals
+              : tokens.$ExclaimEquals
+            : tokens.$Exclaim
         );
       default:
         if (isWhiteSpace(character)) {
@@ -261,25 +193,25 @@ export class ClutchLexer {
   /**
    * Scans a string, returning `undefined` if there was no string.
    */
-  private scanString(): Token {
+  private scanString(): tokens.Token {
     while (this.program.hasNext()) {
       if (this.program.match(Characters.$SQUOTE)) {
         this.position++;
         let lexeme = this.substring();
         lexeme = lexeme.substring(0, lexeme.length - 1);
-        return this.createToken(TokenKind.STRING, lexeme);
+        return this.createToken(tokens.$String, lexeme);
       }
       this.program.advance();
     }
     this.reportError('Unterminated string');
     this.position++;
-    return this.createToken(TokenKind.STRING);
+    return this.createToken(tokens.$String);
   }
 
   /**
    * Scans any tokens that are valid numeric literals
    */
-  private scanNumber(starting: number): Token {
+  private scanNumber(starting: number): tokens.Token {
     if (starting === Characters.$0) {
       if (
         this.program.match(Characters.$X) ||
@@ -310,51 +242,55 @@ export class ClutchLexer {
   /**
    * Scans any tokens that are valid hexadecimel digits, returning a number.
    */
-  private scanHexNumber(): Token {
+  private scanHexNumber(): tokens.Token {
     this.scanPredicate(isHexadecimal);
-    return this.createToken(TokenKind.NUMBER);
+    return this.createToken(tokens.$Number);
   }
 
   /**
    * Scans any tokens that are valid digits, returning a number.
    */
-  private scanDigits(): Token {
+  private scanDigits(): tokens.Token {
     this.scanPredicate(isDigit);
-    return this.createToken(TokenKind.NUMBER);
+    return this.createToken(tokens.$Number);
   }
 
   /**
    * Scans any tokens that are valid identifiers.
    */
-  private scanIdentifierOrKeyword(): Token {
+  private scanIdentifierOrKeyword(): tokens.Token {
     this.scanPredicate(isIdentifier);
     const identifierOrKeyword = this.substring();
-    return new Token(
-      ClutchLexer.keywords[identifierOrKeyword] || TokenKind.IDENTIFIER,
-      identifierOrKeyword,
+    return new tokens.Token(
+      this.position - identifierOrKeyword.length,
+      ClutchLexer.keywords[identifierOrKeyword] || tokens.$Identifier,
       this.clearComments(),
-      this.position - identifierOrKeyword.length
+      identifierOrKeyword
     );
   }
 
   /**
    * Scans tokens preceding with "/".
    */
-  private scanSlash(): Token | undefined {
+  private scanSlash(): tokens.Token | undefined {
     // "//"
     if (this.program.match(Characters.$SLASH)) {
       this.advanceToEOL();
-      this.lastComments.push({
-        lexeme: this.substring().trim(),
-        offset: this.position,
-      });
+      this.lastComments.push(
+        new tokens.Token(
+          this.position,
+          tokens.$Comment,
+          [],
+          this.substring().trim()
+        )
+      );
       return;
     }
     // "/" or "/="
     return this.createToken(
       this.program.match(Characters.$EQUALS)
-        ? TokenKind.SLASH_EQUALS
-        : TokenKind.SLASH
+        ? tokens.$SlashEquals
+        : tokens.$Slash
     );
   }
 
@@ -395,19 +331,22 @@ export class ClutchLexer {
   /**
    * Returns a new token with a @param kind and the current substring.
    */
-  private createToken(kind: TokenKind, content = this.substring()): Token {
-    return new Token(
+  private createToken(
+    kind: tokens.ITokenTypes,
+    content = this.substring()
+  ): tokens.Token {
+    return new tokens.Token(
+      this.position - content.length,
       kind,
-      content,
       this.clearComments(),
-      this.position - content.length
+      content
     );
   }
 
   /**
    * Clear and retrieve comments lexed.
    */
-  private clearComments(): IComment[] {
+  private clearComments(): tokens.Token[] {
     const comments = this.lastComments;
     this.lastComments = [];
     return comments;
@@ -429,31 +368,4 @@ export class ClutchLexer {
   private reportError(error: string, offset = this.position): void {
     this.onError(this.program.source.span(offset, offset + 1), error);
   }
-}
-
-/**
- * A scanned token from @function tokenize.
- */
-export interface IToken {
-  readonly kind: TokenKind;
-  readonly lexeme: string;
-  readonly comments: IComment[];
-  readonly offset: number;
-}
-
-/**
- * Implementation of @interface IToken private to @function tokenize.
- */
-class Token implements IToken {
-  constructor(
-    public readonly kind: TokenKind,
-    public readonly lexeme: string,
-    public readonly comments: IComment[],
-    public readonly offset: number
-  ) {}
-}
-
-export interface IComment {
-  readonly lexeme: string;
-  readonly offset: number;
 }

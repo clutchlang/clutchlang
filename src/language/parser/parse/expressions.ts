@@ -1,4 +1,4 @@
-import { IToken, TokenKind } from '../../lexer';
+import * as tokens from '../../ast/token';
 import { Operator } from '../../parser';
 import { LiteralIdentifier } from '../nodes/expressions';
 import { Expression } from '../nodes/nodes';
@@ -20,7 +20,7 @@ export class ExpressionParser extends AbstractParser {
   }
 
   public parseIdentifier(): LiteralIdentifier {
-    if (this.match(TokenKind.IDENTIFIER)) {
+    if (this.match(tokens.$Identifier)) {
       return this.factory.createLiteralIdentifier(this.peek(-1));
     }
     /* istanbul ignore next */
@@ -32,22 +32,22 @@ export class ExpressionParser extends AbstractParser {
   private parseAssignment(): Expression {
     return this.parseBinary(
       () => this.parseConditional(),
-      TokenKind.EQUALS,
-      TokenKind.PLUS_EQUALS,
-      TokenKind.MINUS_EQUALS,
-      TokenKind.STAR_EQUALS,
-      TokenKind.SLASH_EQUALS,
-      TokenKind.MODULUS_EQUALS
+      tokens.$Equals,
+      tokens.$PlusEquals,
+      tokens.$DashEquals,
+      tokens.$StarEquals,
+      tokens.$SlashEquals,
+      tokens.$PercentEquals
     );
   }
 
   private parseConditional(): Expression {
-    if (this.match(TokenKind.IF)) {
+    if (this.match(tokens.$If)) {
       const ifToken = this.peek(-1);
       const ifBody = this.parseLogicalOr();
       const thenToken = this.advance();
       const thenBody = this.parseLogicalOr();
-      const elseToken = this.match(TokenKind.ELSE) ? this.peek(-1) : undefined;
+      const elseToken = this.match(tokens.$Else) ? this.peek(-1) : undefined;
       const elseBody = elseToken ? this.parseLogicalOr() : undefined;
       return this.factory.createConditionalExpression(
         ifToken,
@@ -62,74 +62,74 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseLogicalOr(): Expression {
-    return this.parseBinary(() => this.parseLogicalAnd(), TokenKind.PIPE_PIPE);
+    return this.parseBinary(() => this.parseLogicalAnd(), tokens.$PipePipe);
   }
 
   private parseLogicalAnd(): Expression {
-    return this.parseBinary(() => this.parseEquality(), TokenKind.AND_AND);
+    return this.parseBinary(() => this.parseEquality(), tokens.$AndAnd);
   }
 
   private parseEquality(): Expression {
     return this.parseBinary(
       () => this.parseComparison(),
-      TokenKind.EQUALS_EQUALS,
-      TokenKind.EXCLAIM_EQUALS,
-      TokenKind.EQUALS_EQUALS_EQUALS,
-      TokenKind.EXCLAIM_EQUALS_EQUALS
+      tokens.$EqualsEquals,
+      tokens.$ExclaimEquals,
+      tokens.$EqualsEqualsEquals,
+      tokens.$ExclaimEqualsEquals
     );
   }
 
   private parseComparison(): Expression {
     return this.parseBinary(
       () => this.parseBitwiseShift(),
-      TokenKind.LEFT_ANGLE,
-      TokenKind.RIGHT_ANGLE,
-      TokenKind.LEFT_ANGLE_EQUALS,
-      TokenKind.RIGHT_ANGLE_EQUALS
+      tokens.$LeftAngle,
+      tokens.$RightAngle,
+      tokens.$LeftAngleEquals,
+      tokens.$RightAngleEquals
     );
   }
 
   private parseBitwiseShift(): Expression {
     return this.parseBinary(
       () => this.parseAdditive(),
-      TokenKind.LEFT_ANGLE_LEFT_ANGLE,
-      TokenKind.RIGHT_ANGLE_RIGHT_ANGLE
+      tokens.$LeftAngleLeftAngle,
+      tokens.$RightAngleRightAngle
     );
   }
 
   private parseAdditive(): Expression {
     return this.parseBinary(
       () => this.parseMultiplicative(),
-      TokenKind.PLUS,
-      TokenKind.MINUS
+      tokens.$Plus,
+      tokens.$Dash
     );
   }
 
   private parseMultiplicative(): Expression {
     return this.parseBinary(
       () => this.parseUnaryPrefix(),
-      TokenKind.STAR,
-      TokenKind.SLASH,
-      TokenKind.MODULUS
+      tokens.$Star,
+      tokens.$Slash,
+      tokens.$Percent
     );
   }
 
   private parseUnaryPrefix(): Expression {
     return this.parsePrefix(
       () => this.parseUnaryPostfix(),
-      TokenKind.MINUS,
-      TokenKind.PLUS,
-      TokenKind.PLUS_PLUS,
-      TokenKind.MINUS_MINUS,
-      TokenKind.EXCLAIM
+      tokens.$Dash,
+      tokens.$Plus,
+      tokens.$PlusPlus,
+      tokens.$DashDash,
+      tokens.$Exclaim
     );
   }
 
   private parseUnaryPostfix(): Expression {
     return this.parsePostfix(
       () => this.parseFunctionCall(),
-      TokenKind.PLUS_PLUS,
-      TokenKind.MINUS_MINUS
+      tokens.$PlusPlus,
+      tokens.$DashDash
     );
   }
 
@@ -137,7 +137,7 @@ export class ExpressionParser extends AbstractParser {
     let expression = this.parseMemberAccess();
     // tslint:disable-next-line:no-constant-condition
     while (true) {
-      if (this.match(TokenKind.LEFT_PAREN)) {
+      if (this.match(tokens.$LeftParen)) {
         expression = this.finishFunctionCall(expression);
       } else {
         break;
@@ -149,7 +149,7 @@ export class ExpressionParser extends AbstractParser {
   private finishFunctionCall(target: Expression): Expression {
     const args: Expression[] = [];
     const leftParen = this.peek(-1);
-    while (!this.match(TokenKind.RIGHT_PAREN)) {
+    while (!this.match(tokens.$RightParen)) {
       args.push(this.parseExpression());
     }
     return this.factory.createFunctionCallExpression(
@@ -161,11 +161,11 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseMemberAccess(): Expression {
-    return this.parseBinary(() => this.parseGroup(), TokenKind.PERIOD);
+    return this.parseBinary(() => this.parseGroup(), tokens.$Period);
   }
 
   private parseGroup(): Expression {
-    if (this.match(TokenKind.LEFT_PAREN)) {
+    if (this.match(tokens.$LeftParen)) {
       const leftParen = this.peek(-1);
       const expression = this.parseExpression();
       const rightParen = this.advance();
@@ -179,13 +179,13 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseLiteral(): Expression {
-    if (this.match(TokenKind.NUMBER)) {
+    if (this.match(tokens.$Number)) {
       return this.factory.createLiteralNumber(this.peek(-1));
     }
-    if (this.match(TokenKind.STRING)) {
+    if (this.match(tokens.$String)) {
       return this.factory.createLiteralString(this.peek(-1));
     }
-    if (this.match(TokenKind.FALSE, TokenKind.TRUE)) {
+    if (this.match(tokens.$False, tokens.$True)) {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
     return this.parseIdentifier();
@@ -193,7 +193,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parseBinary(
     parseNext: () => Expression,
-    ...kinds: TokenKind[]
+    ...kinds: tokens.ITokenTypes[]
   ): Expression {
     let expr = parseNext();
     while (this.match(...kinds)) {
@@ -210,7 +210,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parsePrefix(
     parseNext: () => Expression,
-    ...kinds: TokenKind[]
+    ...kinds: tokens.ITokenTypes[]
   ): Expression {
     if (this.match(...kinds)) {
       const operator = this.peek(-1);
@@ -226,10 +226,10 @@ export class ExpressionParser extends AbstractParser {
 
   private parsePostfix(
     parseNext: () => Expression,
-    ...kinds: TokenKind[]
+    ...kinds: tokens.ITokenTypes[]
   ): Expression {
     const operator = this.peek(1);
-    if (kinds.some(e => e === operator.lexeme)) {
+    if (kinds.some(e => e === operator.type)) {
       const expr = this.factory.createUnaryExpression(
         parseNext(),
         this.parsePostfixOp(operator),
@@ -242,7 +242,7 @@ export class ExpressionParser extends AbstractParser {
     return parseNext();
   }
 
-  private parseBinaryOp(token: IToken): Operator {
+  private parseBinaryOp(token: tokens.Token): Operator {
     switch (token.lexeme) {
       case '.':
         return Operator.MemberAccess;
@@ -295,7 +295,7 @@ export class ExpressionParser extends AbstractParser {
     }
   }
 
-  private parsePrefixOp(token: IToken): Operator {
+  private parsePrefixOp(token: tokens.Token): Operator {
     switch (token.lexeme) {
       case '++':
         return Operator.PrefixIncrement;
@@ -314,7 +314,7 @@ export class ExpressionParser extends AbstractParser {
     }
   }
 
-  private parsePostfixOp(token: IToken): Operator {
+  private parsePostfixOp(token: tokens.Token): Operator {
     switch (token.lexeme) {
       case '++':
         return Operator.PostfixIncrement;

@@ -1,271 +1,404 @@
-import { ClutchLexer, tokenize, TokenKind } from '../../src/language/lexer';
+// tslint:disable:no-magic-numbers
+// tslint:disable:object-literal-sort-keys
+
+import * as tokens from '../../src/language/ast/token';
+import { ClutchLexer, tokenize } from '../../src/language/lexer';
 
 /**
- * Tokenizes @param program as simple JS objects for testing.
+ * A structural representation of @see Token without an offset.
  */
-function tokenizeKinds(program: string): TokenKind[] {
-  return tokenize(program).map(t => t.kind);
+interface ITokenWithoutOffset {
+  readonly text: string;
+  readonly type: tokens.ITokenTypes;
 }
 
-describe('tokenize', () => {
-  it('should scan an empty file', () => {
-    expect(tokenizeKinds('')).toEqual([TokenKind.EOF]);
-  });
+/**
+ * Creates a simple structural representation of @param token.
+ */
+function toSimpleToken(token: tokens.Token): ITokenWithoutOffset {
+  return {
+    text: token.lexeme,
+    type: token.type,
+  };
+}
 
-  it('should scan a file of completely whitespace', () => {
-    expect(tokenizeKinds('  \n  \n\r  \r  ')).toEqual([TokenKind.EOF]);
-  });
+/**
+ * A simple version of @see tokenize that returns @see ITokenWithoutOffset.
+ */
+function simpleTokenize(program: string): ITokenWithoutOffset[] {
+  return tokenize(program).map(toSimpleToken);
+}
 
-  it('should scan parentheses', () => {
-    expect(
-      tokenizeKinds(`
-      (
-        (
-          ()
-        )
-      )
-    `)
-    ).toEqual([
-      TokenKind.LEFT_PAREN,
-      TokenKind.LEFT_PAREN,
-      TokenKind.LEFT_PAREN,
-      TokenKind.RIGHT_PAREN,
-      TokenKind.RIGHT_PAREN,
-      TokenKind.RIGHT_PAREN,
-      TokenKind.EOF,
-    ]);
-  });
+it('should tokenize with a correct offset, comments, lexeme', () => {
+  const program = `
+    // Welcome!
+    main => {}
+  `;
+  const scanned = tokenize(program);
+  expect(scanned[0].offset).toBe(program.indexOf('main'));
+  expect(scanned[0].type).toBe(tokens.$Identifier);
+  expect(scanned[0].lexeme).toBe('main');
+  expect(scanned[0].length).toBe('main'.length);
+  expect(scanned[0].isOperator).toBe(false);
+  expect(scanned[0].isLiteral).toBe(true);
+  expect(scanned[0].isKeyword).toBe(false);
+  expect(scanned[0].isIdentifier).toBe(true);
+  expect(scanned[0].isEndOfFile).toBe(false);
+  expect(scanned[0].end).toBe(program.indexOf('main') + 'main'.length);
+  expect(scanned[0].comments.map(toSimpleToken)).toMatchObject([
+    {
+      text: '// Welcome!',
+      type: tokens.$Comment,
+    },
+  ]);
+});
 
-  it('should scan curlies', () => {
-    expect(
-      tokenizeKinds(`
-      {
+it('should tokenize EOF', () => {
+  const scanned = tokenize('');
+  expect(scanned[0].isEndOfFile).toBe(true);
+});
+
+it('should tokenize function declaration', () => {
+  const scanned = simpleTokenize(`
+    main() -> {} 
+  `);
+  expect(scanned).toMatchObject([
+    {
+      text: 'main',
+      type: tokens.$Identifier,
+    },
+    {
+      text: '(',
+      type: tokens.$LeftParen,
+    },
+    {
+      text: ')',
+      type: tokens.$RightParen,
+    },
+    {
+      text: '->',
+      type: tokens.$DashRightAngle,
+    },
+    {
+      text: '{',
+      type: tokens.$LeftCurly,
+    },
+    {
+      text: '}',
+      type: tokens.$RightCurly,
+    },
+    {
+      text: '',
+      type: tokens.$EOF,
+    },
+  ]);
+});
+
+it('should tokenize external type declaration', () => {
+  const scanned = simpleTokenize(`
+    external type Foo {
+      bar()
+    }
+  `);
+  expect(scanned).toMatchObject([
+    {
+      text: 'external',
+      type: tokens.$External,
+    },
+    {
+      text: 'type',
+      type: tokens.$Type,
+    },
+    {
+      text: 'Foo',
+      type: tokens.$Identifier,
+    },
+    {
+      text: '{',
+      type: tokens.$LeftCurly,
+    },
+    {
+      text: 'bar',
+      type: tokens.$Identifier,
+    },
+    {
+      text: '(',
+      type: tokens.$LeftParen,
+    },
+    {
+      text: ')',
+      type: tokens.$RightParen,
+    },
+    {
+      text: '}',
+      type: tokens.$RightCurly,
+    },
+    {
+      text: '',
+      type: tokens.$EOF,
+    },
+  ]);
+});
+
+describe('keywords', () => {
+  for (const name of Object.keys(ClutchLexer.keywords)) {
+    it(`should tokenize "${name}"`, () => {
+      const keyword = ClutchLexer.keywords[name];
+      expect(name).toBeTruthy();
+      const results: ITokenWithoutOffset[] = [
         {
-          {}
-        }
-      }
+          text: keyword.lexeme,
+          type: keyword,
+        },
+        {
+          text: '',
+          type: tokens.$EOF,
+        },
+      ];
+      expect(simpleTokenize(name)).toMatchObject(results);
+    });
+  }
+});
+
+describe('expressions', () => {
+  describe('prefix', () => {
+    const operators: {
+      [index: string]: tokens.IOperatorTokenType;
+    } = {
+      '!': tokens.$Exclaim,
+      '~': tokens.$Tilde,
+      '+': tokens.$Plus,
+      '-': tokens.$Dash,
+      '++': tokens.$PlusPlus,
+      '--': tokens.$DashDash,
+    };
+
+    for (const name of Object.keys(operators)) {
+      it(`should tokenize "${name}x"`, () => {
+        const operator = operators[name];
+        expect(operator).toBeTruthy();
+        const results: ITokenWithoutOffset[] = [
+          {
+            text: name,
+            type: operator,
+          },
+          {
+            text: 'x',
+            type: tokens.$Identifier,
+          },
+          {
+            text: '',
+            type: tokens.$EOF,
+          },
+        ];
+        expect(simpleTokenize(`${name}x`)).toMatchObject(results);
+      });
+    }
+  });
+
+  describe('binary', () => {
+    const operators: {
+      [index: string]: tokens.IOperatorTokenType;
+    } = {
+      '.': tokens.$Period,
+      '*': tokens.$Star,
+      '/': tokens.$Slash,
+      '%': tokens.$Percent,
+      '+': tokens.$Plus,
+      '-': tokens.$Dash,
+      '<<': tokens.$LeftAngleLeftAngle,
+      '>>': tokens.$RightAngleRightAngle,
+      '<': tokens.$LeftAngle,
+      '<=': tokens.$LeftAngleEquals,
+      '>': tokens.$RightAngle,
+      '>=': tokens.$RightAngleEquals,
+      '==': tokens.$EqualsEquals,
+      '!=': tokens.$ExclaimEquals,
+      '===': tokens.$EqualsEqualsEquals,
+      '!==': tokens.$ExclaimEqualsEquals,
+      '&&': tokens.$AndAnd,
+      '||': tokens.$PipePipe,
+      '=': tokens.$Equals,
+      '+=': tokens.$PlusEquals,
+      '-=': tokens.$DashEquals,
+      '*=': tokens.$StarEquals,
+      '/=': tokens.$SlashEquals,
+      '%=': tokens.$PercentEquals,
+    };
+
+    for (const name of Object.keys(operators)) {
+      it(`should tokenize "x${name}y"`, () => {
+        const operator = operators[name];
+        expect(operator).toBeTruthy();
+        const results: ITokenWithoutOffset[] = [
+          {
+            text: 'x',
+            type: tokens.$Identifier,
+          },
+          {
+            text: name,
+            type: operator,
+          },
+          {
+            text: 'y',
+            type: tokens.$Identifier,
+          },
+          {
+            text: '',
+            type: tokens.$EOF,
+          },
+        ];
+        expect(simpleTokenize(`x${name}y`)).toMatchObject(results);
+      });
+    }
+  });
+
+  describe('postfix', () => {
+    const operators: {
+      [index: string]: tokens.IOperatorTokenType;
+    } = {
+      '++': tokens.$PlusPlus,
+      '--': tokens.$DashDash,
+    };
+
+    for (const name of Object.keys(operators)) {
+      it(`should tokenize "x${name}"`, () => {
+        const operator = operators[name];
+        expect(operator).toBeTruthy();
+        const results: ITokenWithoutOffset[] = [
+          {
+            text: 'x',
+            type: tokens.$Identifier,
+          },
+          {
+            text: name,
+            type: operator,
+          },
+          {
+            text: '',
+            type: tokens.$EOF,
+          },
+        ];
+        expect(simpleTokenize(`x${name}`)).toMatchObject(results);
+      });
+    }
+  });
+
+  it('should tokenize grouping', () => {
+    const results: ITokenWithoutOffset[] = [
+      {
+        text: '(',
+        type: tokens.$LeftParen,
+      },
+      {
+        text: 'a',
+        type: tokens.$Identifier,
+      },
+      {
+        text: '+',
+        type: tokens.$Plus,
+      },
+      {
+        text: 'b',
+        type: tokens.$Identifier,
+      },
+      {
+        text: ')',
+        type: tokens.$RightParen,
+      },
+      {
+        text: '*',
+        type: tokens.$Star,
+      },
+      {
+        text: 'c',
+        type: tokens.$Identifier,
+      },
+      {
+        text: '',
+        type: tokens.$EOF,
+      },
+    ];
+    expect(
+      simpleTokenize(`
+      (a + b) * c
     `)
-    ).toEqual([
-      TokenKind.LEFT_CURLY,
-      TokenKind.LEFT_CURLY,
-      TokenKind.LEFT_CURLY,
-      TokenKind.RIGHT_CURLY,
-      TokenKind.RIGHT_CURLY,
-      TokenKind.RIGHT_CURLY,
-      TokenKind.EOF,
-    ]);
+    ).toMatchObject(results);
   });
 
-  it('should scan a colon', () => {
-    expect(
-      tokenizeKinds(`
-        (foo: Foo)
-      `)
-    ).toEqual([
-      TokenKind.LEFT_PAREN,
-      TokenKind.IDENTIFIER,
-      TokenKind.COLON,
-      TokenKind.IDENTIFIER,
-      TokenKind.RIGHT_PAREN,
-      TokenKind.EOF,
-    ]);
-  });
+  describe('should tokenize literal', () => {
+    describe('numbers', () => {
+      ['1', '1.0', '1.5', '3.14', '31.4', '0xAAA', '2e6'].forEach(n => {
+        it(n, () => {
+          expect(simpleTokenize(n)).toMatchObject([
+            {
+              text: n,
+              type: tokens.$Number,
+            },
+            {
+              text: '',
+              type: tokens.$EOF,
+            },
+          ]);
+        });
+      });
+    });
 
-  it('should scan operators', () => {
-    expect(
-      tokenizeKinds(`
-      .
-      +
-      ++
-      +=
-      -
-      --
-      -=
-      *
-      *=
-      %
-      %=
-      =
-      ->
-      ==
-      !=
-      ===
-      !==
-      >
-      >=
-      >>
-      <
-      <=
-      <<
-      /
-      /=
-      !
-      ~
-      ^
-      |
-      ||
-      &
-      &&
-    `)
-    ).toEqual([
-      TokenKind.PERIOD,
-      TokenKind.PLUS,
-      TokenKind.PLUS_PLUS,
-      TokenKind.PLUS_EQUALS,
-      TokenKind.MINUS,
-      TokenKind.MINUS_MINUS,
-      TokenKind.MINUS_EQUALS,
-      TokenKind.STAR,
-      TokenKind.STAR_EQUALS,
-      TokenKind.MODULUS,
-      TokenKind.MODULUS_EQUALS,
-      TokenKind.EQUALS,
-      TokenKind.ARROW,
-      TokenKind.EQUALS_EQUALS,
-      TokenKind.EXCLAIM_EQUALS,
-      TokenKind.EQUALS_EQUALS_EQUALS,
-      TokenKind.EXCLAIM_EQUALS_EQUALS,
-      TokenKind.RIGHT_ANGLE,
-      TokenKind.RIGHT_ANGLE_EQUALS,
-      TokenKind.RIGHT_ANGLE_RIGHT_ANGLE,
-      TokenKind.LEFT_ANGLE,
-      TokenKind.LEFT_ANGLE_EQUALS,
-      TokenKind.LEFT_ANGLE_LEFT_ANGLE,
-      TokenKind.SLASH,
-      TokenKind.SLASH_EQUALS,
-      TokenKind.EXCLAIM,
-      TokenKind.TILDE,
-      TokenKind.CARET,
-      TokenKind.PIPE,
-      TokenKind.PIPE_PIPE,
-      TokenKind.AND,
-      TokenKind.AND_AND,
-      TokenKind.EOF,
-    ]);
-  });
+    describe('strings', () => {
+      it('single line', () => {
+        expect(
+          simpleTokenize(`
+          'Hello World'
+        `)
+        ).toMatchObject([
+          {
+            text: 'Hello World',
+            type: tokens.$String,
+          },
+          {
+            text: '',
+            type: tokens.$EOF,
+          },
+        ]);
+      });
 
-  it('should scan all valid number literals', () => {
-    expect(
-      tokenize(`
-      0
-      1
-      1.5
-      3.14
-      31.4
-      0xAAA
-      0XAAA
-      0xaaa
-      0Xaaa
-      0x123
-      0X123
-      2e123
-    `).map(t => [t.kind, t.lexeme])
-    ).toEqual([
-      [TokenKind.NUMBER, '0'],
-      [TokenKind.NUMBER, '1'],
-      [TokenKind.NUMBER, '1.5'],
-      [TokenKind.NUMBER, '3.14'],
-      [TokenKind.NUMBER, '31.4'],
-      [TokenKind.NUMBER, '0xAAA'],
-      [TokenKind.NUMBER, '0XAAA'],
-      [TokenKind.NUMBER, '0xaaa'],
-      [TokenKind.NUMBER, '0Xaaa'],
-      [TokenKind.NUMBER, '0x123'],
-      [TokenKind.NUMBER, '0X123'],
-      [TokenKind.NUMBER, '2e123'],
-      [TokenKind.EOF, ''],
-    ]);
-  });
+      it('multiple lines', () => {
+        expect(
+          simpleTokenize(`
+          '
+            1
+            2
+            3
+          '
+        `)
+        ).toMatchObject([
+          {
+            text: '\n            1\n            2\n            3\n          ',
+            type: tokens.$String,
+          },
+          {
+            text: '',
+            type: tokens.$EOF,
+          },
+        ]);
+      });
+    });
 
-  it('should scan booleans', () => {
-    expect(tokenize('true false').map(t => [t.kind, t.lexeme])).toEqual([
-      [TokenKind.TRUE, 'true'],
-      [TokenKind.FALSE, 'false'],
-      [TokenKind.EOF, ''],
-    ]);
-  });
-
-  it('should scan strings', () => {
-    expect(
-      tokenize(`
-      'Hello'
-      'Hello World'
-      'Hello
-        World
-          !'
-    `).map(t => t.lexeme)
-    ).toEqual([
-      'Hello',
-      'Hello World',
-      'Hello\n        World\n          !',
-      '',
-    ]);
-  });
-
-  it('should scan strings without a terminator', () => {
-    expect(() => tokenize("'Hello")).toThrowError(SyntaxError);
-  });
-
-  it('should scan an invalid character', () => {
-    expect(() => tokenize('5 $ 2')).toThrowError(SyntaxError);
-  });
-
-  it('should scan strings with error recovery', () => {
-    expect(
-      tokenize("'Hello", (_, __) => {
-        /* Intentional */
-      }).map(t => t.lexeme)
-    ).toEqual(['Hello', '']);
-  });
-
-  it('should scan comments', () => {
-    expect(
-      tokenize(`
-      // One A
-      // One B
-      1
-      2 // Two
-      3
-      // Three
-    `).map(t => {
-        return [t.kind, t.comments.map(c => c.lexeme)];
-      })
-    ).toEqual([
-      [TokenKind.NUMBER, ['// One A', '// One B']],
-      [TokenKind.NUMBER, []],
-      [TokenKind.NUMBER, ['// Two']],
-      [TokenKind.EOF, ['// Three']],
-    ]);
-  });
-
-  it('should scan comments with DOS-style line endings', () => {
-    expect(
-      tokenize(`a // A\n\rb // B\rc // C\n`).map(t => {
-        return [t.kind, t.comments.map(c => c.lexeme)];
-      })
-    ).toEqual([
-      [TokenKind.IDENTIFIER, []],
-      [TokenKind.IDENTIFIER, ['// A']],
-      [TokenKind.IDENTIFIER, ['// B']],
-      [TokenKind.EOF, ['// C']],
-    ]);
-  });
-
-  it('should scan identifiers', () => {
-    expect(
-      tokenize(`
-      arg1
-      fooBar
-      x_thing
-    `).map(t => t.lexeme)
-    ).toEqual(['arg1', 'fooBar', 'x_thing', '']);
-  });
-
-  it('should scan all valid keywords', () => {
-    expect(
-      tokenizeKinds(`
-    ${Object.keys(ClutchLexer.keywords).join('  \n')}
-    `)
-    ).toEqual(Object.values(ClutchLexer.keywords).concat(TokenKind.EOF));
+    describe('identifiers', () => {
+      ['fooBar', 'foo_Bar', '_fooBar'].forEach(n => {
+        it(n, () => {
+          expect(simpleTokenize(n)).toMatchObject([
+            {
+              text: n,
+              type: tokens.$Identifier,
+            },
+            {
+              text: '',
+              type: tokens.$EOF,
+            },
+          ]);
+        });
+      });
+    });
   });
 });

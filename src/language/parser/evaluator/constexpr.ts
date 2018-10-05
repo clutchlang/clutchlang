@@ -1,4 +1,4 @@
-import { IToken, TokenKind } from '../../lexer';
+import * as tokens from '../../ast/token';
 import {
   BinaryExpression,
   ConditionalExpression,
@@ -36,12 +36,7 @@ export function evaluateConstExpression(
 }
 
 // default token for synthetic nodes.
-const token: IToken = {
-  comments: [],
-  kind: TokenKind.EOF,
-  lexeme: '',
-  offset: -1,
-};
+const token = new tokens.Token(-1, tokens.$EOF, [], '');
 
 /**
  * The maximum recursion depth for `constexpr` evaluation.
