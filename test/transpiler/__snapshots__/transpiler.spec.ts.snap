@@ -27,7 +27,8 @@ exports[`JsOutputTranspiler should support most ast nodes 1`] = `
   1;
   1++;
   true && false;
-  return false || true;
+  false || true;
+  return a.b.c;
 }
 function explicit() {
   return true;

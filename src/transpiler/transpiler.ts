@@ -29,7 +29,11 @@ export class SimpleJsTranspiler extends ast.AstVisitor<
     context = new StringBuffer()
   ): StringBuffer {
     node.left.accept(this, context);
-    context.write(` ${node.operatorToken.lexeme} `);
+    if (node.operator === ast.Operator.MemberAccess) {
+      context.write(node.operatorToken.lexeme);
+    } else {
+      context.write(` ${node.operatorToken.lexeme} `);
+    }
     node.right.accept(this, context);
     return context;
   }

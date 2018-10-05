@@ -34,6 +34,7 @@ describe('JsOutputTranspiler', () => {
         1++
         true && false
         false || true
+        a.b.c
       }
       explicit -> {
         return true
