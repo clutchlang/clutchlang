@@ -1,49 +1,137 @@
-import { Operator } from '../parser';
-
-/**
- * A method is defined as a function where the first argument is typed
- * as the reciever.
- */
-interface IMethodTable {
-  [index: string]: FunctionType;
-}
-
 /**
  * A type is a restrictions on the values that parts of a program may accept.
  */
-export abstract class Type {
-  /**
-   * Whether this type is assignable to a declaration of the other type.
-   * @param other The other type object.
-   */
-  public abstract isAssignableTo(other: Type): boolean;
+interface IType {
 
   /**
    * A user-readable name for the type.
    */
-  public abstract get name(): string;
+  name: string;
+
+  /**
+   * The kind of type this represents.
+   */
+  kind: TypeKind;
+  /**
+   * Whether this type is assignable to a declaration of the other type.
+   * @param other The other type object.
+   */
+  isAssignableTo(other: IType): boolean;
+
+  /**
+   * Whether this type is a subtype of the other type.
+   * @param other The other type object.
+   */
+  isSubtypeOf(other: IType): boolean;
+
+  /**
+   * Whether this type is a supertype of the other type.
+   * @param other the other type object.
+   */
+  isSupertypeOf(other: IType): boolean;
 }
 
 /**
- * The defined interface of a type.
+ * The discriminant for the Type union.
  */
-export class TypeDeclaration {
-  constructor(
-    public readonly type: Type,
-    public readonly methods: IMethodTable
-  ) {}
+export enum TypeKind {
+  /**
+   * A type representhing nothing.
+   */
+  Nothing = 'Nothing',
+  /**
+   * A type representing anything.
+   */
+  Something = 'Something',
+  /**
+   * A type of a function.
+   */
+  Function = 'Function',
+  /**
+   * A Type with only one implementation.
+   */
+  Concrete = 'Concrete',
 }
 
 /**
- * A type that is only assignable to identical type objects.
+ * The union of different type representations.
  */
-export class ExactType extends Type {
-  constructor(public readonly name: string) {
-    super();
+export type Type = Nothing | Something | ConcreteType | FunctionType;
+
+/**
+ * The bottom type.
+ *
+ * There are no valid values of Nothing, instead it represents a program failure.
+ */
+class Nothing implements IType {
+
+  public readonly name = 'Nothing';
+  public readonly kind = TypeKind.Nothing;
+  public isAssignableTo(_: IType): boolean {
+    return true;
   }
 
-  public isAssignableTo(other: Type): boolean {
+  public isSubtypeOf(_: IType): boolean {
+    return true;
+  }
+
+  public isSupertypeOf(_: IType): boolean {
+    return false;
+  }
+}
+
+/**
+ * The singleton instance of the Nothing type.
+ */
+export const NOTHING_TYPE: Type = new Nothing();
+
+/**
+ * The top type.
+ *
+ * Any value is a valid value of Something.
+ */
+class Something implements IType {
+
+  public readonly name = 'Something';
+  public readonly kind = TypeKind.Something;
+  public isAssignableTo(other: IType): boolean {
     return other === this;
+  }
+
+  public isSubtypeOf(_: IType): boolean {
+    return false;
+  }
+
+  public isSupertypeOf(_: IType): boolean {
+    return true;
+  }
+}
+
+/**
+ * The singleton instance of the Something type.
+ */
+export const SOMETHING_TYPE: Type = new Something();
+
+/**
+ * A concrete type has no parameters and exactly one supertype (Something) and
+ *  exactly one subtype (Nothing);
+ */
+export class ConcreteType implements IType {
+
+  public readonly methods: FunctionType[] = [];
+  public readonly kind = TypeKind.Concrete;
+  constructor(public readonly name: string) {}
+
+  public isSubtypeOf(other: IType): boolean {
+    return other === this || other === SOMETHING_TYPE;
+  }
+
+  public isSupertypeOf(other: IType): boolean {
+    return other === NOTHING_TYPE;
+  }
+
+  public isAssignableTo(other: IType): boolean {
+    return this.isSubtypeOf(other);
   }
 }
 
@@ -52,30 +140,30 @@ export class ExactType extends Type {
  *
  * Function types are structural.
  */
-export class FunctionType extends Type {
+export class FunctionType implements IType {
+
   public get name(): string {
     return `(${this.parameterTypes.map(type => type.name).join(', ')}) -> ${
       this.returnType.name
     }`;
   }
-  public methods: IMethodTable = {};
+
+  public readonly kind = TypeKind.Function;
   constructor(
     public readonly parameterTypes: Type[],
     public readonly returnType: Type
-  ) {
-    super();
-  }
+  ) {}
 
-  public isAssignableTo(other: Type): boolean {
+  public isSubtypeOf(other: IType): boolean {
     if (other instanceof FunctionType) {
-      if (!this.returnType.isAssignableTo(other.returnType)) {
+      if (!this.returnType.isSubtypeOf(other.returnType)) {
         return false;
       }
       if (this.parameterTypes.length !== other.parameterTypes.length) {
         return false;
       }
       for (let i = 0; i < this.parameterTypes.length; i++) {
-        if (!this.parameterTypes[i].isAssignableTo(other.parameterTypes[i])) {
+        if (!this.parameterTypes[i].isSubtypeOf(other.parameterTypes[i])) {
           return false;
         }
       }
@@ -83,115 +171,19 @@ export class FunctionType extends Type {
     }
     return false;
   }
+
+  public isSupertypeOf(other: IType): boolean {
+    return other === NOTHING_TYPE;
+  }
+
+  public isAssignableTo(other: IType): boolean {
+    return this.isSubtypeOf(other);
+  }
 }
 
-/**
- * The type of Strings.
- */
-export const STRING_TYPE: Type = new ExactType('String');
-
-/**
- * The type of Numbers.
- */
-export const NUMBER_TYPE: Type = new ExactType('Number');
-
-/**
- * The type of Booleans.
- */
-export const BOOLEAN_TYPE: Type = new ExactType('Boolean');
 /**
  * The Void type.
  *
  * This represents "no value."
  */
-export const VOID_TYPE: Type = new ExactType('()');
-
-/**
- * The bottom type.
- *
- * This represents a program failure or exception.
- */
-export const BOTTOM_TYPE: Type = new ExactType('⊥');
-
-/**
- * The declaration of the Boolean type.
- */
-export const BOOLEAN_DECLARATION = new TypeDeclaration(BOOLEAN_TYPE, {
-  [Operator.LogicalAnd.name]: new FunctionType(
-    [BOOLEAN_TYPE, BOOLEAN_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.LogicalAnd.name]: new FunctionType(
-    [BOOLEAN_TYPE, BOOLEAN_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.LogicalNot.name]: new FunctionType([BOOLEAN_TYPE], BOOLEAN_TYPE),
-  [Operator.Equality.name]: new FunctionType(
-    [BOOLEAN_TYPE, BOOLEAN_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.Inequality.name]: new FunctionType(
-    [BOOLEAN_TYPE, BOOLEAN_TYPE],
-    BOOLEAN_TYPE
-  ),
-});
-
-/**
- * The declaration of the number type.
- */
-export const NUMBER_DECLARATION = new TypeDeclaration(NUMBER_TYPE, {
-  [Operator.PrefixIncrement.name]: new FunctionType([NUMBER_TYPE], NUMBER_TYPE),
-  [Operator.PostfixIncrement.name]: new FunctionType(
-    [NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.PrefixDecrement.name]: new FunctionType([NUMBER_TYPE], NUMBER_TYPE),
-  [Operator.PostfixDecrement.name]: new FunctionType(
-    [NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Addition.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Subtraction.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Multiplication.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Division.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Remainder.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    NUMBER_TYPE
-  ),
-  [Operator.Equality.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.Inequality.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.LessThan.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.GreaterThan.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.LessThanOrEqual.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-  [Operator.GreaterThanOrEqual.name]: new FunctionType(
-    [NUMBER_TYPE, NUMBER_TYPE],
-    BOOLEAN_TYPE
-  ),
-});
+export const VOID_TYPE: Type = new ConcreteType('()');
