@@ -6,7 +6,7 @@ import {
   isLetter,
   isWhiteSpace,
 } from '../agnostic/strings';
-import * as token from './ast/token';
+import * as tokens from './ast/token';
 
 function isIdentifier(character: number): boolean {
   return isIdentifierStart(character) || isDigit(character);
@@ -22,7 +22,7 @@ function isIdentifierStart(character: number): boolean {
 export function tokenize(
   program: string,
   onError?: ErrorReporter
-): token.Token[] {
+): tokens.Token[] {
   return new ClutchLexer().scanProgram(new StringScanner(program), onError);
 }
 
@@ -36,23 +36,24 @@ export type ErrorReporter = (span: ISourceSpan, error: string) => void;
  */
 export class ClutchLexer {
   public static readonly keywords: {
-    [index: string]: token.ITokenTypes;
+    [index: string]: tokens.IKeywordTokenType;
   } = {
-    const: token.$Const,
-    else: token.$Else,
-    false: token.$False,
-    if: token.$If,
-    let: token.$Else,
-    return: token.$Return,
-    then: token.$Then,
-    true: token.$True,
-    type: token.$Type,
+    const: tokens.$Const,
+    else: tokens.$Else,
+    external: tokens.$External,
+    false: tokens.$False,
+    if: tokens.$If,
+    let: tokens.$Let,
+    return: tokens.$Return,
+    then: tokens.$Then,
+    true: tokens.$True,
+    type: tokens.$Type,
   };
 
   private program!: StringScanner;
   private onError!: ErrorReporter;
   private position!: number;
-  private lastComments: token.Token[] = [];
+  private lastComments: tokens.Token[] = [];
 
   public scanProgram(
     program: StringScanner,
@@ -61,91 +62,91 @@ export class ClutchLexer {
         `${message} "${span.text}" at ${span.line}:${span.column}`
       );
     }
-  ): token.Token[] {
+  ): tokens.Token[] {
     this.position = 0;
     this.program = program;
     this.onError = onError;
-    const tokens: token.Token[] = [];
+    const scanned: tokens.Token[] = [];
     while (program.hasNext()) {
-      const t = this.scanToken();
-      if (t) {
-        tokens.push(t);
+      const token = this.scanToken();
+      if (token) {
+        scanned.push(token);
       }
     }
-    tokens.push(this.createToken(token.$EOF, ''));
-    return tokens;
+    scanned.push(this.createToken(tokens.$EOF, ''));
+    return scanned;
   }
 
-  private scanToken(): token.Token | undefined {
+  private scanToken(): tokens.Token | undefined {
     const character = this.program.advance();
     switch (character) {
       case Characters.$LPAREN: // "("
-        return this.createToken(token.$LeftParen);
+        return this.createToken(tokens.$LeftParen);
       case Characters.$RPAREN: // ")"
-        return this.createToken(token.$RightParen);
+        return this.createToken(tokens.$RightParen);
       case Characters.$LCURLY: // "{"
-        return this.createToken(token.$LeftCurly);
+        return this.createToken(tokens.$LeftCurly);
       case Characters.$RCURLY: // "}"
-        return this.createToken(token.$RightCurly);
+        return this.createToken(tokens.$RightCurly);
       case Characters.$COLON: // ":"
-        return this.createToken(token.$Colon);
+        return this.createToken(tokens.$Colon);
       case Characters.$PERIOD: // "."
-        return this.createToken(token.$Period);
+        return this.createToken(tokens.$Period);
       case Characters.$PLUS: // "+" or "+=" or "++"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? token.$PlusEquals
+            ? tokens.$PlusEquals
             : this.program.match(Characters.$PLUS)
-              ? token.$PlusPlus
-              : token.$Plus
+              ? tokens.$PlusPlus
+              : tokens.$Plus
         );
       case Characters.$MINUS: // "-" or "--" or "-=" or "->"
         return this.createToken(
           this.program.match(Characters.$RANGLE)
-            ? token.$DashRightAngle
+            ? tokens.$DashRightAngle
             : this.program.match(Characters.$EQUALS)
-              ? token.$DashEquals
+              ? tokens.$DashEquals
               : this.program.match(Characters.$MINUS)
-                ? token.$DashDash
-                : token.$Dash
+                ? tokens.$DashDash
+                : tokens.$Dash
           // Code coverage considers the `);` to be a missed line :(
           /* istanbul ignore next */
         );
       case Characters.$STAR: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? token.$StarEquals
-            : token.$Star
+            ? tokens.$StarEquals
+            : tokens.$Star
         );
       case Characters.$PERCENT: // "*" or "*="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? token.$PercentEquals
-            : token.$Percent
+            ? tokens.$PercentEquals
+            : tokens.$Percent
         );
       case Characters.$EQUALS: // "=" or "==" or "==="
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? token.$EqualsEqualsEquals
-              : token.$EqualsEquals
-            : token.$Equals
+              ? tokens.$EqualsEqualsEquals
+              : tokens.$EqualsEquals
+            : tokens.$Equals
         );
       case Characters.$LANGLE: // "<" or "<=" or "<<"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? token.$LeftAngleEquals
+            ? tokens.$LeftAngleEquals
             : this.program.match(Characters.$LANGLE)
-              ? token.$LeftAngleLeftAngle
-              : token.$LeftAngle
+              ? tokens.$LeftAngleLeftAngle
+              : tokens.$LeftAngle
         );
       case Characters.$RANGLE: // ">" or ">=" or ">>"
         return this.createToken(
           this.program.match(Characters.$EQUALS)
-            ? token.$RightAngleEquals
+            ? tokens.$RightAngleEquals
             : this.program.match(Characters.$RANGLE)
-              ? token.$RightAngleRightAngle
-              : token.$RightAngle
+              ? tokens.$RightAngleRightAngle
+              : tokens.$RightAngle
         );
       case Characters.$SLASH: // "/" or "//" or "/="
         return this.scanSlash();
@@ -153,23 +154,23 @@ export class ClutchLexer {
         return this.scanString();
       case Characters.$PIPE: // "|" or "||"
         return this.createToken(
-          this.program.match(Characters.$PIPE) ? token.$PipePipe : token.$Pipe
+          this.program.match(Characters.$PIPE) ? tokens.$PipePipe : tokens.$Pipe
         );
       case Characters.$AND: // "&" or "&&"
         return this.createToken(
-          this.program.match(Characters.$AND) ? token.$AndAnd : token.$And
+          this.program.match(Characters.$AND) ? tokens.$AndAnd : tokens.$And
         );
       case Characters.$TILDE: // "~"
-        return this.createToken(token.$Tilde);
+        return this.createToken(tokens.$Tilde);
       case Characters.$CARET: // "^"
-        return this.createToken(token.$Caret);
+        return this.createToken(tokens.$Caret);
       case Characters.$EXCLAIM: // "!" or "!=" or "!==""
         return this.createToken(
           this.program.match(Characters.$EQUALS)
             ? this.program.match(Characters.$EQUALS)
-              ? token.$ExclaimEqualsEquals
-              : token.$ExclaimEquals
-            : token.$Exclaim
+              ? tokens.$ExclaimEqualsEquals
+              : tokens.$ExclaimEquals
+            : tokens.$Exclaim
         );
       default:
         if (isWhiteSpace(character)) {
@@ -192,25 +193,25 @@ export class ClutchLexer {
   /**
    * Scans a string, returning `undefined` if there was no string.
    */
-  private scanString(): token.Token {
+  private scanString(): tokens.Token {
     while (this.program.hasNext()) {
       if (this.program.match(Characters.$SQUOTE)) {
         this.position++;
         let lexeme = this.substring();
         lexeme = lexeme.substring(0, lexeme.length - 1);
-        return this.createToken(token.$String, lexeme);
+        return this.createToken(tokens.$String, lexeme);
       }
       this.program.advance();
     }
     this.reportError('Unterminated string');
     this.position++;
-    return this.createToken(token.$String);
+    return this.createToken(tokens.$String);
   }
 
   /**
    * Scans any tokens that are valid numeric literals
    */
-  private scanNumber(starting: number): token.Token {
+  private scanNumber(starting: number): tokens.Token {
     if (starting === Characters.$0) {
       if (
         this.program.match(Characters.$X) ||
@@ -241,28 +242,28 @@ export class ClutchLexer {
   /**
    * Scans any tokens that are valid hexadecimel digits, returning a number.
    */
-  private scanHexNumber(): token.Token {
+  private scanHexNumber(): tokens.Token {
     this.scanPredicate(isHexadecimal);
-    return this.createToken(token.$Number);
+    return this.createToken(tokens.$Number);
   }
 
   /**
    * Scans any tokens that are valid digits, returning a number.
    */
-  private scanDigits(): token.Token {
+  private scanDigits(): tokens.Token {
     this.scanPredicate(isDigit);
-    return this.createToken(token.$Number);
+    return this.createToken(tokens.$Number);
   }
 
   /**
    * Scans any tokens that are valid identifiers.
    */
-  private scanIdentifierOrKeyword(): token.Token {
+  private scanIdentifierOrKeyword(): tokens.Token {
     this.scanPredicate(isIdentifier);
     const identifierOrKeyword = this.substring();
-    return new token.Token(
+    return new tokens.Token(
       this.position - identifierOrKeyword.length,
-      ClutchLexer.keywords[identifierOrKeyword] || token.$Identifier,
+      ClutchLexer.keywords[identifierOrKeyword] || tokens.$Identifier,
       this.clearComments(),
       identifierOrKeyword
     );
@@ -271,14 +272,14 @@ export class ClutchLexer {
   /**
    * Scans tokens preceding with "/".
    */
-  private scanSlash(): token.Token | undefined {
+  private scanSlash(): tokens.Token | undefined {
     // "//"
     if (this.program.match(Characters.$SLASH)) {
       this.advanceToEOL();
       this.lastComments.push(
-        new token.Token(
+        new tokens.Token(
           this.position,
-          token.$Comment,
+          tokens.$Comment,
           [],
           this.substring().trim()
         )
@@ -287,7 +288,9 @@ export class ClutchLexer {
     }
     // "/" or "/="
     return this.createToken(
-      this.program.match(Characters.$EQUALS) ? token.$SlashEquals : token.$Slash
+      this.program.match(Characters.$EQUALS)
+        ? tokens.$SlashEquals
+        : tokens.$Slash
     );
   }
 
@@ -329,10 +332,10 @@ export class ClutchLexer {
    * Returns a new token with a @param kind and the current substring.
    */
   private createToken(
-    kind: token.ITokenTypes,
+    kind: tokens.ITokenTypes,
     content = this.substring()
-  ): token.Token {
-    return new token.Token(
+  ): tokens.Token {
+    return new tokens.Token(
       this.position - content.length,
       kind,
       this.clearComments(),
@@ -343,7 +346,7 @@ export class ClutchLexer {
   /**
    * Clear and retrieve comments lexed.
    */
-  private clearComments(): token.Token[] {
+  private clearComments(): tokens.Token[] {
     const comments = this.lastComments;
     this.lastComments = [];
     return comments;

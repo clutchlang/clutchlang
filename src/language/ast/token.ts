@@ -3,35 +3,19 @@
  */
 export class Token {
   /**
-   * Lexeme reprensting this token.
+   * Create a new token.
+   *
+   * @param offset Offset from the beginning of the file to the first character.
+   * @param type Type of the token.
+   * @param comments Precedencing comments before the token.
+   * @param lexeme Lexeme representing this token.
    */
-  public readonly lexeme: string;
-
   constructor(
-    /**
-     * Offset from the beginning of the file to the first character here.
-     */
     public readonly offset: number,
-    /**
-     * Type of the token.
-     */
     public readonly type: ITokenTypes,
-    /**
-     * Precedencing comments before the token.
-     */
-    public readonly comments: Token[] = [],
-    /**
-     * Lexeme reprensting this token.
-     */
-    lexeme?: string
-  ) {
-    if (this.type.kind === 'marker') {
-      this.lexeme = '';
-      return;
-    }
-    this.lexeme =
-      lexeme || (this.type.kind !== 'literal' ? this.type.lexeme : '');
-  }
+    public readonly comments: Token[],
+    public readonly lexeme: string
+  ) {}
 
   /**
    * Offset from the beginning of the file to the last character here.
@@ -48,10 +32,10 @@ export class Token {
   }
 
   /**
-   * Whether this is a literal token.
+   * Whether this is an end-of-file token.
    */
-  public get isLiteral(): boolean {
-    return this.type.kind === 'literal';
+  public get isEndOfFile(): boolean {
+    return this.type.kind === 'marker' && this.type.name === '<EOF>';
   }
 
   /**
@@ -71,10 +55,10 @@ export class Token {
   }
 
   /**
-   * Whether this is an end-of-file token.
+   * Whether this is a literal token.
    */
-  public get isEof(): boolean {
-    return this.type.kind === 'marker' && this.type.name === '<EOF>';
+  public get isLiteral(): boolean {
+    return this.type.kind === 'literal';
   }
 
   /**
@@ -128,6 +112,7 @@ export interface IKeywordTokenType extends ITokenType {
   readonly lexeme:
     | 'const'
     | 'else'
+    | 'external'
     | 'false'
     | 'if'
     | 'let'
@@ -241,6 +226,11 @@ export const $Const: IKeywordTokenType = {
 export const $Else: IKeywordTokenType = {
   kind: 'keyword',
   lexeme: 'else',
+};
+
+export const $External: IKeywordTokenType = {
+  kind: 'keyword',
+  lexeme: 'external',
 };
 
 export const $False: IKeywordTokenType = {

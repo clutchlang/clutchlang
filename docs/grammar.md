@@ -38,26 +38,33 @@ See ["Design Note: Implicit Semiclons"][1] in _Crafting Interpreters_ for more.
 
 start<br>
 **clutchFile**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`topLevelElement*`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`topLevelDeclarations*`<br>
 &nbsp;&nbsp;;
 
-**topLevelElement**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`class`<br>
+**topLevelDeclarations**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`function`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`type`<br>
 &nbsp;&nbsp;;
 
-### Elements
+### Declarations
+
+**fieldOrParamter**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`Identifier`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`typeAnnotation?`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"=" expression?`<br>
+&nbsp;&nbsp;;
 
 **function**<br>
-&nbsp;&nbsp;:&nbsp;&nbsp;`SimpleName`<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`Identifier`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`parameterList?`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`typeAnnotation?`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`"->"`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `block` )<br>
 &nbsp;&nbsp;;
 
 **parameterList**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`"("`<br>
-&nbsp;&nbsp; &nbsp;&nbsp;`identifier*`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`fieldOrParamter*`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`")"`<br>
 &nbsp;&nbsp;;
 
@@ -66,6 +73,23 @@ start<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`SimpleName`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`"="`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp;;
+
+**type**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`"external"?`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"type"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"{"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`typeMember*`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"}"`<br>
+&nbsp;&nbsp;;
+
+**typeAnnotation**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;`":"`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`Identifier`<br>
+&nbsp;&nbsp;;
+
+**typeMember**<br>
+&nbsp;&nbsp;:&nbsp;&nbsp;( `function` | `fieldOrParamter` )<br>
 &nbsp;&nbsp;;
 
 ### Statements
@@ -142,6 +166,7 @@ start<br>
 **conditional**<br>
 &nbsp;&nbsp;:&nbsp;&nbsp;`"if"`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`expression`<br>
+&nbsp;&nbsp; &nbsp;&nbsp;`"then"`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `statementBlock` )<br>
 &nbsp;&nbsp; &nbsp;&nbsp;`"else"?`<br>
 &nbsp;&nbsp; &nbsp;&nbsp;( `expression` | `statementBlock` )<br>
