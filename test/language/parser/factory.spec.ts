@@ -1,6 +1,6 @@
 // tslint:disable:no-magic-numbers
 
-import * as tokens from '../../../src/language/ast/token';
+import * as ast from '../../../src/ast';
 import {
   AstNodeFactory,
   Operator,
@@ -8,8 +8,8 @@ import {
   PrintTreeVisitor,
 } from '../../../src/language/parser';
 
-function toToken(type: tokens.ITokenTypes): tokens.Token {
-  return new tokens.Token(
+function toToken(type: ast.ITokenTypes): ast.Token {
+  return new ast.Token(
     0,
     type,
     [],
@@ -22,15 +22,15 @@ describe('AstNodeFactory', () => {
   const visitor = new PrintTreeVisitor();
 
   const a = factory.createLiteralIdentifier(
-    new tokens.Token(0, tokens.$Identifier, [], 'a')
+    new ast.Token(0, ast.$Identifier, [], 'a')
   );
 
   const b = factory.createLiteralIdentifier(
-    new tokens.Token(0, tokens.$Identifier, [], 'b')
+    new ast.Token(0, ast.$Identifier, [], 'b')
   );
 
   it('should create a file root', () => {
-    const $arrow = toToken(tokens.$DashRightAngle);
+    const $arrow = toToken(ast.$DashRightAngle);
     const $function = factory.createFunctionDeclaration(
       a,
       [],
@@ -47,7 +47,7 @@ describe('AstNodeFactory', () => {
   });
 
   it('should create a function', () => {
-    const $arrow = new tokens.Token(0, tokens.$DashRightAngle, [], '->');
+    const $arrow = new ast.Token(0, ast.$DashRightAngle, [], '->');
     const $function = factory.createFunctionDeclaration(
       a,
       [new ParameterDeclaration(b)],
@@ -67,7 +67,7 @@ describe('AstNodeFactory', () => {
 
   describe('<Expression>', () => {
     it('should create BinaryExpression', () => {
-      const $plus = toToken(tokens.$Plus);
+      const $plus = toToken(ast.$Plus);
       const expr = factory.createBinaryExpression(
         a,
         Operator.Addition,
@@ -84,7 +84,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should create prefix UnaryExpression', () => {
-      const $negate = toToken(tokens.$Exclaim);
+      const $negate = toToken(ast.$Exclaim);
       const expr = factory.createUnaryExpression(
         a,
         Operator.UnaryNegative,
@@ -99,7 +99,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should create postfix UnaryExpression', () => {
-      const $accessor = toToken(tokens.$Period);
+      const $accessor = toToken(ast.$Period);
       const expr = factory.createUnaryExpression(
         a,
         Operator.MemberAccess,
@@ -114,8 +114,8 @@ describe('AstNodeFactory', () => {
     });
 
     it('should create GroupExpression', () => {
-      const $lp = toToken(tokens.$LeftParen);
-      const $rp = toToken(tokens.$RightParen);
+      const $lp = toToken(ast.$LeftParen);
+      const $rp = toToken(ast.$RightParen);
       const expr = factory.createGroupExpression($lp, $rp, a);
       expect(expr.expression).toEqual(a);
       expect(expr.firstToken).toEqual($lp);
@@ -124,8 +124,8 @@ describe('AstNodeFactory', () => {
     });
 
     describe('should create IfExpression', () => {
-      const $if = toToken(tokens.$If);
-      const $then = toToken(tokens.$Then);
+      const $if = toToken(ast.$If);
+      const $then = toToken(ast.$Then);
 
       it('', () => {
         const expr = factory.createConditionalExpression($if, a, $then, b);
@@ -140,7 +140,7 @@ describe('AstNodeFactory', () => {
       });
 
       it('with else', () => {
-        const $else = toToken(tokens.$Else);
+        const $else = toToken(ast.$Else);
         const expr = factory.createConditionalExpression(
           $if,
           a,
@@ -163,8 +163,8 @@ describe('AstNodeFactory', () => {
 
   describe('Statement', () => {
     it('should create a block', () => {
-      const $lc = toToken(tokens.$LeftCurly);
-      const $rc = toToken(tokens.$RightCurly);
+      const $lc = toToken(ast.$LeftCurly);
+      const $rc = toToken(ast.$RightCurly);
       const stmt = factory.createStatementBlock($lc, [], $rc);
       expect(stmt.firstToken).toEqual($lc);
       expect(stmt.statements).toEqual([]);
@@ -172,7 +172,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should create a return statement', () => {
-      const $return = toToken(tokens.$Return);
+      const $return = toToken(ast.$Return);
       const stmt = factory.createReturnStatement($return, a);
       expect(stmt.expression).toEqual(a);
       expect(stmt.firstToken).toEqual($return);
@@ -181,8 +181,8 @@ describe('AstNodeFactory', () => {
     });
 
     it('should create a let statement', () => {
-      const $let = toToken(tokens.$Let);
-      const $eq = toToken(tokens.$EqualsEquals);
+      const $let = toToken(ast.$Let);
+      const $eq = toToken(ast.$EqualsEquals);
       const stmt = factory.createVariableDeclarationStatement(
         $let,
         a,
@@ -200,8 +200,8 @@ describe('AstNodeFactory', () => {
   });
 
   it('should create an invoke expression', () => {
-    const $open = toToken(tokens.$LeftParen);
-    const $close = toToken(tokens.$RightParen);
+    const $open = toToken(ast.$LeftParen);
+    const $close = toToken(ast.$RightParen);
     const expr = factory.createFunctionCallExpression(a, $open, [], $close);
     expect(expr.closeToken).toEqual($close);
     expect(expr.firstToken).toEqual(a.firstToken);
@@ -214,7 +214,7 @@ describe('AstNodeFactory', () => {
 
   describe('LiteralBoolean', () => {
     it('should evaluate true', () => {
-      const token = toToken(tokens.$True);
+      const token = toToken(ast.$True);
       const $true = factory.createLiteralBoolean(token);
       expect($true.firstToken).toBe(token);
       expect($true.lastToken).toBe(token);
@@ -223,7 +223,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate false', () => {
-      const token = toToken(tokens.$False);
+      const token = toToken(ast.$False);
       const $false = factory.createLiteralBoolean(token);
       expect($false.firstToken).toBe(token);
       expect($false.lastToken).toBe(token);
@@ -234,7 +234,7 @@ describe('AstNodeFactory', () => {
 
   describe('LiteralNumber', () => {
     it('should evaluate int', () => {
-      const token = new tokens.Token(0, tokens.$Number, [], '1');
+      const token = new ast.Token(0, ast.$Number, [], '1');
       const $1 = factory.createLiteralNumber(token);
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
@@ -243,7 +243,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate float', () => {
-      const token = new tokens.Token(0, tokens.$Number, [], '1.5');
+      const token = new ast.Token(0, ast.$Number, [], '1.5');
       const $1 = factory.createLiteralNumber(token);
       expect($1.firstToken).toBe(token);
       expect($1.lastToken).toBe(token);
@@ -252,7 +252,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate hex', () => {
-      const token = new tokens.Token(0, tokens.$Number, [], '0xFFF');
+      const token = new ast.Token(0, ast.$Number, [], '0xFFF');
       const $0xFFF = factory.createLiteralNumber(token);
       expect($0xFFF.firstToken).toBe(token);
       expect($0xFFF.lastToken).toBe(token);
@@ -261,7 +261,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate exponential', () => {
-      const token = new tokens.Token(0, tokens.$Number, [], '2e6');
+      const token = new ast.Token(0, ast.$Number, [], '2e6');
       const $2e6 = factory.createLiteralNumber(token);
       expect($2e6.firstToken).toBe(token);
       expect($2e6.lastToken).toBe(token);
@@ -272,7 +272,7 @@ describe('AstNodeFactory', () => {
 
   describe('LiteralString', () => {
     it('should evaluate an empty string', () => {
-      const token = new tokens.Token(0, tokens.$String, [], '');
+      const token = new ast.Token(0, ast.$String, [], '');
       const empty = factory.createLiteralString(token);
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
@@ -281,7 +281,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate a single-line string', () => {
-      const token = new tokens.Token(0, tokens.$String, [], 'Hello');
+      const token = new ast.Token(0, ast.$String, [], 'Hello');
       const empty = factory.createLiteralString(token);
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
@@ -289,12 +289,7 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate a single-line string with escaped newlines', () => {
-      const token = new tokens.Token(
-        0,
-        tokens.$String,
-        [],
-        String.raw`Hello\nWorld`
-      );
+      const token = new ast.Token(0, ast.$String, [], String.raw`Hello\nWorld`);
       const empty = factory.createLiteralString(token);
       expect(empty.firstToken).toBe(token);
       expect(empty.lastToken).toBe(token);
@@ -302,9 +297,9 @@ describe('AstNodeFactory', () => {
     });
 
     it('should evaluate a multi-line string', () => {
-      const token = new tokens.Token(
+      const token = new ast.Token(
         0,
-        tokens.$String,
+        ast.$String,
         [],
         `
         <html>
@@ -320,7 +315,7 @@ describe('AstNodeFactory', () => {
   });
 
   it('SimpleName should implement AstNode', () => {
-    const token = new tokens.Token(0, tokens.$Identifier, [], 'fooBar');
+    const token = new ast.Token(0, ast.$Identifier, [], 'fooBar');
     const fooBar = factory.createLiteralIdentifier(token);
     expect(fooBar.firstToken).toBe(token);
     expect(fooBar.lastToken).toBe(token);

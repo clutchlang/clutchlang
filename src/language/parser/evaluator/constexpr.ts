@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as ast from '../../../ast';
 import {
   BinaryExpression,
   ConditionalExpression,
@@ -36,7 +36,7 @@ export function evaluateConstExpression(
 }
 
 // default token for synthetic nodes.
-const token = new tokens.Token(-1, tokens.$EOF, [], '');
+const token = new ast.Token(-1, ast.$EOF, [], '');
 
 /**
  * The maximum recursion depth for `constexpr` evaluation.

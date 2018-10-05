@@ -1,5 +1,5 @@
 import { splitLines, unescapeString } from '../../agnostic/strings';
-import * as tokens from '../ast/token';
+import * as ast from '../../ast';
 import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,
@@ -37,7 +37,7 @@ export class AstNodeFactory {
     name: LiteralIdentifier,
     parameters: ParameterDeclaration[],
     type: LiteralIdentifier | undefined,
-    arrowToken: tokens.Token,
+    arrowToken: ast.Token,
     body: Expression | StatementBlock,
     isConst: boolean
   ): FunctionDeclaration {
@@ -61,7 +61,7 @@ export class AstNodeFactory {
   public createUnaryExpression(
     target: Expression,
     operator: Operator,
-    operatorToken: tokens.Token,
+    operatorToken: ast.Token,
     isPrefix: boolean
   ): UnaryExpression {
     return new UnaryExpression(target, operator, operatorToken, isPrefix);
@@ -70,26 +70,26 @@ export class AstNodeFactory {
   public createBinaryExpression(
     left: Expression,
     operator: Operator,
-    operatorToken: tokens.Token,
+    operatorToken: ast.Token,
     right: Expression
   ): BinaryExpression {
     return new BinaryExpression(left, operator, operatorToken, right);
   }
 
   public createGroupExpression(
-    leftParen: tokens.Token,
-    rightParen: tokens.Token,
+    leftParen: ast.Token,
+    rightParen: ast.Token,
     expression: Expression
   ): GroupExpression {
     return new GroupExpression(leftParen, rightParen, expression);
   }
 
   public createConditionalExpression(
-    ifToken: tokens.Token,
+    ifToken: ast.Token,
     condition: Expression,
-    thenToken: tokens.Token,
+    thenToken: ast.Token,
     body: Expression | StatementBlock,
-    elseToken?: tokens.Token,
+    elseToken?: ast.Token,
     elseBody?: Expression | StatementBlock
   ): ConditionalExpression {
     return new ConditionalExpression(
@@ -104,29 +104,29 @@ export class AstNodeFactory {
 
   public createFunctionCallExpression(
     target: Expression,
-    openToken: tokens.Token,
+    openToken: ast.Token,
     parameters: Expression[],
-    closeToken: tokens.Token
+    closeToken: ast.Token
   ): InvokeExpression {
     return new InvokeExpression(target, openToken, parameters, closeToken);
   }
 
   public createStatementBlock(
-    start: tokens.Token,
+    start: ast.Token,
     statements: Statement[],
-    end: tokens.Token
+    end: ast.Token
   ) {
     return new StatementBlock(start, statements, end);
   }
 
-  public createReturnStatement(keyword: tokens.Token, expression?: Expression) {
+  public createReturnStatement(keyword: ast.Token, expression?: Expression) {
     return new ReturnStatement(keyword, expression);
   }
 
   public createVariableDeclarationStatement(
-    start: tokens.Token,
+    start: ast.Token,
     name: LiteralIdentifier,
-    assign: tokens.Token,
+    assign: ast.Token,
     expression: Expression,
     isConst: boolean
   ) {
@@ -139,19 +139,19 @@ export class AstNodeFactory {
     );
   }
 
-  public createLiteralIdentifier(token: tokens.Token): LiteralIdentifier {
+  public createLiteralIdentifier(token: ast.Token): LiteralIdentifier {
     return new LiteralIdentifier(token, token.lexeme);
   }
 
-  public createLiteralBoolean(token: tokens.Token): LiteralBoolean {
+  public createLiteralBoolean(token: ast.Token): LiteralBoolean {
     return new LiteralBoolean(token, token.lexeme === 'true');
   }
 
-  public createLiteralNumber(token: tokens.Token): LiteralNumber {
+  public createLiteralNumber(token: ast.Token): LiteralNumber {
     return new LiteralNumber(token, this.parseLiteralNumberValue(token.lexeme));
   }
 
-  public createLiteralString(token: tokens.Token): LiteralString {
+  public createLiteralString(token: ast.Token): LiteralString {
     return new LiteralString(token, this.parseLiteralStringValue(token.lexeme));
   }
 

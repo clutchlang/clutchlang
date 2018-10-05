@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as ast from '../../../ast';
 import { Operator } from '../../parser';
 import { LiteralIdentifier } from '../nodes/expressions';
 import { Expression } from '../nodes/nodes';
@@ -20,7 +20,7 @@ export class ExpressionParser extends AbstractParser {
   }
 
   public parseIdentifier(): LiteralIdentifier {
-    if (this.match(tokens.$Identifier)) {
+    if (this.match(ast.$Identifier)) {
       return this.factory.createLiteralIdentifier(this.peek(-1));
     }
     /* istanbul ignore next */
@@ -32,22 +32,22 @@ export class ExpressionParser extends AbstractParser {
   private parseAssignment(): Expression {
     return this.parseBinary(
       () => this.parseConditional(),
-      tokens.$Equals,
-      tokens.$PlusEquals,
-      tokens.$DashEquals,
-      tokens.$StarEquals,
-      tokens.$SlashEquals,
-      tokens.$PercentEquals
+      ast.$Equals,
+      ast.$PlusEquals,
+      ast.$DashEquals,
+      ast.$StarEquals,
+      ast.$SlashEquals,
+      ast.$PercentEquals
     );
   }
 
   private parseConditional(): Expression {
-    if (this.match(tokens.$If)) {
+    if (this.match(ast.$If)) {
       const ifToken = this.peek(-1);
       const ifBody = this.parseLogicalOr();
       const thenToken = this.advance();
       const thenBody = this.parseLogicalOr();
-      const elseToken = this.match(tokens.$Else) ? this.peek(-1) : undefined;
+      const elseToken = this.match(ast.$Else) ? this.peek(-1) : undefined;
       const elseBody = elseToken ? this.parseLogicalOr() : undefined;
       return this.factory.createConditionalExpression(
         ifToken,
@@ -62,74 +62,74 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseLogicalOr(): Expression {
-    return this.parseBinary(() => this.parseLogicalAnd(), tokens.$PipePipe);
+    return this.parseBinary(() => this.parseLogicalAnd(), ast.$PipePipe);
   }
 
   private parseLogicalAnd(): Expression {
-    return this.parseBinary(() => this.parseEquality(), tokens.$AndAnd);
+    return this.parseBinary(() => this.parseEquality(), ast.$AndAnd);
   }
 
   private parseEquality(): Expression {
     return this.parseBinary(
       () => this.parseComparison(),
-      tokens.$EqualsEquals,
-      tokens.$ExclaimEquals,
-      tokens.$EqualsEqualsEquals,
-      tokens.$ExclaimEqualsEquals
+      ast.$EqualsEquals,
+      ast.$ExclaimEquals,
+      ast.$EqualsEqualsEquals,
+      ast.$ExclaimEqualsEquals
     );
   }
 
   private parseComparison(): Expression {
     return this.parseBinary(
       () => this.parseBitwiseShift(),
-      tokens.$LeftAngle,
-      tokens.$RightAngle,
-      tokens.$LeftAngleEquals,
-      tokens.$RightAngleEquals
+      ast.$LeftAngle,
+      ast.$RightAngle,
+      ast.$LeftAngleEquals,
+      ast.$RightAngleEquals
     );
   }
 
   private parseBitwiseShift(): Expression {
     return this.parseBinary(
       () => this.parseAdditive(),
-      tokens.$LeftAngleLeftAngle,
-      tokens.$RightAngleRightAngle
+      ast.$LeftAngleLeftAngle,
+      ast.$RightAngleRightAngle
     );
   }
 
   private parseAdditive(): Expression {
     return this.parseBinary(
       () => this.parseMultiplicative(),
-      tokens.$Plus,
-      tokens.$Dash
+      ast.$Plus,
+      ast.$Dash
     );
   }
 
   private parseMultiplicative(): Expression {
     return this.parseBinary(
       () => this.parseUnaryPrefix(),
-      tokens.$Star,
-      tokens.$Slash,
-      tokens.$Percent
+      ast.$Star,
+      ast.$Slash,
+      ast.$Percent
     );
   }
 
   private parseUnaryPrefix(): Expression {
     return this.parsePrefix(
       () => this.parseUnaryPostfix(),
-      tokens.$Dash,
-      tokens.$Plus,
-      tokens.$PlusPlus,
-      tokens.$DashDash,
-      tokens.$Exclaim
+      ast.$Dash,
+      ast.$Plus,
+      ast.$PlusPlus,
+      ast.$DashDash,
+      ast.$Exclaim
     );
   }
 
   private parseUnaryPostfix(): Expression {
     return this.parsePostfix(
       () => this.parseFunctionCall(),
-      tokens.$PlusPlus,
-      tokens.$DashDash
+      ast.$PlusPlus,
+      ast.$DashDash
     );
   }
 
@@ -137,7 +137,7 @@ export class ExpressionParser extends AbstractParser {
     let expression = this.parseMemberAccess();
     // tslint:disable-next-line:no-constant-condition
     while (true) {
-      if (this.match(tokens.$LeftParen)) {
+      if (this.match(ast.$LeftParen)) {
         expression = this.finishFunctionCall(expression);
       } else {
         break;
@@ -149,7 +149,7 @@ export class ExpressionParser extends AbstractParser {
   private finishFunctionCall(target: Expression): Expression {
     const args: Expression[] = [];
     const leftParen = this.peek(-1);
-    while (!this.match(tokens.$RightParen)) {
+    while (!this.match(ast.$RightParen)) {
       args.push(this.parseExpression());
     }
     return this.factory.createFunctionCallExpression(
@@ -161,11 +161,11 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseMemberAccess(): Expression {
-    return this.parseBinary(() => this.parseGroup(), tokens.$Period);
+    return this.parseBinary(() => this.parseGroup(), ast.$Period);
   }
 
   private parseGroup(): Expression {
-    if (this.match(tokens.$LeftParen)) {
+    if (this.match(ast.$LeftParen)) {
       const leftParen = this.peek(-1);
       const expression = this.parseExpression();
       const rightParen = this.advance();
@@ -179,13 +179,13 @@ export class ExpressionParser extends AbstractParser {
   }
 
   private parseLiteral(): Expression {
-    if (this.match(tokens.$Number)) {
+    if (this.match(ast.$Number)) {
       return this.factory.createLiteralNumber(this.peek(-1));
     }
-    if (this.match(tokens.$String)) {
+    if (this.match(ast.$String)) {
       return this.factory.createLiteralString(this.peek(-1));
     }
-    if (this.match(tokens.$False, tokens.$True)) {
+    if (this.match(ast.$False, ast.$True)) {
       return this.factory.createLiteralBoolean(this.peek(-1));
     }
     return this.parseIdentifier();
@@ -193,7 +193,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parseBinary(
     parseNext: () => Expression,
-    ...kinds: tokens.ITokenTypes[]
+    ...kinds: ast.ITokenTypes[]
   ): Expression {
     let expr = parseNext();
     while (this.match(...kinds)) {
@@ -210,7 +210,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parsePrefix(
     parseNext: () => Expression,
-    ...kinds: tokens.ITokenTypes[]
+    ...kinds: ast.ITokenTypes[]
   ): Expression {
     if (this.match(...kinds)) {
       const operator = this.peek(-1);
@@ -226,7 +226,7 @@ export class ExpressionParser extends AbstractParser {
 
   private parsePostfix(
     parseNext: () => Expression,
-    ...kinds: tokens.ITokenTypes[]
+    ...kinds: ast.ITokenTypes[]
   ): Expression {
     const operator = this.peek(1);
     if (kinds.some(e => e === operator.type)) {
@@ -242,7 +242,7 @@ export class ExpressionParser extends AbstractParser {
     return parseNext();
   }
 
-  private parseBinaryOp(token: tokens.Token): Operator {
+  private parseBinaryOp(token: ast.Token): Operator {
     switch (token.lexeme) {
       case '.':
         return Operator.MemberAccess;
@@ -295,7 +295,7 @@ export class ExpressionParser extends AbstractParser {
     }
   }
 
-  private parsePrefixOp(token: tokens.Token): Operator {
+  private parsePrefixOp(token: ast.Token): Operator {
     switch (token.lexeme) {
       case '++':
         return Operator.PrefixIncrement;
@@ -314,7 +314,7 @@ export class ExpressionParser extends AbstractParser {
     }
   }
 
-  private parsePostfixOp(token: tokens.Token): Operator {
+  private parsePostfixOp(token: ast.Token): Operator {
     switch (token.lexeme) {
       case '++':
         return Operator.PostfixIncrement;

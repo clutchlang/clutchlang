@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as ast from '../../../ast';
 import { AstVisitor } from '../visitors';
 import { LiteralIdentifier } from './expressions';
 import { StatementBlock } from './statements';
@@ -15,12 +15,12 @@ export abstract class AstNode {
   /**
    * The first token that was scanned to form this node.
    */
-  public abstract get firstToken(): tokens.Token;
+  public abstract get firstToken(): ast.Token;
 
   /**
    * The last token that was scanned to form this node.
    */
-  public abstract get lastToken(): tokens.Token;
+  public abstract get lastToken(): ast.Token;
 }
 
 /**
@@ -35,11 +35,11 @@ export class FileRoot extends AstNode {
     return visitor.visitFileRoot(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.topLevelElements[0].firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return this.topLevelElements[this.topLevelElements.length - 1].lastToken;
   }
 }
@@ -57,7 +57,7 @@ export class FunctionDeclaration extends TopLevelElement {
     public readonly name: LiteralIdentifier,
     public readonly parameters: ParameterDeclaration[],
     public readonly returnType: LiteralIdentifier | undefined,
-    public readonly arrowToken: tokens.Token,
+    public readonly arrowToken: ast.Token,
     public readonly body: Expression | StatementBlock,
     public readonly isConst: boolean
   ) {
@@ -68,11 +68,11 @@ export class FunctionDeclaration extends TopLevelElement {
     return visitor.visitFunctionDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.name.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return this.body.lastToken;
   }
 }
@@ -89,11 +89,11 @@ export class ParameterDeclaration extends AstNode {
     return visitor.visitParameterDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): ast.Token {
     return this.name.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): ast.Token {
     return (this.type || this.name).lastToken;
   }
 }

@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as ast from '../../../ast';
 import {
   Expression,
   FileRoot,
@@ -21,13 +21,13 @@ export class FileParser extends StatementParser {
   private parseFunctionDeclaration(): FunctionDeclaration {
     // TODO: Assert tokens are valid.
     let isConst = false;
-    if (this.match(tokens.$Const)) {
+    if (this.match(ast.$Const)) {
       isConst = true;
     }
     return this.factory.createFunctionDeclaration(
       this.parseIdentifier(),
       this.parseParameterList(),
-      this.match(tokens.$Colon) ? this.parseIdentifier() : undefined,
+      this.match(ast.$Colon) ? this.parseIdentifier() : undefined,
       this.advance(),
       this.parseBody(),
       isConst
@@ -35,10 +35,10 @@ export class FileParser extends StatementParser {
   }
 
   private parseBody(): Expression | StatementBlock {
-    if (this.match(tokens.$LeftCurly)) {
+    if (this.match(ast.$LeftCurly)) {
       const leftCurly = this.peek(-1);
       const statements: Statement[] = [];
-      while (!this.match(tokens.$RightCurly)) {
+      while (!this.match(ast.$RightCurly)) {
         statements.push(this.parseStatement());
       }
       const rightCurly = this.peek(-1);
@@ -52,13 +52,13 @@ export class FileParser extends StatementParser {
   }
 
   private parseParameterList(): ParameterDeclaration[] {
-    if (this.match(tokens.$LeftParen)) {
+    if (this.match(ast.$LeftParen)) {
       const parameters: ParameterDeclaration[] = [];
-      while (!this.match(tokens.$RightParen)) {
+      while (!this.match(ast.$RightParen)) {
         parameters.push(
           this.factory.createParameterDeclaration(
             this.parseIdentifier(),
-            this.match(tokens.$Colon) ? this.parseIdentifier() : undefined
+            this.match(ast.$Colon) ? this.parseIdentifier() : undefined
           )
         );
       }
