@@ -1,4 +1,4 @@
-import { IToken } from '../../lexer';
+import * as tokens from '../../ast/token';
 import { AstVisitor } from '../visitors';
 import { LiteralIdentifier } from './expressions';
 import { Expression, Statement } from './nodes';
@@ -23,9 +23,9 @@ import { Expression, Statement } from './nodes';
  */
 export class StatementBlock {
   constructor(
-    public readonly firstToken: IToken,
+    public readonly firstToken: tokens.Token,
     public readonly statements: Statement[],
-    public readonly lastToken: IToken
+    public readonly lastToken: tokens.Token
   ) {}
 }
 
@@ -34,7 +34,7 @@ export class StatementBlock {
  */
 export class ReturnStatement extends Statement {
   constructor(
-    public readonly firstToken: IToken,
+    public readonly firstToken: tokens.Token,
     public readonly expression?: Expression
   ) {
     super();
@@ -44,7 +44,7 @@ export class ReturnStatement extends Statement {
     return visitor.visitReturnStatement(this, context);
   }
 
-  public get lastToken(): IToken {
+  public get lastToken(): tokens.Token {
     return this.expression ? this.expression.lastToken : this.firstToken;
   }
 }
@@ -54,9 +54,9 @@ export class ReturnStatement extends Statement {
  */
 export class VariableDeclarationStatement extends Statement {
   constructor(
-    public readonly firstToken: IToken,
+    public readonly firstToken: tokens.Token,
     public readonly name: LiteralIdentifier,
-    public readonly assignToken: IToken,
+    public readonly assignToken: tokens.Token,
     public readonly expression: Expression,
     public readonly isConst: boolean
   ) {
@@ -67,7 +67,7 @@ export class VariableDeclarationStatement extends Statement {
     return visitor.visitVariableDeclarationStatement(this, context);
   }
 
-  public get lastToken(): IToken {
+  public get lastToken(): tokens.Token {
     return this.expression.lastToken;
   }
 }
