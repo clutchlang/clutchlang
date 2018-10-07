@@ -26,6 +26,10 @@ describe('Types', () => {
     expect(STRING_TYPE.isAssignableTo(NUMBER_TYPE)).toBe(false);
     expect(STRING_TYPE.isAssignableTo(VOID_TYPE)).toBe(false);
     expect(STRING_TYPE.isAssignableTo(NOTHING_TYPE)).toBe(false);
+
+    expect(NOTHING_TYPE.isSubtypeOf(STRING_TYPE)).toBe(true);
+    expect(NOTHING_TYPE.isSubtypeOf(BOOLEAN_TYPE)).toBe(true);
+    expect(NOTHING_TYPE.isSubtypeOf(NUMBER_TYPE)).toBe(true);
   });
 
   it('function types are structural', () => {

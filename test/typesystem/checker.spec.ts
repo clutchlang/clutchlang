@@ -86,10 +86,10 @@ describe('typechecker', () => {
     foo(n: Number): Number -> 2
     long(b1: Boolean n1: Number b2: Boolean s1: String): String -> 'hello'
     `;
-    expect(() => checkFile(mod + '\nfoo(true)')).toThrow(); // type error.
-    expect(() => checkFile(mod + '\nfoo()')).toThrow(); // mismatched parameters.
-    expect(() => checkFile(mod + '\nbar()')).toThrow(); // cannot invoke non-function.
-    expect(() => checkFile(mod + '\nlong(1, 1, 1, 1)')).toThrow();
+    expect(() => checkFile(mod + '\nmain() -> foo(true)')).toThrow(); // type error.
+    expect(() => checkFile(mod + '\nmain() -> foo()')).toThrow(); // mismatched parameters.
+    expect(() => checkFile(mod + '\nmain() -> bar()')).toThrow(); // cannot invoke non-function.
+    expect(() => checkFile(mod + '\nmain() -> long(1, 1, 1, 1)')).toThrow();
   });
 
   describe('if', () => {
