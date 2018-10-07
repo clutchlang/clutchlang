@@ -20,6 +20,7 @@ import { CORE_MODULE } from './core';
 import { ModuleDeclarationElement } from './element';
 import {
   AssignmentError,
+  MissingIdentifier,
   NoSuchMethodError,
   ParameterLengthError,
 } from './errors';
@@ -168,7 +169,7 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
     const result =
       context.scope.lookup(node.name) || context.module.resolveType(node.name);
     if (result === null) {
-      throw new Error(node.name);
+      throw new MissingIdentifier(node.name);
     }
     return result;
   }

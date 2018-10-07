@@ -50,8 +50,6 @@ export function outline(
   root.topLevelElements.forEach(node => {
     if (node instanceof FunctionDeclaration) {
       parent.functions.push(FunctionDeclarationElement.fromNode(node, parent));
-    } else if (node instanceof VariableDeclarationStatement) {
-      parent.variables.push(VariableDeclarationElement.fromNode(node, parent));
     }
   });
   return parent;
@@ -172,6 +170,7 @@ export abstract class Element {
 /**
  * Represents a top level variable within a module.
  */
+/* istanbul ignore next */
 export class VariableDeclarationElement implements Element {
   /**
    * Create a variable declaration from an AST node.
@@ -180,7 +179,6 @@ export class VariableDeclarationElement implements Element {
     node: VariableDeclarationStatement,
     parent: ModuleDeclarationElement
   ): VariableDeclarationElement {
-    // TODO: canonicalize names across modules (mod1::name).
     const name = node.name.name;
     const result = new VariableDeclarationElement(
       parent,
@@ -319,7 +317,7 @@ export class FunctionDeclarationElement implements Element {
     const parameters = this.parameterTypes.map(
       param => this.parent.resolveType(param) || NOTHING_TYPE
     );
-    const returnType = this.parent.resolveType(this.returnType) || NOTHING_TYPE;
+    const returnType = this.parent.resolveType(this.returnType)!;
     this.computedType = new FunctionType(parameters, returnType);
     return this.computedType;
   }
@@ -358,7 +356,7 @@ export class TypeDeclarationElement implements Element {
   }
 
   public resolveType(name: string): Type {
-    return this.parent.resolveType(name) || NOTHING_TYPE;
+    return this.parent.resolveType(name)!;
   }
 
   /**

@@ -84,8 +84,7 @@ describe('typechecker', () => {
   it('can check invocations', () => {
     const mod = `
     foo(n: Number): Number -> 2
-    long(b1: Boolean, n1: Number, b2: Boolean, s1: String): String -> 'hello'
-    let bar = 2
+    long(b1: Boolean n1: Number b2: Boolean s1: String): String -> 'hello'
     `;
     expect(() => checkFile(mod + '\nfoo(true)')).toThrow(); // type error.
     expect(() => checkFile(mod + '\nfoo()')).toThrow(); // mismatched parameters.
@@ -94,7 +93,7 @@ describe('typechecker', () => {
   });
 
   describe('if', () => {
-    it('', () => {
+    it('basic support', () => {
       expect(checkExpr('if (true) then 2 else 3')).toBe(NUMBER_TYPE);
     });
 

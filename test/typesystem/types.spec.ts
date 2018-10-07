@@ -5,11 +5,11 @@ import {
   VOID_TYPE,
 } from '../../src/language/typesystem/type';
 
-const STRING_TYPE = CORE_MODULE.resolveType('String')!;
-const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
-const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
+describe('Types', () => {
+  const STRING_TYPE = CORE_MODULE.resolveType('String')!;
+  const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
+  const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
 
-describe('', () => {
   it('Exact types are exact', () => {
     expect(STRING_TYPE.isAssignableTo(STRING_TYPE)).toBe(true);
     expect(BOOLEAN_TYPE.isAssignableTo(BOOLEAN_TYPE)).toBe(true);

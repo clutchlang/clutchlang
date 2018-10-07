@@ -47,3 +47,16 @@ export class ParameterLengthError {
     } parameters but was invoked with ${this.actual}.`;
   }
 }
+
+/**
+ * An error thrown when attempting to reference an identifier that isn't
+ * defined.
+ */
+/* istanbul ignore next */
+export class MissingIdentifier {
+  constructor(public readonly identifier: string) {}
+
+  public toString() {
+    return `MissingIdentifier: No identifier ${this.identifier} defined`;
+  }
+}

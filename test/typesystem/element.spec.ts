@@ -7,17 +7,31 @@ const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
 
 describe('element tree', () => {
   it('can be (de)serialized from json', () => {
-    const raw = `
-          {
-            "name":"test",
-            "variables": [{"name":"C", "type":"String", "isConst": false}],
-            "functions": [{"name": "B", "isConst": false, "type":{"parameterTypes":[],"returnType":"Number"}}],
-            "types": [{"name": "A", "methods": [
-              {"name":"bar", "isConst":false, "type": {"parameterTypes": ["Boolean"], "returnType": "()"}}
-            ]}]
-          }
-        `;
-    const mod = ModuleDeclarationElement.fromJSON(JSON.parse(raw));
+    const raw = {
+      functions: [
+        {
+          isConst: false,
+          name: 'B',
+          type: { parameterTypes: [], returnType: 'Number' },
+        },
+      ],
+      imports: [],
+      name: 'test',
+      types: [
+        {
+          methods: [
+            {
+              isConst: false,
+              name: 'bar',
+              type: { parameterTypes: ['Boolean'], returnType: '()' },
+            },
+          ],
+          name: 'A',
+        },
+      ],
+      variables: [{ name: 'C', type: 'String', isConst: false }],
+    };
+    const mod = ModuleDeclarationElement.fromJSON(raw);
     mod.imports.push(CORE_MODULE);
 
     expect(mod.resolveType('C')!.isAssignableTo(STRING_TYPE)).toBe(true);
