@@ -1,4 +1,4 @@
-import { IToken, TokenKind } from '../../lexer';
+import * as ast_tokens from '../../ast/token';
 import { AstNodeFactory } from '../factory';
 
 /**
@@ -11,14 +11,14 @@ export abstract class AbstractParser {
   private position = 0;
 
   constructor(
-    private readonly tokens: IToken[],
+    private readonly tokens: ast_tokens.Token[],
     protected readonly factory = new AstNodeFactory()
   ) {}
 
   /**
    * Returns whether any of the provided @param kinds are seen in order.
    */
-  protected match(...kinds: TokenKind[]): boolean {
+  protected match(...kinds: ast_tokens.ITokenTypes[]): boolean {
     return kinds.some(e => {
       if (this.check(e)) {
         this.advance();
@@ -29,16 +29,16 @@ export abstract class AbstractParser {
   }
 
   /**
-   * Returns whether the next token is of type @param kind.
+   * Returns whether the next token is of type @param type.
    */
-  protected check(kind: TokenKind): boolean {
-    return this.hasNext ? this.peek().kind === kind : false;
+  protected check(type: ast_tokens.ITokenTypes): boolean {
+    return this.hasNext ? this.peek().type === type : false;
   }
 
   /**
    * Returns the next token.
    */
-  protected advance(): IToken {
+  protected advance(): ast_tokens.Token {
     if (this.hasNext) {
       this.position++;
     }
@@ -49,13 +49,13 @@ export abstract class AbstractParser {
    * Returns whether at least one more token remains for parsing.
    */
   protected get hasNext(): boolean {
-    return this.tokens[this.position].kind !== TokenKind.EOF;
+    return !this.tokens[this.position].isEndOfFile;
   }
 
   /**
    * Returns the token at @member position + @param offset.
    */
-  protected peek(offset = 0): IToken {
+  protected peek(offset = 0): ast_tokens.Token {
     return this.tokens[this.position + offset];
   }
 }

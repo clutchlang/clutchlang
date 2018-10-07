@@ -41,7 +41,7 @@ exports[`AstNodeFactory <Expression> should create postfix UnaryExpression 1`] =
 "UnaryExpression:
   Target:
     SimpleName: a
-  Operator: ! (Postfix)
+  Operator: . (Postfix)
 "
 `;
 
