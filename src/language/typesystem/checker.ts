@@ -14,27 +14,28 @@ import {
   UnaryExpression,
   VariableDeclarationStatement,
 } from '../parser';
-import { ParameterDeclaration } from '../parser/nodes/nodes';
+import { Expression, ParameterDeclaration } from '../parser/nodes/nodes';
 import { StatementBlock } from '../parser/nodes/statements';
 import { CORE_MODULE } from './core';
-import { ModuleDeclarationElement, outline } from './element';
+import { ModuleDeclarationElement } from './element';
 import {
-  FunctionType,
-  SOMETHING_TYPE,
-  Type,
-  TypeKind,
-  VOID_TYPE,
-} from './type';
+  AssignmentError,
+  NoSuchMethodError,
+  ParameterLengthError,
+} from './errors';
+import { SOMETHING_TYPE, Type, TypeKind, VOID_TYPE } from './type';
 
 interface ITypeCheckerContext {
   module: ModuleDeclarationElement;
   scope: LocalScope;
 }
 
+const STRING_TYPE = CORE_MODULE.resolveType('String')!;
+const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
+const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
+
 export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
   public visitFileRoot(node: FileRoot, context: ITypeCheckerContext): Type {
-    context.module = outline(node, 'main');
-    context.module.imports.push(CORE_MODULE);
     for (const element of node.topLevelElements) {
       element.accept(this, context);
     }
@@ -49,20 +50,21 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
     const right = node.right.accept(this, context);
     switch (left.kind) {
       case TypeKind.Concrete: {
-        const method = left.methods.find(m => m.name === node.operator.name);
+        const method = left.resolveMethod(node.operator.name);
         if (method === null || method === undefined) {
-          throw new Error('');
+          throw new NoSuchMethodError(node.operator.name, left);
         }
-        // TODO: refactor this into a separate type checker.
-        if (!right.isAssignableTo(method.parameterTypes[1])) {
-          throw new Error('');
+        if (!right.isAssignableTo(method.parameterTypes[0])) {
+          throw new AssignmentError(method.parameterTypes[0], right);
         }
         return method.returnType;
       }
       case TypeKind.Function:
       case TypeKind.Something:
       case TypeKind.Nothing:
-        throw new Error('');
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
   }
 
@@ -78,8 +80,8 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
     context: ITypeCheckerContext
   ): Type {
     const ifType = node.condition.accept(this, context);
-    if (!ifType.isAssignableTo(context.module.resolveType('Boolean')!)) {
-      throw new Error('');
+    if (!ifType.isAssignableTo(BOOLEAN_TYPE)) {
+      throw new AssignmentError(BOOLEAN_TYPE, ifType);
     }
     let ifBranchType: Type;
     let elseBranchType: Type;
@@ -108,59 +110,65 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
     if (ifBranchType.isAssignableTo(elseBranchType)) {
       return ifBranchType;
     }
-    throw new Error('');
+    return SOMETHING_TYPE;
   }
 
   public visitInvokeExpression(
     node: InvokeExpression,
     context: ITypeCheckerContext
   ): Type {
-    const result = node.target.accept(this, context);
-    if (result instanceof FunctionType) {
-      const parameterTypes = node.parameters.map(param =>
-        param.accept(this, context)
-      );
-      if (parameterTypes.length !== result.parameterTypes.length) {
-        throw new Error('');
-      }
-      for (let i = 0; i < parameterTypes.length; i++) {
-        if (!parameterTypes[i].isAssignableTo(result.parameterTypes[i])) {
-          throw new Error('');
+    const result: Type = node.target.accept(this, context);
+    switch (result.kind) {
+      case TypeKind.Function: {
+        const argumentTypes = node.parameters.map(param =>
+          param.accept(this, context)
+        );
+        if (argumentTypes.length !== result.parameterTypes.length) {
+          throw new ParameterLengthError(
+            result.name,
+            result.parameterTypes.length,
+            argumentTypes.length
+          );
         }
+        for (let i = 0; i < argumentTypes.length; i++) {
+          if (!argumentTypes[i].isAssignableTo(result.parameterTypes[i])) {
+            throw new AssignmentError(
+              result.parameterTypes[i],
+              argumentTypes[i]
+            );
+          }
+        }
+        return result.returnType;
       }
-      return result.returnType;
+      case TypeKind.Concrete:
+      case TypeKind.Nothing:
+      case TypeKind.Something:
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    throw new Error('');
   }
 
-  public visitLiteralBoolean(
-    _: LiteralBoolean,
-    context: ITypeCheckerContext
-  ): Type {
-    return context.module.resolveType('Boolean')!;
+  public visitLiteralBoolean(_: LiteralBoolean, __: ITypeCheckerContext): Type {
+    return BOOLEAN_TYPE;
   }
 
-  public visitLiteralNumber(
-    _: LiteralNumber,
-    context: ITypeCheckerContext
-  ): Type {
-    return context.module.resolveType('Number')!;
+  public visitLiteralNumber(_: LiteralNumber, __: ITypeCheckerContext): Type {
+    return NUMBER_TYPE;
   }
 
-  public visitLiteralString(
-    _: LiteralString,
-    context: ITypeCheckerContext
-  ): Type {
-    return context.module.resolveType('String')!;
+  public visitLiteralString(_: LiteralString, __: ITypeCheckerContext): Type {
+    return STRING_TYPE;
   }
 
   public visitSimpleName(
     node: LiteralIdentifier,
     context: ITypeCheckerContext
   ): Type {
-    const result = context.scope.lookup(node.name);
+    const result =
+      context.scope.lookup(node.name) || context.module.resolveType(node.name);
     if (result === null) {
-      throw new Error('');
+      throw new Error(node.name);
     }
     return result;
   }
@@ -172,16 +180,18 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
     const target = node.target.accept(this, context)!;
     switch (target.kind) {
       case TypeKind.Concrete: {
-        const method = target.methods.find(m => m.name === node.operator.name);
+        const method = target.resolveMethod(node.operator.name);
         if (method === null || method === undefined) {
-          throw new Error('');
+          throw new NoSuchMethodError(node.operator.name, target);
         }
         return method.returnType;
       }
       case TypeKind.Something:
       case TypeKind.Nothing:
       case TypeKind.Function:
-        throw new Error('');
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
   }
 
@@ -218,31 +228,40 @@ export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
               ? SOMETHING_TYPE
               : context.module.resolveType(param.type.name);
           if (paramType === null) {
-            throw new Error('');
+            throw new Error('5');
           }
           scope.store(param.name.name, paramType);
         }
+        if (node.body instanceof Expression) {
+          const actualRetunType = node.body.accept(this, {
+            module: context.module,
+            scope,
+          });
+          if (!actualRetunType.isAssignableTo(functionType.returnType)) {
+            throw new AssignmentError(functionType.returnType, actualRetunType);
+          }
+        } else {
+          /* istanbul ignore next */
+          throw new Error('Unsupported');
+        }
+        return VOID_TYPE;
       }
       case TypeKind.Concrete:
       case TypeKind.Something:
       case TypeKind.Nothing:
-        throw new Error('');
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    return VOID_TYPE;
   }
 
   public visitParameterDeclaration(
-    node: ParameterDeclaration,
-    context: ITypeCheckerContext
+    _: ParameterDeclaration,
+    __: ITypeCheckerContext
   ): Type {
-    if (node.type === undefined) {
-      return SOMETHING_TYPE;
-    }
-    const type = context.module.resolveType(node.name.name);
-    if (type === null) {
-      throw new Error('');
-    }
-    return type;
+    // NOTE: only the element tree handles parameter declarations.
+    /* istanbul ignore next */
+    throw new Error('Unreachable');
   }
 }
 

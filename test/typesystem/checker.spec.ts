@@ -12,22 +12,27 @@ import {
 } from '../../src/language/typesystem/element';
 import {
   FunctionType,
+  SOMETHING_TYPE,
   Type,
   VOID_TYPE,
 } from '../../src/language/typesystem/type';
 
 function checkExpr(source: string): Type {
   const node = new ClutchParser(tokenize(source)).parseExpression();
+  const module = new ModuleDeclarationElement('main');
+  module.imports.push(CORE_MODULE);
   return node.accept(new TypeCheckingVisitor(), {
-    module: CORE_MODULE,
+    module,
     scope: new LocalScope(),
   });
 }
 
 function checkStatement(source: string): Type {
   const node = new ClutchParser(tokenize(source)).parseStatement();
+  const module = new ModuleDeclarationElement('main');
+  module.imports.push(CORE_MODULE);
   return node.accept(new TypeCheckingVisitor(), {
-    module: CORE_MODULE,
+    module,
     scope: new LocalScope(),
   });
 }
@@ -35,8 +40,9 @@ function checkStatement(source: string): Type {
 function checkFile(source: string): ModuleDeclarationElement {
   const node = new ClutchParser(tokenize(source)).parseFileRoot();
   const module = outline(node, 'main');
+  module.imports.push(CORE_MODULE);
   node.accept(new TypeCheckingVisitor(), {
-    module: CORE_MODULE,
+    module,
     scope: new LocalScope(),
   });
   return module;
@@ -72,7 +78,7 @@ describe('typechecker', () => {
 
   it('looks up types', () => {
     expect(checkFile('').resolveType('Number')).toBe(NUMBER_TYPE);
-    expect(() => checkFile('').resolveType('Nmber')).toBe(null);
+    expect(checkFile('').resolveType('Nmber')).toBe(null);
   });
 
   it('can check invocations', () => {
@@ -92,8 +98,8 @@ describe('typechecker', () => {
       expect(checkExpr('if (true) then 2 else 3')).toBe(NUMBER_TYPE);
     });
 
-    it('incompatible branches', () => {
-      expect(() => checkExpr('if (true) then 2 else true')).toThrow();
+    it('incompatible branches become Something', () => {
+      expect(checkExpr('if (true) then 2 else true')).toEqual(SOMETHING_TYPE);
     });
 
     it('requires boolean condition', () => {
@@ -119,19 +125,19 @@ describe('typechecker', () => {
       const mod = checkFile(
         'fib(n: Number): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)'
       );
-      expect(
-        mod
-          .resolveType('fib')!
-          .isAssignableTo(new FunctionType([NUMBER_TYPE], NUMBER_TYPE))
-      ).toBe(true);
+      const expected = new FunctionType([NUMBER_TYPE], NUMBER_TYPE);
+      expect(mod.resolveType('fib')!.isAssignableTo(expected)).toBe(true);
     });
 
-    it('does not handle missing annotations on parameters', () => {
-      expect(() =>
-        checkFile(
-          'fib(n: Number b): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)'
-        )
-      ).toThrow();
+    it('infers Something as the missing type of parameters', () => {
+      const mod = checkFile(
+        'fib(n: Number b): Number -> if n <= 2 then fib(n - 1 b) else fib(n - 2 b)'
+      );
+      const expected = new FunctionType(
+        [NUMBER_TYPE, SOMETHING_TYPE],
+        NUMBER_TYPE
+      );
+      expect(mod.resolveType('fib')!.isAssignableTo(expected)).toBe(true);
     });
 
     it('only infers void return type', () => {

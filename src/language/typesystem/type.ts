@@ -1,8 +1,9 @@
+import { TypeDeclarationElement } from './element';
+
 /**
- * A type is a restrictions on the values that parts of a program may accept.
+ * An internal interface that all members of the Type union should implement.
  */
 interface IType {
-
   /**
    * A user-readable name for the type.
    */
@@ -16,19 +17,13 @@ interface IType {
    * Whether this type is assignable to a declaration of the other type.
    * @param other The other type object.
    */
-  isAssignableTo(other: IType): boolean;
+  isAssignableTo(other: Type): boolean;
 
   /**
    * Whether this type is a subtype of the other type.
    * @param other The other type object.
    */
-  isSubtypeOf(other: IType): boolean;
-
-  /**
-   * Whether this type is a supertype of the other type.
-   * @param other the other type object.
-   */
-  isSupertypeOf(other: IType): boolean;
+  isSubtypeOf(other: Type): boolean;
 }
 
 /**
@@ -51,12 +46,16 @@ export enum TypeKind {
    * A Type with only one implementation.
    */
   Concrete = 'Concrete',
+  /**
+   * A Type meant to be unused.
+   */
+  Void = '()',
 }
 
 /**
  * The union of different type representations.
  */
-export type Type = Nothing | Something | ConcreteType | FunctionType;
+export type Type = Nothing | Something | Void | ConcreteType | FunctionType;
 
 /**
  * The bottom type.
@@ -64,19 +63,15 @@ export type Type = Nothing | Something | ConcreteType | FunctionType;
  * There are no valid values of Nothing, instead it represents a program failure.
  */
 class Nothing implements IType {
-
   public readonly name = 'Nothing';
   public readonly kind = TypeKind.Nothing;
-  public isAssignableTo(_: IType): boolean {
+
+  public isAssignableTo(_: Type): boolean {
     return true;
   }
 
-  public isSubtypeOf(_: IType): boolean {
+  public isSubtypeOf(_: Type): boolean {
     return true;
-  }
-
-  public isSupertypeOf(_: IType): boolean {
-    return false;
   }
 }
 
@@ -91,19 +86,15 @@ export const NOTHING_TYPE: Type = new Nothing();
  * Any value is a valid value of Something.
  */
 class Something implements IType {
-
   public readonly name = 'Something';
   public readonly kind = TypeKind.Something;
-  public isAssignableTo(other: IType): boolean {
+
+  public isAssignableTo(other: Type): boolean {
     return other === this;
   }
 
-  public isSubtypeOf(_: IType): boolean {
-    return false;
-  }
-
-  public isSupertypeOf(_: IType): boolean {
-    return true;
+  public isSubtypeOf(other: Type): boolean {
+    return other === this;
   }
 }
 
@@ -113,25 +104,51 @@ class Something implements IType {
 export const SOMETHING_TYPE: Type = new Something();
 
 /**
+ * A top type with no values that is meant to be unused.
+ */
+class Void implements IType {
+  public readonly name = '()';
+  public readonly kind = TypeKind.Void;
+
+  public isAssignableTo(other: Type): boolean {
+    return other === this;
+  }
+
+  public isSubtypeOf(_: Type): boolean {
+    return false;
+  }
+}
+
+/**
+ * The singleton instance of the void type.
+ */
+export const VOID_TYPE: Type = new Void();
+
+/**
  * A concrete type has no parameters and exactly one supertype (Something) and
  *  exactly one subtype (Nothing);
  */
 export class ConcreteType implements IType {
-
-  public readonly methods: FunctionType[] = [];
   public readonly kind = TypeKind.Concrete;
-  constructor(public readonly name: string) {}
 
-  public isSubtypeOf(other: IType): boolean {
+  constructor(
+    public readonly name: string,
+    private readonly element: TypeDeclarationElement
+  ) {}
+
+  public isSubtypeOf(other: Type): boolean {
     return other === this || other === SOMETHING_TYPE;
   }
 
-  public isSupertypeOf(other: IType): boolean {
-    return other === NOTHING_TYPE;
+  public isAssignableTo(other: Type): boolean {
+    return this.isSubtypeOf(other);
   }
 
-  public isAssignableTo(other: IType): boolean {
-    return this.isSubtypeOf(other);
+  /**
+   * @param name the name of the method.
+   */
+  public resolveMethod(name: string): FunctionType | null {
+    return this.element.resolveMethod(name);
   }
 }
 
@@ -141,7 +158,6 @@ export class ConcreteType implements IType {
  * Function types are structural.
  */
 export class FunctionType implements IType {
-
   public get name(): string {
     return `(${this.parameterTypes.map(type => type.name).join(', ')}) -> ${
       this.returnType.name
@@ -154,7 +170,7 @@ export class FunctionType implements IType {
     public readonly returnType: Type
   ) {}
 
-  public isSubtypeOf(other: IType): boolean {
+  public isSubtypeOf(other: Type): boolean {
     if (other instanceof FunctionType) {
       if (!this.returnType.isSubtypeOf(other.returnType)) {
         return false;
@@ -172,18 +188,7 @@ export class FunctionType implements IType {
     return false;
   }
 
-  public isSupertypeOf(other: IType): boolean {
-    return other === NOTHING_TYPE;
-  }
-
-  public isAssignableTo(other: IType): boolean {
+  public isAssignableTo(other: Type): boolean {
     return this.isSubtypeOf(other);
   }
 }
-
-/**
- * The Void type.
- *
- * This represents "no value."
- */
-export const VOID_TYPE: Type = new ConcreteType('()');

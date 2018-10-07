@@ -10,34 +10,31 @@ import {
   VOID_TYPE,
 } from './type';
 
-/**
- * A visitor for traversing the element tree.
- */
-export abstract class ElementVisitor<R, C> {
-  public abstract visitModuleDeclarationElement(
-    element: ModuleDeclarationElement,
-    context?: C
-  ): R;
+interface IModuleJSON {
+  name: string;
+  functions: IFunctionJSON[];
+  variables: IVariableJSON[];
+  types: ITypeJSON[];
+}
 
-  public abstract visitFunctionDeclarationElement(
-    element: FunctionDeclarationElement,
-    context?: C
-  ): R;
+interface IFunctionJSON {
+  name: string;
+  isConst: boolean;
+  type: {
+    parameterTypes: string[];
+    returnType: string;
+  };
+}
 
-  public abstract visitTypeDeclarationElement(
-    element: TypeDeclarationElement,
-    context?: C
-  ): R;
+interface IVariableJSON {
+  name: string;
+  type: string;
+  isConst: boolean;
+}
 
-  public abstract visitMethodDeclarationElement(
-    element: MethodDeclarationElement,
-    context?: C
-  ): R;
-
-  public abstract visitVariableDeclarationElement(
-    element: VariableDeclarationElement,
-    context?: C
-  ): R;
+interface ITypeJSON {
+  name: string;
+  methods: IFunctionJSON[];
 }
 
 /**
@@ -68,28 +65,22 @@ export class ModuleDeclarationElement implements Element {
    * Create an element tree from a JSON summary.
    * @param object The JSON summary.
    */
-  public static fromJSON(object: any): ModuleDeclarationElement {
+  public static fromJSON(object: IModuleJSON): ModuleDeclarationElement {
     const module = new ModuleDeclarationElement(object.name);
-    if (object.function !== undefined) {
-      for (const fn of object.functions) {
-        const deserialized = FunctionDeclarationElement.fromJSON(fn, module);
-        module.functions.push(deserialized);
-      }
+    for (const fn of object.functions) {
+      const deserialized = FunctionDeclarationElement.fromJSON(fn, module);
+      module.functions.push(deserialized);
     }
-    if (object.types !== undefined) {
-      for (const type of object.types) {
-        const deserialized = TypeDeclarationElement.fromJSON(type, module);
-        module.types.push(deserialized);
-      }
+    for (const type of object.types) {
+      const deserialized = TypeDeclarationElement.fromJSON(type, module);
+      module.types.push(deserialized);
     }
-    if (object.variables !== undefined) {
-      for (const variable of object.variable) {
-        const deserialized = VariableDeclarationElement.fromJSON(
-          variable,
-          module
-        );
-        module.variables.push(deserialized);
-      }
+    for (const variable of object.variables) {
+      const deserialized = VariableDeclarationElement.fromJSON(
+        variable,
+        module
+      );
+      module.variables.push(deserialized);
     }
     return module;
   }
@@ -152,10 +143,6 @@ export class ModuleDeclarationElement implements Element {
     return null;
   }
 
-  public accept<R, C>(vistor: ElementVisitor<R, C>, context?: C): R {
-    return vistor.visitModuleDeclarationElement(this, context);
-  }
-
   public toJSON() {
     return {
       functions: this.functions.map(fn => fn.toJSON),
@@ -176,13 +163,6 @@ export class ModuleDeclarationElement implements Element {
  * AST node.
  */
 export abstract class Element {
-  /**
-   * Accept a visitor on this element.
-   * @param vistor
-   * @param context
-   */
-  public abstract accept<R, C>(vistor: ElementVisitor<R, C>, context?: C): R;
-
   /**
    * Create a JSON representation of this element.
    */
@@ -218,7 +198,7 @@ export class VariableDeclarationElement implements Element {
    * @param parent the parent module
    */
   public static fromJSON(
-    object: any,
+    object: IVariableJSON,
     parent: ModuleDeclarationElement
   ): VariableDeclarationElement {
     return new VariableDeclarationElement(
@@ -244,22 +224,19 @@ export class VariableDeclarationElement implements Element {
    * Compute the type of this variable.
    */
   public computeType(): Type {
-    if (this.computedType !== null && this.computedType !== undefined) {
+    /* istanbul ignore if */
+    if (this.computedType !== null) {
       return this.computedType;
     }
     this.computedType = this.parent.resolveType(this.type) || NOTHING_TYPE;
     return this.computedType;
   }
 
-  public accept<R, C>(visitor: ElementVisitor<R, C>, context?: C) {
-    return visitor.visitVariableDeclarationElement(this, context);
-  }
-
-  public toJSON(): object {
+  public toJSON(): IVariableJSON {
     return {
       isConst: this.isConst,
+      name: this.name,
       type: this.type,
-      variable: this.name,
     };
   }
 }
@@ -275,13 +252,12 @@ export class FunctionDeclarationElement implements Element {
     node: FunctionDeclaration,
     parent: ModuleDeclarationElement
   ): FunctionDeclarationElement {
-    // TODO: canonicalize names across modules (mod1::name).
     const name = node.name.name;
     const parameterTypes = node.parameters.map(
       param => (param.type === undefined ? 'Something' : param.type.name)
     );
     const returnType =
-      node.returnType === undefined ? '()' : node.returnType.name;
+      node.returnType === undefined ? VOID_TYPE.name : node.returnType.name;
     const isConst = node.isConst;
     const result = new FunctionDeclarationElement(
       parent,
@@ -300,15 +276,15 @@ export class FunctionDeclarationElement implements Element {
    * @param parent the parent module
    */
   public static fromJSON(
-    object: any,
+    object: IFunctionJSON,
     parent: ModuleDeclarationElement
   ): FunctionDeclarationElement {
     return new FunctionDeclarationElement(
       parent,
       object.isConst,
       object.name,
-      object.parameterTypes,
-      object.returnType
+      object.type.parameterTypes,
+      object.type.returnType
     );
   }
 
@@ -321,11 +297,7 @@ export class FunctionDeclarationElement implements Element {
     private readonly returnType: string
   ) {}
 
-  public accept<R, C>(vistor: ElementVisitor<R, C>, context?: C): R {
-    return vistor.visitFunctionDeclarationElement(this, context);
-  }
-
-  public toJSON(): object {
+  public toJSON(): IFunctionJSON {
     return {
       isConst: this.isConst,
       name: this.name,
@@ -340,6 +312,7 @@ export class FunctionDeclarationElement implements Element {
    * Compute the type defined by this function declaration.
    */
   public computeType(): FunctionType {
+    /* istanbul ignore if */
     if (this.computedType !== null) {
       return this.computedType;
     }
@@ -354,17 +327,15 @@ export class FunctionDeclarationElement implements Element {
 
 /**
  * Represents the declaration of a type.
- * TODO: use this class once we have types.
  */
-/* istanbul ignore next */
-class TypeDeclarationElement implements Element {
+export class TypeDeclarationElement implements Element {
   /**
    * Create a type declaration from a JSON summary.
    * @param object The partial summary object.
    * @param parent The parent module.
    */
   public static fromJSON(
-    object: any,
+    object: ITypeJSON,
     parent: ModuleDeclarationElement
   ): TypeDeclarationElement {
     const deserialized = new TypeDeclarationElement(parent, object.name, false);
@@ -383,15 +354,23 @@ class TypeDeclarationElement implements Element {
     public readonly name: string,
     public readonly isExternal: boolean
   ) {
-    this.type = new ConcreteType(name);
+    this.type = new ConcreteType(name, this);
   }
 
   public resolveType(name: string): Type {
     return this.parent.resolveType(name) || NOTHING_TYPE;
   }
 
-  public accept<R, C>(visitor: ElementVisitor<R, C>, context?: C): R {
-    return visitor.visitTypeDeclarationElement(this, context);
+  /**
+   * Resolve the type of the method.
+   * @param name the name of the method.
+   */
+  public resolveMethod(name: string): FunctionType | null {
+    const method = this.methods.find(m => m.name === name);
+    if (method === undefined) {
+      return null;
+    }
+    return method.computeType();
   }
 
   public toJSON(): object {
@@ -413,14 +392,14 @@ export class MethodDeclarationElement implements Element {
    * @param parent The parent Type this is contained in.
    */
   public static fromJSON(
-    object: any,
+    object: IFunctionJSON,
     parent: TypeDeclarationElement
   ): MethodDeclarationElement {
     return new MethodDeclarationElement(
       parent,
       object.name,
-      object.parameterTypes,
-      object.returnType
+      object.type.parameterTypes,
+      object.type.returnType
     );
   }
 
@@ -441,9 +420,6 @@ export class MethodDeclarationElement implements Element {
 
   /**
    * Compute the type of this method.
-   *
-   * A method type is a function type with an added first argument as the type
-   * of the reciever.
    */
   public computeType(): FunctionType {
     if (this.computedType !== null) {
@@ -453,19 +429,13 @@ export class MethodDeclarationElement implements Element {
       this.parent.resolveType(param)
     );
     const returnType = this.parent.resolveType(this.returnType);
-    this.computedType = new FunctionType(
-      [this.parent.type, ...parameters],
-      returnType
-    );
+    this.computedType = new FunctionType(parameters, returnType);
     return this.computedType;
   }
 
-  public accept<R, C>(visitor: ElementVisitor<R, C>, context?: C): R {
-    return visitor.visitMethodDeclarationElement(this, context);
-  }
-
-  public toJSON(): object {
+  public toJSON(): IFunctionJSON {
     return {
+      isConst: false,
       name: this.name,
       type: {
         parameterTypes: this.parameterTypes,

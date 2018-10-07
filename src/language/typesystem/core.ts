@@ -7,9 +7,11 @@ import { ModuleDeclarationElement } from './element';
 export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fromJSON(
   {
     name: 'core',
+    variables: [],
     functions: [
       {
         name: 'print',
+        isConst: false,
         type: {
           parameterTypes: ['Something'],
           returnType: '()',
@@ -21,77 +23,120 @@ export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fr
         name: 'Number',
         methods: [
           {
-            name: Operator.Addition,
+            name: Operator.PostfixDecrement.name,
+            isConst: false,
+            type: {
+              parameterTypes: [],
+              returnType: 'Number',
+            },
+          },
+          {
+            name: Operator.PrefixDecrement.name,
+            isConst: false,
+            type: {
+              parameterTypes: [],
+              returnType: 'Number',
+            },
+          },
+          {
+            name: Operator.PostfixIncrement.name,
+            isConst: false,
+            type: {
+              parameterTypes: [],
+              returnType: 'Number',
+            },
+          },
+          {
+            name: Operator.PrefixIncrement.name,
+            isConst: false,
+            type: {
+              parameterTypes: [],
+              returnType: 'Number',
+            },
+          },
+          {
+            name: Operator.Addition.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Number',
             },
           },
           {
-            name: Operator.Subtraction,
+            name: Operator.Subtraction.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Number',
             },
           },
           {
-            name: Operator.Multiplication,
+            name: Operator.Multiplication.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Number',
             },
           },
           {
-            name: Operator.Division,
+            name: Operator.Division.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Number',
             },
           },
           {
-            name: Operator.Remainder,
+            name: Operator.Remainder.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Number',
             },
           },
           {
-            name: Operator.Equality,
+            name: Operator.Equality.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.Inequality,
+            name: Operator.Inequality.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.GreaterThan,
+            name: Operator.GreaterThan.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.GreaterThanOrEqual,
+            name: Operator.GreaterThanOrEqual.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.LessThan,
+            name: Operator.LessThan.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.LessThanOrEqual,
+            name: Operator.LessThanOrEqual.name,
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'Boolean',
@@ -103,35 +148,40 @@ export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fr
         name: 'Boolean',
         methods: [
           {
-            name: Operator.Inequality,
+            name: Operator.Inequality.name,
+            isConst: false,
             type: {
               parameterTypes: ['Boolean'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.Equality,
+            name: Operator.Equality.name,
+            isConst: false,
             type: {
               parameterTypes: ['Boolean'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.LogicalAnd,
+            name: Operator.LogicalAnd.name,
+            isConst: false,
             type: {
               parameterTypes: ['Boolean'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.LogicalOr,
+            name: Operator.LogicalOr.name,
+            isConst: false,
             type: {
               parameterTypes: ['Boolean'],
               returnType: 'Boolean',
             },
           },
           {
-            name: Operator.LogicalNot,
+            name: Operator.LogicalNot.name,
+            isConst: false,
             type: {
               parameterTypes: [],
               returnType: 'Boolean',
@@ -144,6 +194,7 @@ export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fr
         methods: [
           {
             name: 'toLowerCase',
+            isConst: false,
             type: {
               parameterTypes: [],
               returnType: 'String',
@@ -151,6 +202,7 @@ export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fr
           },
           {
             name: 'toUpperCase',
+            isConst: false,
             type: {
               parameterTypes: [],
               returnType: 'String',
@@ -158,6 +210,7 @@ export const CORE_MODULE: ModuleDeclarationElement = ModuleDeclarationElement.fr
           },
           {
             name: 'charAt',
+            isConst: false,
             type: {
               parameterTypes: ['Number'],
               returnType: 'String',
