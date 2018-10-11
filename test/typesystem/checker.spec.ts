@@ -1,36 +1,56 @@
 // tslint:disable:no-magic-numbers
 import { tokenize } from '../../src/language/lexer';
 import { ClutchParser } from '../../src/language/parser';
-import { TypeChecker, TypeScope } from '../../src/language/typesystem/checker';
 import {
-  BOOLEAN_TYPE,
+  LocalScope,
+  TypeCheckingVisitor,
+} from '../../src/language/typesystem/checker';
+import { CORE_MODULE } from '../../src/language/typesystem/core';
+import {
+  ModuleDeclarationElement,
+  outline,
+} from '../../src/language/typesystem/element';
+import {
   FunctionType,
-  NUMBER_TYPE,
-  STRING_TYPE,
+  SOMETHING_TYPE,
   Type,
   VOID_TYPE,
 } from '../../src/language/typesystem/type';
 
-function checkExpr(source: string, scope?: TypeScope): Type {
+function checkExpr(source: string): Type {
   const node = new ClutchParser(tokenize(source)).parseExpression();
-  return node.accept(
-    new TypeChecker(),
-    scope === undefined ? new TypeScope(null) : scope
-  );
+  const module = new ModuleDeclarationElement('main');
+  module.imports.push(CORE_MODULE);
+  return node.accept(new TypeCheckingVisitor(), {
+    module,
+    scope: new LocalScope(),
+  });
 }
 
-function checkStatement(source: string, scope?: TypeScope): Type {
+function checkStatement(source: string): Type {
   const node = new ClutchParser(tokenize(source)).parseStatement();
-  return node.accept(
-    new TypeChecker(),
-    scope === undefined ? new TypeScope(null) : scope
-  );
+  const module = new ModuleDeclarationElement('main');
+  module.imports.push(CORE_MODULE);
+  return node.accept(new TypeCheckingVisitor(), {
+    module,
+    scope: new LocalScope(),
+  });
 }
 
-function checkFile(source: string, scope?: TypeScope): void {
+function checkFile(source: string): ModuleDeclarationElement {
   const node = new ClutchParser(tokenize(source)).parseFileRoot();
-  node.accept(new TypeChecker(), scope);
+  const module = outline(node, 'main');
+  module.imports.push(CORE_MODULE);
+  node.accept(new TypeCheckingVisitor(), {
+    module,
+    scope: new LocalScope(),
+  });
+  return module;
 }
+
+const STRING_TYPE = CORE_MODULE.resolveType('String')!;
+const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
+const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
 
 describe('typechecker', () => {
   it('can type literals', () => {
@@ -56,48 +76,29 @@ describe('typechecker', () => {
     expect(() => checkExpr('++true')).toThrow();
   });
 
-  it('can check identifiers', () => {
-    expect(() => checkExpr('1 + foo')).toThrow();
-
-    const scope = new TypeScope(null);
-    scope.store('foo', NUMBER_TYPE);
-
-    expect(checkExpr('1 + foo', scope)).toBe(NUMBER_TYPE);
-  });
-
   it('looks up types', () => {
-    const scope = new TypeScope(null);
-    scope.store('Number', NUMBER_TYPE);
-
-    expect(checkExpr('Number', scope)).toBe(NUMBER_TYPE);
-    expect(() => checkExpr('Nmber', scope)).toThrow();
+    expect(checkFile('').resolveType('Number')).toBe(NUMBER_TYPE);
+    expect(checkFile('').resolveType('Nmber')).toBe(null);
   });
 
   it('can check invocations', () => {
-    const fib = new FunctionType([NUMBER_TYPE], NUMBER_TYPE);
-    const long = new FunctionType(
-      [BOOLEAN_TYPE, NUMBER_TYPE, BOOLEAN_TYPE, STRING_TYPE],
-      STRING_TYPE
-    );
-    const scope = new TypeScope(null);
-    scope.store('foo', fib);
-    scope.store('bar', NUMBER_TYPE);
-    scope.store('long', long);
-
-    expect(checkExpr('foo(2)', scope)).toBe(NUMBER_TYPE);
-    expect(() => checkExpr('foo(true)', scope)).toThrow(); // type error.
-    expect(() => checkExpr('foo()', scope)).toThrow(); // mismatched parameters.
-    expect(() => checkExpr('bar()', scope)).toThrow(); // cannot invoke non-function.
-    expect(() => checkExpr('long(1, 1, 1, 1)', scope)).toThrow();
+    const mod = `
+    foo(n: Number): Number -> 2
+    long(b1: Boolean n1: Number b2: Boolean s1: String): String -> 'hello'
+    `;
+    expect(() => checkFile(mod + '\nmain() -> foo(true)')).toThrow(); // type error.
+    expect(() => checkFile(mod + '\nmain() -> foo()')).toThrow(); // mismatched parameters.
+    expect(() => checkFile(mod + '\nmain() -> bar()')).toThrow(); // cannot invoke non-function.
+    expect(() => checkFile(mod + '\nmain() -> long(1, 1, 1, 1)')).toThrow();
   });
 
   describe('if', () => {
-    it('', () => {
+    it('basic support', () => {
       expect(checkExpr('if (true) then 2 else 3')).toBe(NUMBER_TYPE);
     });
 
-    it('incompatible branches', () => {
-      expect(() => checkExpr('if (true) then 2 else true')).toThrow();
+    it('incompatible branches become Something', () => {
+      expect(checkExpr('if (true) then 2 else true')).toEqual(SOMETHING_TYPE);
     });
 
     it('requires boolean condition', () => {
@@ -120,59 +121,43 @@ describe('typechecker', () => {
 
   describe('functions', () => {
     it('can check functions', () => {
-      const scope = new TypeScope(null);
-      scope.store('Number', NUMBER_TYPE);
-      checkFile(
-        'fib(n: Number): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)',
-        scope
+      const mod = checkFile(
+        'fib(n: Number): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)'
       );
-      expect(
-        scope
-          .lookup('fib')!
-          .isAssignableTo(new FunctionType([NUMBER_TYPE], NUMBER_TYPE))
-      ).toBe(true);
+      const expected = new FunctionType([NUMBER_TYPE], NUMBER_TYPE);
+      expect(mod.resolveType('fib')!.isAssignableTo(expected)).toBe(true);
     });
 
-    it('does not handle missing annotations on parameters', () => {
-      const scope = new TypeScope(null);
-      scope.store('Number', NUMBER_TYPE);
-      expect(() =>
-        checkFile(
-          'fib(n: Number b): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)',
-          scope
-        )
-      ).toThrow();
+    it('infers Something as the missing type of parameters', () => {
+      const mod = checkFile(
+        'fib(n: Number b): Number -> if n <= 2 then fib(n - 1 b) else fib(n - 2 b)'
+      );
+      const expected = new FunctionType(
+        [NUMBER_TYPE, SOMETHING_TYPE],
+        NUMBER_TYPE
+      );
+      expect(mod.resolveType('fib')!.isAssignableTo(expected)).toBe(true);
     });
 
     it('only infers void return type', () => {
-      const scope = new TypeScope(null);
-      scope.store('print', new FunctionType([NUMBER_TYPE], VOID_TYPE));
-      scope.store('Number', NUMBER_TYPE);
-      checkFile('foob(n: Number) -> print(n)', scope);
+      const mod = checkFile('foob(n: Number) -> print(n)');
       expect(
-        scope
-          .lookup('foob')!
+        mod
+          .resolveType('foob')!
           .isAssignableTo(new FunctionType([NUMBER_TYPE], VOID_TYPE))
       );
     });
 
     it('does not handle mistyped annotations', () => {
-      const scope = new TypeScope(null);
-      scope.store('Number', NUMBER_TYPE);
       expect(() =>
         checkFile(
-          'fib(n: Nmber): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)',
-          scope
+          'fib(n: Nmber): Number -> if n <= 2 then fib(n - 1) else fib(n - 2)'
         )
       ).toThrow();
     });
 
     it('catches mismatched return type', () => {
-      const scope = new TypeScope(null);
-      scope.store('Number', NUMBER_TYPE);
-      expect(() =>
-        checkFile('fib(n: Number): Number -> true', scope)
-      ).toThrow();
+      expect(() => checkFile('fib(n: Number): Number -> true')).toThrow();
     });
   });
 });
