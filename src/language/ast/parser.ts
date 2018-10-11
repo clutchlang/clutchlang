@@ -4,6 +4,11 @@ import * as tokens from './token';
  * Represents an unresolved node in the abstract syntax tree.
  */
 export abstract class AstNode {
+  public abstract accept<R, C>(
+    visitor: AstVisitor<R, C>,
+    context?: C
+  ): R | undefined;
+
   /**
    * First token that represents this AST node.
    */
@@ -35,7 +40,11 @@ export abstract class SimpleNode extends AstNode {
 /**
  * Represents an operator node parsed from a single token.
  */
-export class Operator extends SimpleNode {}
+export class Operator extends SimpleNode {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitOperator(this, context);
+  }
+}
 
 /**
  * Represents a marker type of AST node for all statements.
@@ -80,6 +89,10 @@ export abstract class OperatorExpression extends Expression {
  * Represents an expression in the form of `<OP><EXPR>`.
  */
 export class PrefixExpression extends OperatorExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitPrefixExpression(this, context);
+  }
+
   public get first(): tokens.Token {
     return this.operator.first;
   }
@@ -93,6 +106,10 @@ export class PrefixExpression extends OperatorExpression {
  * Represents an expression in the form of `<EXPR><OP>`.
  */
 export class PostfixExpression extends OperatorExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitPostfixExpression(this, context);
+  }
+
   public get first(): tokens.Token {
     return this.target.first;
   }
@@ -112,6 +129,10 @@ export class BinaryExpression extends OperatorExpression {
     public readonly right: Expression
   ) {
     super(operator, left);
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitBinaryExpression(this, context);
   }
 
   public get first(): tokens.Token {
@@ -134,6 +155,10 @@ export class PropertyExpression extends Expression {
     super();
   }
 
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitPropertyExpression(this, context);
+  }
+
   public get first(): tokens.Token {
     return this.target.first;
   }
@@ -154,6 +179,10 @@ export class ArgumentList extends AstNode {
   ) {
     super();
   }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitArgumentList(this, context);
+  }
 }
 
 /**
@@ -170,6 +199,10 @@ export class CallExpression extends Expression {
     super();
   }
 
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitCallExpression(this, context);
+  }
+
   public get first(): tokens.Token {
     return (this.target || this.name).first;
   }
@@ -179,10 +212,48 @@ export class CallExpression extends Expression {
   }
 }
 
+export class ConditionalExpression extends Expression {
+  constructor(
+    public readonly first: tokens.Token,
+    public readonly condition: Expression,
+    public readonly body: Expression | StatementBlock,
+    public readonly elseCondition?: Expression,
+    public readonly elseBody?: Expression | StatementBlock
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitConditionalExpression(this, context);
+  }
+
+  public get last(): tokens.Token {
+    return (this.elseBody || this.body).last;
+  }
+}
+
+export class GroupExpression extends Expression {
+  constructor(
+    public readonly first: tokens.Token,
+    public readonly expression: Expression,
+    public readonly last: tokens.Token
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitGroupExpression(this, context);
+  }
+}
+
 /**
  * Represents an expression for a literal identifier (name).
  */
 export class Identifier extends SimpleExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitIdentifier(this, context);
+  }
+
   public get name(): string {
     return this.token.lexeme;
   }
@@ -192,6 +263,10 @@ export class Identifier extends SimpleExpression {
  * Represents an expression for a literal boolean.
  */
 export class LiteralBoolean extends SimpleExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitLiteralBoolean(this, context);
+  }
+
   public get value(): string {
     return this.token.lexeme;
   }
@@ -201,6 +276,10 @@ export class LiteralBoolean extends SimpleExpression {
  * Represents an expression for a literal number.
  */
 export class LiteralNumber extends SimpleExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitLiteralNumber(this, context);
+  }
+
   public get value(): string {
     return this.token.lexeme;
   }
@@ -210,6 +289,10 @@ export class LiteralNumber extends SimpleExpression {
  * Represents an expression for a literal string.
  */
 export class LiteralString extends SimpleExpression {
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitLiteralString(this, context);
+  }
+
   public get value(): string {
     return this.token.lexeme;
   }
@@ -225,6 +308,10 @@ export class VariableDeclaration extends AstNode {
     public readonly value?: Expression
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitVariableDeclaration(this, context);
   }
 
   public get first(): tokens.Token {
@@ -247,6 +334,10 @@ export class ParameterList extends AstNode {
   ) {
     super();
   }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitParameterList(this, context);
+  }
 }
 
 /**
@@ -259,6 +350,30 @@ export class StatementBlock extends AstNode {
     public readonly last: tokens.Token
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitStatementBlock(this, context);
+  }
+}
+
+/**
+ * Represents a return statement.
+ */
+export class ReturnStatement extends AstNode {
+  constructor(
+    public readonly first: tokens.Token,
+    public readonly expression?: Expression
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitReturnStatement(this, context);
+  }
+
+  public get last(): tokens.Token {
+    return this.expression ? this.expression.last : this.first;
   }
 }
 
@@ -273,6 +388,10 @@ export class FunctionDeclaration extends AstNode {
     public readonly returnType?: Identifier
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitFunctionDeclaration(this, context);
   }
 
   public get first(): tokens.Token {
@@ -297,30 +416,137 @@ export class TypeDeclaration extends AstNode {
     super();
   }
 
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitTypeDeclaration(this, context);
+  }
+
   public get first(): tokens.Token {
     return this.modifiers.length ? this.modifiers[0] : this.name.first;
+  }
+}
+
+/**
+ *
+ */
+export class ModuleRoot extends AstNode {
+  constructor(
+    public readonly declarations: Array<
+      FunctionDeclaration | TypeDeclaration | VariableDeclaration
+    >
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitModuleRoot(this, context);
+  }
+
+  public get first(): tokens.Token {
+    return this.declarations[0].first;
+  }
+
+  public get last(): tokens.Token {
+    return this.declarations[this.declarations.length - 1].last;
   }
 }
 
 export class AstParser {}
 
 /**
- * Interface for visiting every known concrete implementation of @see AstNode.
+ * An AST visitor that by default does nothing visiting an AST node.
  *
- * May optionally pass around a contextual object "C", and return an "R".
+ * It is intended to be a superclass for classes that use the visitor pattern
+ * primarily as a dispatch mechanism (and do not need to recursively need to
+ * visit the whole structure) and only need to visit a small number of node
+ * types.
  */
-export interface IAstVisitor<R, C> {
-  visitArgumentList(node: ArgumentList, context?: C): R;
-  visitCallExpression(node: CallExpression, context?: C): R;
-  visitFunctionDeclaration(node: FunctionDeclaration, context?: C): R;
-  visitIdentifier(node: Identifier, context?: C): R;
-  visitLiteralBoolean(node: LiteralBoolean, context?: C): R;
-  visitLiteralNumber(node: LiteralNumber, context?: C): R;
-  visitLiteralString(node: LiteralString, context?: C): R;
-  visitParameterList(node: ParameterList, context?: C): R;
-  visitPrefixExpression(node: PrefixExpression, context?: C): R;
-  visitPostfixExpression(node: PostfixExpression, context?: C): R;
-  visitPropertyExpression(node: PropertyExpression, context?: C): R;
-  visitTypeDeclaration(node: TypeDeclaration, context?: C): R;
-  visitVariableDeclaration(node: VariableDeclaration, context?: C): R;
+export class AstVisitor<R, C> {
+  public visitArgumentList(_: ArgumentList, __?: C): R | undefined {
+    return;
+  }
+
+  public visitBinaryExpression(_: BinaryExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitCallExpression(_: CallExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitConditionalExpression(
+    _: ConditionalExpression,
+    __?: C
+  ): R | undefined {
+    return;
+  }
+
+  public visitFunctionDeclaration(
+    _: FunctionDeclaration,
+    __?: C
+  ): R | undefined {
+    return;
+  }
+
+  public visitGroupExpression(_: GroupExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitIdentifier(_: Identifier, __?: C): R | undefined {
+    return;
+  }
+
+  public visitLiteralBoolean(_: LiteralBoolean, __?: C): R | undefined {
+    return;
+  }
+
+  public visitLiteralNumber(_: LiteralNumber, __?: C): R | undefined {
+    return;
+  }
+
+  public visitLiteralString(_: LiteralString, __?: C): R | undefined {
+    return;
+  }
+
+  public visitModuleRoot(_: ModuleRoot, __?: C): R | undefined {
+    return;
+  }
+
+  public visitOperator(_: Operator, __?: C): R | undefined {
+    return;
+  }
+
+  public visitParameterList(_: ParameterList, __?: C): R | undefined {
+    return;
+  }
+
+  public visitPrefixExpression(_: PrefixExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitPostfixExpression(_: PostfixExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitPropertyExpression(_: PropertyExpression, __?: C): R | undefined {
+    return;
+  }
+
+  public visitReturnStatement(_: ReturnStatement, __?: C): R | undefined {
+    return;
+  }
+
+  public visitStatementBlock(_: StatementBlock, __?: C): R | undefined {
+    return;
+  }
+
+  public visitTypeDeclaration(_: TypeDeclaration, __?: C): R | undefined {
+    return;
+  }
+
+  public visitVariableDeclaration(
+    _: VariableDeclaration,
+    __?: C
+  ): R | undefined {
+    return;
+  }
 }
