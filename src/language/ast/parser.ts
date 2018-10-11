@@ -453,100 +453,42 @@ export class ModuleRoot extends AstNode {
 export class AstParser {}
 
 /**
- * An AST visitor that by default does nothing visiting an AST node.
- *
- * It is intended to be a superclass for classes that use the visitor pattern
- * primarily as a dispatch mechanism (and do not need to recursively need to
- * visit the whole structure) and only need to visit a small number of node
- * types.
+ * A dispatch mechanism for visiting AST nodes.
  */
-export class AstVisitor<R, C> {
-  public visitArgumentList(_: ArgumentList, __?: C): R | undefined {
-    return;
-  }
-
-  public visitBinaryExpression(_: BinaryExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitCallExpression(_: CallExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitConditionalExpression(
-    _: ConditionalExpression,
-    __?: C
-  ): R | undefined {
-    return;
-  }
-
-  public visitFunctionDeclaration(
-    _: FunctionDeclaration,
-    __?: C
-  ): R | undefined {
-    return;
-  }
-
-  public visitGroupExpression(_: GroupExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitIdentifier(_: Identifier, __?: C): R | undefined {
-    return;
-  }
-
-  public visitLiteralBoolean(_: LiteralBoolean, __?: C): R | undefined {
-    return;
-  }
-
-  public visitLiteralNumber(_: LiteralNumber, __?: C): R | undefined {
-    return;
-  }
-
-  public visitLiteralString(_: LiteralString, __?: C): R | undefined {
-    return;
-  }
-
-  public visitModuleRoot(_: ModuleRoot, __?: C): R | undefined {
-    return;
-  }
-
-  public visitOperator(_: Operator, __?: C): R | undefined {
-    return;
-  }
-
-  public visitParameterList(_: ParameterList, __?: C): R | undefined {
-    return;
-  }
-
-  public visitPrefixExpression(_: PrefixExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitPostfixExpression(_: PostfixExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitPropertyExpression(_: PropertyExpression, __?: C): R | undefined {
-    return;
-  }
-
-  public visitReturnStatement(_: ReturnStatement, __?: C): R | undefined {
-    return;
-  }
-
-  public visitStatementBlock(_: StatementBlock, __?: C): R | undefined {
-    return;
-  }
-
-  public visitTypeDeclaration(_: TypeDeclaration, __?: C): R | undefined {
-    return;
-  }
-
-  public visitVariableDeclaration(
-    _: VariableDeclaration,
-    __?: C
-  ): R | undefined {
-    return;
-  }
+export abstract class AstVisitor<R, C> {
+  public abstract visitArgumentList(node: ArgumentList, context?: C): R;
+  public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
+  public abstract visitCallExpression(node: CallExpression, context?: C): R;
+  public abstract visitConditionalExpression(
+    node: ConditionalExpression,
+    context?: C
+  ): R;
+  public abstract visitFunctionDeclaration(
+    node: FunctionDeclaration,
+    context?: C
+  ): R;
+  public abstract visitGroupExpression(node: GroupExpression, context?: C): R;
+  public abstract visitIdentifier(node: Identifier, context?: C): R;
+  public abstract visitLiteralBoolean(node: LiteralBoolean, context?: C): R;
+  public abstract visitLiteralNumber(node: LiteralNumber, context?: C): R;
+  public abstract visitLiteralString(node: LiteralString, context?: C): R;
+  public abstract visitModuleRoot(node: ModuleRoot, context?: C): R;
+  public abstract visitOperator(node: Operator, context?: C): R;
+  public abstract visitParameterList(node: ParameterList, context?: C): R;
+  public abstract visitPrefixExpression(node: PrefixExpression, context?: C): R;
+  public abstract visitPostfixExpression(
+    node: PostfixExpression,
+    context?: C
+  ): R;
+  public abstract visitPropertyExpression(
+    node: PropertyExpression,
+    context?: C
+  ): R;
+  public abstract visitReturnStatement(node: ReturnStatement, context?: C): R;
+  public abstract visitStatementBlock(node: StatementBlock, context?: C): R;
+  public abstract visitTypeDeclaration(node: TypeDeclaration, context?: C): R;
+  public abstract visitVariableDeclaration(
+    node: VariableDeclaration,
+    context?: C
+  ): R;
 }
