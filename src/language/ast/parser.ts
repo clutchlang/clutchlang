@@ -5,14 +5,19 @@ import * as tokens from './token';
  */
 export abstract class AstNode {
   /**
+   * Vitis this node using the @param visitor interface/
+   */
+  public abstract accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R;
+
+  /**
    * First token that represents this AST node.
    */
-  public abstract get first(): tokens.Token;
+  public abstract get firstToken(): tokens.Token;
 
   /**
    * Last token that represents this AST node.
    */
-  public abstract get last(): tokens.Token;
+  public abstract get lastToken(): tokens.Token;
 }
 
 /**
@@ -23,11 +28,11 @@ export abstract class SimpleNode extends AstNode {
     super();
   }
 
-  public get first(): tokens.Token {
+  public get firstToken(): tokens.Token {
     return this.token;
   }
 
-  public get last(): tokens.Token {
+  public get lastToken(): tokens.Token {
     return this.token;
   }
 }
@@ -35,7 +40,11 @@ export abstract class SimpleNode extends AstNode {
 /**
  * Represents an operator node parsed from a single token.
  */
-export class Operator extends SimpleNode {}
+export class Operator extends SimpleNode {
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitOperator(this, context);
+  }
+}
 
 /**
  * Represents a marker type of AST node for all statements.
@@ -55,11 +64,11 @@ export abstract class SimpleExpression extends Expression {
     super();
   }
 
-  public get first(): tokens.Token {
+  public get firstToken(): tokens.Token {
     return this.token;
   }
 
-  public get last(): tokens.Token {
+  public get lastToken(): tokens.Token {
     return this.token;
   }
 }
@@ -80,12 +89,16 @@ export abstract class OperatorExpression extends Expression {
  * Represents an expression in the form of `<OP><EXPR>`.
  */
 export class PrefixExpression extends OperatorExpression {
-  public get first(): tokens.Token {
-    return this.operator.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitPrefixExpression(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.target.last;
+  public get firstToken(): tokens.Token {
+    return this.operator.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.target.lastToken;
   }
 }
 
@@ -93,12 +106,16 @@ export class PrefixExpression extends OperatorExpression {
  * Represents an expression in the form of `<EXPR><OP>`.
  */
 export class PostfixExpression extends OperatorExpression {
-  public get first(): tokens.Token {
-    return this.target.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitPostfixExpression(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.operator.last;
+  public get firstToken(): tokens.Token {
+    return this.target.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.operator.lastToken;
   }
 }
 
@@ -114,12 +131,16 @@ export class BinaryExpression extends OperatorExpression {
     super(operator, left);
   }
 
-  public get first(): tokens.Token {
-    return this.left.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitBinaryExpresion(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.right.last;
+  public get firstToken(): tokens.Token {
+    return this.left.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.right.lastToken;
   }
 }
 
@@ -134,12 +155,16 @@ export class PropertyExpression extends Expression {
     super();
   }
 
-  public get first(): tokens.Token {
-    return this.target.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitPropertyExpression(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.property.last;
+  public get firstToken(): tokens.Token {
+    return this.target.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.property.lastToken;
   }
 }
 
@@ -148,11 +173,15 @@ export class PropertyExpression extends Expression {
  */
 export class ArgumentList extends AstNode {
   constructor(
-    public readonly first: tokens.Token,
+    public readonly firstToken: tokens.Token,
     public readonly args: Expression[],
-    public readonly last: tokens.Token
+    public readonly lastToken: tokens.Token
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitArgumentList(this, context);
   }
 }
 
@@ -170,12 +199,16 @@ export class CallExpression extends Expression {
     super();
   }
 
-  public get first(): tokens.Token {
-    return (this.target || this.name).first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitCallExpression(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.args.last;
+  public get firstToken(): tokens.Token {
+    return (this.target || this.name).firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.args.lastToken;
   }
 }
 
@@ -186,6 +219,10 @@ export class Identifier extends SimpleExpression {
   public get name(): string {
     return this.token.lexeme;
   }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitIdentifier(this, context);
+  }
 }
 
 /**
@@ -194,6 +231,10 @@ export class Identifier extends SimpleExpression {
 export class LiteralBoolean extends SimpleExpression {
   public get value(): string {
     return this.token.lexeme;
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralBoolean(this, context);
   }
 }
 
@@ -204,6 +245,10 @@ export class LiteralNumber extends SimpleExpression {
   public get value(): string {
     return this.token.lexeme;
   }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralNumber(this, context);
+  }
 }
 
 /**
@@ -212,6 +257,10 @@ export class LiteralNumber extends SimpleExpression {
 export class LiteralString extends SimpleExpression {
   public get value(): string {
     return this.token.lexeme;
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitLiteralString(this, context);
   }
 }
 
@@ -227,12 +276,16 @@ export class VariableDeclaration extends AstNode {
     super();
   }
 
-  public get first(): tokens.Token {
-    return this.name.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitVariableDeclaration(this, context);
   }
 
-  public get last(): tokens.Token {
-    return (this.value || this.type || this.name).last;
+  public get firstToken(): tokens.Token {
+    return this.name.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return (this.value || this.type || this.name).lastToken;
   }
 }
 
@@ -241,11 +294,15 @@ export class VariableDeclaration extends AstNode {
  */
 export class ParameterList extends AstNode {
   constructor(
-    public readonly first: tokens.Token,
+    public readonly firstToken: tokens.Token,
     public readonly params: VariableDeclaration[],
-    public readonly last: tokens.Token
+    public readonly lastToken: tokens.Token
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitParameterList(this, context);
   }
 }
 
@@ -254,11 +311,15 @@ export class ParameterList extends AstNode {
  */
 export class StatementBlock extends AstNode {
   constructor(
-    public readonly first: tokens.Token,
+    public readonly firstToken: tokens.Token,
     public readonly statements: Statement[],
-    public readonly last: tokens.Token
+    public readonly lastToken: tokens.Token
   ) {
     super();
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitStatementBlock(this, context);
   }
 }
 
@@ -275,12 +336,16 @@ export class FunctionDeclaration extends AstNode {
     super();
   }
 
-  public get first(): tokens.Token {
-    return this.name.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitFunctionDeclaration(this, context);
   }
 
-  public get last(): tokens.Token {
-    return this.body.last;
+  public get firstToken(): tokens.Token {
+    return this.name.firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.body.lastToken;
   }
 }
 
@@ -292,13 +357,40 @@ export class TypeDeclaration extends AstNode {
     public readonly modifiers: tokens.Token[],
     public readonly name: Identifier,
     public readonly members: Array<FunctionDeclaration | VariableDeclaration>,
-    public readonly last: tokens.Token
+    public readonly lastToken: tokens.Token
   ) {
     super();
   }
 
-  public get first(): tokens.Token {
-    return this.modifiers.length ? this.modifiers[0] : this.name.first;
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitTypeDeclaration(this, context);
+  }
+
+  public get firstToken(): tokens.Token {
+    return this.modifiers.length ? this.modifiers[0] : this.name.firstToken;
+  }
+}
+
+/**
+ * Represents a module declared in a file.
+ */
+export class ModuleDeclaration extends AstNode {
+  constructor(
+    public readonly members: Array<FunctionDeclaration | TypeDeclaration | VariableDeclaration>,
+  ) {
+    super();
+  }
+
+  public accept<R, C>(visitor: IAstVisitor<R, C>, context?: C): R {
+    return visitor.visitModuleDeclaration(this, context);
+  }
+
+  public get firstToken(): tokens.Token {
+    return this.members[0].firstToken;
+  }
+
+  public get lastToken(): tokens.Token {
+    return this.members[this.members.length - 1].lastToken;
   }
 }
 
@@ -311,16 +403,20 @@ export class AstParser {}
  */
 export interface IAstVisitor<R, C> {
   visitArgumentList(node: ArgumentList, context?: C): R;
+  visitBinaryExpresion(node: BinaryExpression, context?: C): R;
   visitCallExpression(node: CallExpression, context?: C): R;
   visitFunctionDeclaration(node: FunctionDeclaration, context?: C): R;
   visitIdentifier(node: Identifier, context?: C): R;
   visitLiteralBoolean(node: LiteralBoolean, context?: C): R;
   visitLiteralNumber(node: LiteralNumber, context?: C): R;
   visitLiteralString(node: LiteralString, context?: C): R;
+  visitModuleDeclaration(node: ModuleDeclaration, context?: C): R;
+  visitOperator(node: Operator, context?: C): R;
   visitParameterList(node: ParameterList, context?: C): R;
   visitPrefixExpression(node: PrefixExpression, context?: C): R;
   visitPostfixExpression(node: PostfixExpression, context?: C): R;
   visitPropertyExpression(node: PropertyExpression, context?: C): R;
+  visitStatementBlock(node: StatementBlock, context?: C): R;
   visitTypeDeclaration(node: TypeDeclaration, context?: C): R;
   visitVariableDeclaration(node: VariableDeclaration, context?: C): R;
 }
