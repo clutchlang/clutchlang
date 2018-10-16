@@ -14,37 +14,29 @@ import {
   UnaryExpression,
   VariableDeclarationStatement,
 } from '../parser';
-import { ParameterDeclaration } from '../parser/nodes/nodes';
+import { Expression, ParameterDeclaration } from '../parser/nodes/nodes';
 import { StatementBlock } from '../parser/nodes/statements';
+import { CORE_MODULE } from './core';
+import { ModuleDeclarationElement } from './element';
 import {
-  BOOLEAN_DECLARATION,
-  BOOLEAN_TYPE,
-  FunctionType,
-  NUMBER_DECLARATION,
-  NUMBER_TYPE,
-  STRING_TYPE,
-  Type,
-  VOID_TYPE,
-} from './type';
+  AssignmentError,
+  MissingIdentifier,
+  NoSuchMethodError,
+  ParameterLengthError,
+} from './errors';
+import { SOMETHING_TYPE, Type, TypeKind, VOID_TYPE } from './type';
 
-/**
- *  The expected number of parameters for a binary operator.
- */
-const BINARY_OPERATOR_LENGTH = 2;
+interface ITypeCheckerContext {
+  module: ModuleDeclarationElement;
+  scope: LocalScope;
+}
 
-/**
- * The expected number of parameters for a unary operator.
- */
-const UNARY_OPERATOR_LENGTH = 1;
+const STRING_TYPE = CORE_MODULE.resolveType('String')!;
+const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
+const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
 
-export class TypeChecker extends AstVisitor<Type, TypeScope> {
-  private readonly declarations = new Map([
-    [BOOLEAN_TYPE, BOOLEAN_DECLARATION],
-    [NUMBER_TYPE, NUMBER_DECLARATION],
-  ]);
-
-  /* istanbul ignore next */
-  public visitFileRoot(node: FileRoot, context: TypeScope): Type {
+export class TypeCheckingVisitor extends AstVisitor<Type, ITypeCheckerContext> {
+  public visitFileRoot(node: FileRoot, context: ITypeCheckerContext): Type {
     for (const element of node.topLevelElements) {
       element.accept(this, context);
     }
@@ -53,47 +45,44 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
 
   public visitBinaryExpression(
     node: BinaryExpression,
-    context: TypeScope
+    context: ITypeCheckerContext
   ): Type {
     const left = node.left.accept(this, context);
     const right = node.right.accept(this, context);
-    const declaration = this.declarations.get(left)!;
-    const method = declaration.methods[node.operator.name];
-    if (method === null || method === undefined) {
-      throw new Error(
-        `No such method: No method ${node.operator.name} found on ${left.name}`
-      );
+    switch (left.kind) {
+      case TypeKind.Concrete: {
+        const method = left.resolveMethod(node.operator.name);
+        if (method === null || method === undefined) {
+          throw new NoSuchMethodError(node.operator.name, left);
+        }
+        if (!right.isAssignableTo(method.parameterTypes[0])) {
+          throw new AssignmentError(method.parameterTypes[0], right);
+        }
+        return method.returnType;
+      }
+      case TypeKind.Function:
+      case TypeKind.Something:
+      case TypeKind.Nothing:
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    /* istanbul ignore if */
-    if (method.parameterTypes.length !== BINARY_OPERATOR_LENGTH) {
-      throw new Error(
-        `Mismatched parameters: requires: ${method.parameterTypes
-          .map(p => p.name)
-          .join(', ')} found (${left.name},${right.name})}`
-      );
-    }
-    const second = method.parameterTypes[BINARY_OPERATOR_LENGTH - 1]!;
-    if (!right.isAssignableTo(second)) {
-      throw new Error(
-        `Mismatched types: cannot assign ${right.name} to ${second.name}`
-      );
-    }
-    return method.returnType;
   }
 
-  public visitGroupExpression(node: GroupExpression, context: TypeScope): Type {
+  public visitGroupExpression(
+    node: GroupExpression,
+    context: ITypeCheckerContext
+  ): Type {
     return node.expression.accept(this, context);
   }
 
   public visitConditionalExpression(
     node: ConditionalExpression,
-    context: TypeScope
+    context: ITypeCheckerContext
   ): Type {
     const ifType = node.condition.accept(this, context);
     if (!ifType.isAssignableTo(BOOLEAN_TYPE)) {
-      throw new Error(
-        `Type error: boolean expression expected found ${ifType.name}`
-      );
+      throw new AssignmentError(BOOLEAN_TYPE, ifType);
     }
     let ifBranchType: Type;
     let elseBranchType: Type;
@@ -122,86 +111,95 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
     if (ifBranchType.isAssignableTo(elseBranchType)) {
       return ifBranchType;
     }
-    throw new Error(
-      `Incompatible branch types: if branch returned ${
-        ifBranchType.name
-      } but else branch returned ${elseBranchType.name}`
-    );
+    return SOMETHING_TYPE;
   }
 
   public visitInvokeExpression(
     node: InvokeExpression,
-    context: TypeScope
+    context: ITypeCheckerContext
   ): Type {
-    const result = node.target.accept(this, context);
-    if (result instanceof FunctionType) {
-      const parameterTypes = node.parameters.map(param =>
-        param.accept(this, context)
-      );
-      if (parameterTypes.length !== result.parameterTypes.length) {
-        const required = result.parameterTypes.map(p => p.name).join(', ');
-        const provided = parameterTypes.map(p => p.name).join(', ');
-        throw new Error(
-          `Mismatched parameters: requires: ${required} found ${provided}`
+    const result: Type = node.target.accept(this, context);
+    switch (result.kind) {
+      case TypeKind.Function: {
+        const argumentTypes = node.parameters.map(param =>
+          param.accept(this, context)
         );
-      }
-      for (let i = 0; i < parameterTypes.length; i++) {
-        if (!parameterTypes[i].isAssignableTo(result.parameterTypes[i])) {
-          throw new Error(
-            `Mismatched parameters: requires: ${result.parameterTypes
-              .map(p => p.name)
-              .join(', ')} found ${parameterTypes.map(p => p.name).join(', ')}`
+        if (argumentTypes.length !== result.parameterTypes.length) {
+          throw new ParameterLengthError(
+            result.name,
+            result.parameterTypes.length,
+            argumentTypes.length
           );
         }
+        for (let i = 0; i < argumentTypes.length; i++) {
+          if (!argumentTypes[i].isAssignableTo(result.parameterTypes[i])) {
+            throw new AssignmentError(
+              result.parameterTypes[i],
+              argumentTypes[i]
+            );
+          }
+        }
+        return result.returnType;
       }
-      return result.returnType;
+      case TypeKind.Concrete:
+      case TypeKind.Nothing:
+      case TypeKind.Something:
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    throw new Error(`Invoke error: Cannot invoke non-function ${result.name}`);
   }
 
-  public visitLiteralBoolean(_: LiteralBoolean, __: TypeScope): Type {
+  public visitLiteralBoolean(_: LiteralBoolean, __: ITypeCheckerContext): Type {
     return BOOLEAN_TYPE;
   }
 
-  public visitLiteralNumber(_: LiteralNumber, __: TypeScope): Type {
+  public visitLiteralNumber(_: LiteralNumber, __: ITypeCheckerContext): Type {
     return NUMBER_TYPE;
   }
 
-  public visitLiteralString(_: LiteralString, __: TypeScope): Type {
+  public visitLiteralString(_: LiteralString, __: ITypeCheckerContext): Type {
     return STRING_TYPE;
   }
 
-  public visitSimpleName(node: LiteralIdentifier, scope: TypeScope): Type {
-    const result = scope.lookup(node.name);
+  public visitSimpleName(
+    node: LiteralIdentifier,
+    context: ITypeCheckerContext
+  ): Type {
+    const result =
+      context.scope.lookup(node.name) || context.module.resolveType(node.name);
     if (result === null) {
-      throw new Error(`Missing identifier: ${node.name} is not defined`);
+      throw new MissingIdentifier(node.name);
     }
     return result;
   }
 
-  public visitUnaryExpression(node: UnaryExpression, context: TypeScope): Type {
-    const target = node.target.accept(this, context);
-    const declaration = this.declarations.get(target)!;
-    const method = declaration.methods[node.operator.name];
-    if (method === null || method === undefined) {
-      throw new Error(
-        `No such method: No method ${node.operator.name} found on ${
-          target.name
-        }`
-      );
+  public visitUnaryExpression(
+    node: UnaryExpression,
+    context: ITypeCheckerContext
+  ): Type {
+    const target = node.target.accept(this, context)!;
+    switch (target.kind) {
+      case TypeKind.Concrete: {
+        const method = target.resolveMethod(node.operator.name);
+        if (method === null || method === undefined) {
+          throw new NoSuchMethodError(node.operator.name, target);
+        }
+        return method.returnType;
+      }
+      case TypeKind.Something:
+      case TypeKind.Nothing:
+      case TypeKind.Function:
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    /* istanbul ignore if */
-    if (method.parameterTypes.length !== UNARY_OPERATOR_LENGTH) {
-      throw new Error(
-        `Mismatched parameters: requires: ${method.parameterTypes
-          .map(p => p.name)
-          .join(', ')} found ${target.name}`
-      );
-    }
-    return method.returnType;
   }
 
-  public visitReturnStatement(node: ReturnStatement, context: TypeScope): Type {
+  public visitReturnStatement(
+    node: ReturnStatement,
+    context: ITypeCheckerContext
+  ): Type {
     if (node.expression !== null && node.expression !== undefined) {
       const result = node.expression.accept(this, context);
       return result;
@@ -211,65 +209,69 @@ export class TypeChecker extends AstVisitor<Type, TypeScope> {
 
   public visitVariableDeclarationStatement(
     node: VariableDeclarationStatement,
-    context: TypeScope
+    context: ITypeCheckerContext
   ): Type {
-    context.store(node.name.name, node.expression.accept(this, context));
+    context.scope.store(node.name.name, node.expression.accept(this, context));
     return VOID_TYPE;
   }
 
   public visitFunctionDeclaration(
     node: FunctionDeclaration,
-    scope: TypeScope
+    context: ITypeCheckerContext
   ): Type {
-    const returnType =
-      node.returnType === undefined
-        ? VOID_TYPE
-        : node.returnType.accept(this, scope);
-    const typeParameters = node.parameters.map(param =>
-      param.accept(this, scope)
-    );
-    const functionType = new FunctionType(typeParameters, returnType);
-    scope.store(node.name.name, functionType);
-    /* istanbul ignore if */
-    if (node.body instanceof StatementBlock) {
-      throw new Error('Unsupported error');
-    } else {
-      const childScope = new TypeScope(scope);
-      for (let i = 0; i < typeParameters.length; i++) {
-        childScope.store(node.parameters[i].name.name, typeParameters[i]);
+    const functionType = context.module.resolveType(node.name.name)!;
+    switch (functionType.kind) {
+      case TypeKind.Function: {
+        const scope = new LocalScope();
+        for (const param of node.parameters) {
+          const paramType =
+            param.type === undefined
+              ? SOMETHING_TYPE
+              : context.module.resolveType(param.type.name);
+          if (paramType === null) {
+            throw new Error('5');
+          }
+          scope.store(param.name.name, paramType);
+        }
+        if (node.body instanceof Expression) {
+          const actualRetunType = node.body.accept(this, {
+            module: context.module,
+            scope,
+          });
+          if (!actualRetunType.isAssignableTo(functionType.returnType)) {
+            throw new AssignmentError(functionType.returnType, actualRetunType);
+          }
+        } else {
+          /* istanbul ignore next */
+          throw new Error('Unsupported');
+        }
+        return VOID_TYPE;
       }
-      const actualReturnType = node.body.accept(this, childScope);
-      if (!returnType.isAssignableTo(actualReturnType)) {
-        throw new Error(
-          `Return type error: ${node.name} declares a return type of ${
-            returnType.name
-          } but actually returns ${actualReturnType.name}`
-        );
-      }
+      case TypeKind.Concrete:
+      case TypeKind.Something:
+      case TypeKind.Nothing:
+      case TypeKind.Void:
+        /* istanbul ignore next */
+        throw new Error('Unreachable');
     }
-    return functionType;
   }
 
   public visitParameterDeclaration(
-    node: ParameterDeclaration,
-    scope: TypeScope
+    _: ParameterDeclaration,
+    __: ITypeCheckerContext
   ): Type {
-    if (node.type === undefined) {
-      throw new Error(
-        `Missing Parameter Type: No type for parameter ${node.name}`
-      );
-    }
-    const type = scope.lookup(node.type.name);
-    if (type === null) {
-      throw new Error(`Unknown Type: No type named ${node.type.name}`);
-    }
-    return type;
+    // NOTE: only the element tree handles parameter declarations.
+    /* istanbul ignore next */
+    throw new Error('Unreachable');
   }
 }
 
-export class TypeScope {
+/**
+ * A scope for tracking the types of local variables and type promotions.
+ */
+export class LocalScope {
   private readonly cache: Map<string, Type> = new Map();
-  constructor(private readonly parent: TypeScope | null) {}
+  constructor(private readonly parent?: LocalScope | undefined) {}
 
   public lookup(id: string): Type | null {
     const type = this.cache.get(id);

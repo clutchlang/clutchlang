@@ -1,19 +1,21 @@
+import { CORE_MODULE } from '../../src/language/typesystem/core';
 import {
-  BOOLEAN_TYPE,
-  BOTTOM_TYPE,
   FunctionType,
-  NUMBER_TYPE,
-  STRING_TYPE,
+  NOTHING_TYPE,
   VOID_TYPE,
 } from '../../src/language/typesystem/type';
 
-describe('', () => {
+describe('Types', () => {
+  const STRING_TYPE = CORE_MODULE.resolveType('String')!;
+  const NUMBER_TYPE = CORE_MODULE.resolveType('Number')!;
+  const BOOLEAN_TYPE = CORE_MODULE.resolveType('Boolean')!;
+
   it('Exact types are exact', () => {
     expect(STRING_TYPE.isAssignableTo(STRING_TYPE)).toBe(true);
     expect(BOOLEAN_TYPE.isAssignableTo(BOOLEAN_TYPE)).toBe(true);
     expect(NUMBER_TYPE.isAssignableTo(NUMBER_TYPE)).toBe(true);
     expect(VOID_TYPE.isAssignableTo(VOID_TYPE)).toBe(true);
-    expect(BOTTOM_TYPE.isAssignableTo(BOTTOM_TYPE)).toBe(true);
+    expect(NOTHING_TYPE.isAssignableTo(NOTHING_TYPE)).toBe(true);
 
     expect(STRING_TYPE.name).toBe('String');
     expect(BOOLEAN_TYPE.name).toBe('Boolean');
@@ -23,7 +25,11 @@ describe('', () => {
     expect(STRING_TYPE.isAssignableTo(BOOLEAN_TYPE)).toBe(false);
     expect(STRING_TYPE.isAssignableTo(NUMBER_TYPE)).toBe(false);
     expect(STRING_TYPE.isAssignableTo(VOID_TYPE)).toBe(false);
-    expect(STRING_TYPE.isAssignableTo(BOTTOM_TYPE)).toBe(false);
+    expect(STRING_TYPE.isAssignableTo(NOTHING_TYPE)).toBe(false);
+
+    expect(NOTHING_TYPE.isSubtypeOf(STRING_TYPE)).toBe(true);
+    expect(NOTHING_TYPE.isSubtypeOf(BOOLEAN_TYPE)).toBe(true);
+    expect(NOTHING_TYPE.isSubtypeOf(NUMBER_TYPE)).toBe(true);
   });
 
   it('function types are structural', () => {
