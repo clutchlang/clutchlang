@@ -1,21 +1,20 @@
 // tslint:disable:no-magic-numbers
 // tslint:disable:object-literal-sort-keys
 
-import * as tokens from '../../src/language/ast/token';
-import { ClutchLexer, tokenize } from '../../src/language/lexer';
+import * as lexer from '../../src/language/ast/lexer';
 
 /**
  * A structural representation of @see Token without an offset.
  */
 interface ITokenWithoutOffset {
   readonly text: string;
-  readonly type: tokens.ITokenTypes;
+  readonly type: lexer.ITokenTypes;
 }
 
 /**
  * Creates a simple structural representation of @param token.
  */
-function toSimpleToken(token: tokens.Token): ITokenWithoutOffset {
+function toSimpleToken(token: lexer.Token): ITokenWithoutOffset {
   return {
     text: token.lexeme,
     type: token.type,
@@ -26,7 +25,7 @@ function toSimpleToken(token: tokens.Token): ITokenWithoutOffset {
  * A simple version of @see tokenize that returns @see ITokenWithoutOffset.
  */
 function simpleTokenize(program: string): ITokenWithoutOffset[] {
-  return tokenize(program).map(toSimpleToken);
+  return lexer.tokenize(program).map(toSimpleToken);
 }
 
 it('should tokenize with a correct offset, comments, lexeme', () => {
@@ -34,9 +33,9 @@ it('should tokenize with a correct offset, comments, lexeme', () => {
     // Welcome!
     main => {}
   `;
-  const scanned = tokenize(program);
+  const scanned = lexer.tokenize(program);
   expect(scanned[0].offset).toBe(program.indexOf('main'));
-  expect(scanned[0].type).toBe(tokens.$Identifier);
+  expect(scanned[0].type).toBe(lexer.$Identifier);
   expect(scanned[0].lexeme).toBe('main');
   expect(scanned[0].length).toBe('main'.length);
   expect(scanned[0].isOperator).toBe(false);
@@ -48,13 +47,13 @@ it('should tokenize with a correct offset, comments, lexeme', () => {
   expect(scanned[0].comments.map(toSimpleToken)).toMatchObject([
     {
       text: '// Welcome!',
-      type: tokens.$Comment,
+      type: lexer.$Comment,
     },
   ]);
 });
 
 it('should tokenize EOF', () => {
-  const scanned = tokenize('');
+  const scanned = lexer.tokenize('');
   expect(scanned[0].isEndOfFile).toBe(true);
 });
 
@@ -65,31 +64,31 @@ it('should tokenize function declaration', () => {
   expect(scanned).toMatchObject([
     {
       text: 'main',
-      type: tokens.$Identifier,
+      type: lexer.$Identifier,
     },
     {
       text: '(',
-      type: tokens.$LeftParen,
+      type: lexer.$LeftParen,
     },
     {
       text: ')',
-      type: tokens.$RightParen,
+      type: lexer.$RightParen,
     },
     {
       text: '->',
-      type: tokens.$DashRightAngle,
+      type: lexer.$DashRightAngle,
     },
     {
       text: '{',
-      type: tokens.$LeftCurly,
+      type: lexer.$LeftCurly,
     },
     {
       text: '}',
-      type: tokens.$RightCurly,
+      type: lexer.$RightCurly,
     },
     {
       text: '',
-      type: tokens.$EOF,
+      type: lexer.$EOF,
     },
   ]);
 });
@@ -103,47 +102,47 @@ it('should tokenize external type declaration', () => {
   expect(scanned).toMatchObject([
     {
       text: 'external',
-      type: tokens.$External,
+      type: lexer.$External,
     },
     {
       text: 'type',
-      type: tokens.$Type,
+      type: lexer.$Type,
     },
     {
       text: 'Foo',
-      type: tokens.$Identifier,
+      type: lexer.$Identifier,
     },
     {
       text: '{',
-      type: tokens.$LeftCurly,
+      type: lexer.$LeftCurly,
     },
     {
       text: 'bar',
-      type: tokens.$Identifier,
+      type: lexer.$Identifier,
     },
     {
       text: '(',
-      type: tokens.$LeftParen,
+      type: lexer.$LeftParen,
     },
     {
       text: ')',
-      type: tokens.$RightParen,
+      type: lexer.$RightParen,
     },
     {
       text: '}',
-      type: tokens.$RightCurly,
+      type: lexer.$RightCurly,
     },
     {
       text: '',
-      type: tokens.$EOF,
+      type: lexer.$EOF,
     },
   ]);
 });
 
 describe('keywords', () => {
-  for (const name of Object.keys(ClutchLexer.keywords)) {
+  for (const name of Object.keys(lexer.ClutchLexer.keywords)) {
     it(`should tokenize "${name}"`, () => {
-      const keyword = ClutchLexer.keywords[name];
+      const keyword = lexer.ClutchLexer.keywords[name];
       expect(name).toBeTruthy();
       const results: ITokenWithoutOffset[] = [
         {
@@ -152,7 +151,7 @@ describe('keywords', () => {
         },
         {
           text: '',
-          type: tokens.$EOF,
+          type: lexer.$EOF,
         },
       ];
       expect(simpleTokenize(name)).toMatchObject(results);
@@ -163,14 +162,14 @@ describe('keywords', () => {
 describe('expressions', () => {
   describe('prefix', () => {
     const operators: {
-      [index: string]: tokens.IOperatorTokenType;
+      [index: string]: lexer.IOperatorTokenType;
     } = {
-      '!': tokens.$Exclaim,
-      '~': tokens.$Tilde,
-      '+': tokens.$Plus,
-      '-': tokens.$Dash,
-      '++': tokens.$PlusPlus,
-      '--': tokens.$DashDash,
+      '!': lexer.$Exclaim,
+      '~': lexer.$Tilde,
+      '+': lexer.$Plus,
+      '-': lexer.$Dash,
+      '++': lexer.$PlusPlus,
+      '--': lexer.$DashDash,
     };
 
     for (const name of Object.keys(operators)) {
@@ -184,11 +183,11 @@ describe('expressions', () => {
           },
           {
             text: 'x',
-            type: tokens.$Identifier,
+            type: lexer.$Identifier,
           },
           {
             text: '',
-            type: tokens.$EOF,
+            type: lexer.$EOF,
           },
         ];
         expect(simpleTokenize(`${name}x`)).toMatchObject(results);
@@ -198,32 +197,32 @@ describe('expressions', () => {
 
   describe('binary', () => {
     const operators: {
-      [index: string]: tokens.IOperatorTokenType;
+      [index: string]: lexer.IOperatorTokenType;
     } = {
-      '.': tokens.$Period,
-      '*': tokens.$Star,
-      '/': tokens.$Slash,
-      '%': tokens.$Percent,
-      '+': tokens.$Plus,
-      '-': tokens.$Dash,
-      '<<': tokens.$LeftAngleLeftAngle,
-      '>>': tokens.$RightAngleRightAngle,
-      '<': tokens.$LeftAngle,
-      '<=': tokens.$LeftAngleEquals,
-      '>': tokens.$RightAngle,
-      '>=': tokens.$RightAngleEquals,
-      '==': tokens.$EqualsEquals,
-      '!=': tokens.$ExclaimEquals,
-      '===': tokens.$EqualsEqualsEquals,
-      '!==': tokens.$ExclaimEqualsEquals,
-      '&&': tokens.$AndAnd,
-      '||': tokens.$PipePipe,
-      '=': tokens.$Equals,
-      '+=': tokens.$PlusEquals,
-      '-=': tokens.$DashEquals,
-      '*=': tokens.$StarEquals,
-      '/=': tokens.$SlashEquals,
-      '%=': tokens.$PercentEquals,
+      '.': lexer.$Period,
+      '*': lexer.$Star,
+      '/': lexer.$Slash,
+      '%': lexer.$Percent,
+      '+': lexer.$Plus,
+      '-': lexer.$Dash,
+      '<<': lexer.$LeftAngleLeftAngle,
+      '>>': lexer.$RightAngleRightAngle,
+      '<': lexer.$LeftAngle,
+      '<=': lexer.$LeftAngleEquals,
+      '>': lexer.$RightAngle,
+      '>=': lexer.$RightAngleEquals,
+      '==': lexer.$EqualsEquals,
+      '!=': lexer.$ExclaimEquals,
+      '===': lexer.$EqualsEqualsEquals,
+      '!==': lexer.$ExclaimEqualsEquals,
+      '&&': lexer.$AndAnd,
+      '||': lexer.$PipePipe,
+      '=': lexer.$Equals,
+      '+=': lexer.$PlusEquals,
+      '-=': lexer.$DashEquals,
+      '*=': lexer.$StarEquals,
+      '/=': lexer.$SlashEquals,
+      '%=': lexer.$PercentEquals,
     };
 
     for (const name of Object.keys(operators)) {
@@ -233,7 +232,7 @@ describe('expressions', () => {
         const results: ITokenWithoutOffset[] = [
           {
             text: 'x',
-            type: tokens.$Identifier,
+            type: lexer.$Identifier,
           },
           {
             text: name,
@@ -241,11 +240,11 @@ describe('expressions', () => {
           },
           {
             text: 'y',
-            type: tokens.$Identifier,
+            type: lexer.$Identifier,
           },
           {
             text: '',
-            type: tokens.$EOF,
+            type: lexer.$EOF,
           },
         ];
         expect(simpleTokenize(`x${name}y`)).toMatchObject(results);
@@ -255,10 +254,10 @@ describe('expressions', () => {
 
   describe('postfix', () => {
     const operators: {
-      [index: string]: tokens.IOperatorTokenType;
+      [index: string]: lexer.IOperatorTokenType;
     } = {
-      '++': tokens.$PlusPlus,
-      '--': tokens.$DashDash,
+      '++': lexer.$PlusPlus,
+      '--': lexer.$DashDash,
     };
 
     for (const name of Object.keys(operators)) {
@@ -268,7 +267,7 @@ describe('expressions', () => {
         const results: ITokenWithoutOffset[] = [
           {
             text: 'x',
-            type: tokens.$Identifier,
+            type: lexer.$Identifier,
           },
           {
             text: name,
@@ -276,7 +275,7 @@ describe('expressions', () => {
           },
           {
             text: '',
-            type: tokens.$EOF,
+            type: lexer.$EOF,
           },
         ];
         expect(simpleTokenize(`x${name}`)).toMatchObject(results);
@@ -288,35 +287,35 @@ describe('expressions', () => {
     const results: ITokenWithoutOffset[] = [
       {
         text: '(',
-        type: tokens.$LeftParen,
+        type: lexer.$LeftParen,
       },
       {
         text: 'a',
-        type: tokens.$Identifier,
+        type: lexer.$Identifier,
       },
       {
         text: '+',
-        type: tokens.$Plus,
+        type: lexer.$Plus,
       },
       {
         text: 'b',
-        type: tokens.$Identifier,
+        type: lexer.$Identifier,
       },
       {
         text: ')',
-        type: tokens.$RightParen,
+        type: lexer.$RightParen,
       },
       {
         text: '*',
-        type: tokens.$Star,
+        type: lexer.$Star,
       },
       {
         text: 'c',
-        type: tokens.$Identifier,
+        type: lexer.$Identifier,
       },
       {
         text: '',
-        type: tokens.$EOF,
+        type: lexer.$EOF,
       },
     ];
     expect(
@@ -333,11 +332,11 @@ describe('expressions', () => {
           expect(simpleTokenize(n)).toMatchObject([
             {
               text: n,
-              type: tokens.$Number,
+              type: lexer.$Number,
             },
             {
               text: '',
-              type: tokens.$EOF,
+              type: lexer.$EOF,
             },
           ]);
         });
@@ -353,11 +352,11 @@ describe('expressions', () => {
         ).toMatchObject([
           {
             text: 'Hello World',
-            type: tokens.$String,
+            type: lexer.$String,
           },
           {
             text: '',
-            type: tokens.$EOF,
+            type: lexer.$EOF,
           },
         ]);
       });
@@ -374,11 +373,11 @@ describe('expressions', () => {
         ).toMatchObject([
           {
             text: '\n            1\n            2\n            3\n          ',
-            type: tokens.$String,
+            type: lexer.$String,
           },
           {
             text: '',
-            type: tokens.$EOF,
+            type: lexer.$EOF,
           },
         ]);
       });
@@ -390,11 +389,11 @@ describe('expressions', () => {
           expect(simpleTokenize(n)).toMatchObject([
             {
               text: n,
-              type: tokens.$Identifier,
+              type: lexer.$Identifier,
             },
             {
               text: '',
-              type: tokens.$EOF,
+              type: lexer.$EOF,
             },
           ]);
         });

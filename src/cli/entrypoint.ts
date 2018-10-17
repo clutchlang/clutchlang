@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { tokenize } from '../language/lexer';
+import { tokenize } from '../language/ast/lexer/tokenizer';
 import { ClutchParser } from '../language/parser/parser';
 import { PrintTreeVisitor } from '../language/parser/visitors/printer';
 import { SimpleJsTranspiler } from '../transpiler/transpiler';

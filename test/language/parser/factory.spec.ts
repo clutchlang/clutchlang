@@ -1,6 +1,6 @@
 // tslint:disable:no-magic-numbers
 
-import * as tokens from '../../../src/language/ast/token';
+import * as tokens from '../../../src/language/ast/lexer/token';
 import {
   AstNodeFactory,
   Operator,

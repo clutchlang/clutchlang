@@ -1,5 +1,5 @@
 // tslint:disable:no-magic-numbers
-import { tokenize } from '../../../../src/language/lexer';
+import { tokenize } from '../../../../src/language/ast/lexer/tokenizer';
 import {
   ClutchParser,
   LiteralBoolean,

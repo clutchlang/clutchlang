@@ -1,4 +1,4 @@
-import * as tokens from '../token';
+import * as lexer from '../lexer';
 
 /**
  * Represents an unresolved node in the abstract syntax tree.
@@ -12,33 +12,40 @@ export abstract class AstNode {
   /**
    * First token that represents this AST node.
    */
-  public abstract get firstToken(): tokens.Token;
+  public abstract get firstToken(): lexer.Token;
 
   /**
    * Last token that represents this AST node.
    */
-  public abstract get lastToken(): tokens.Token;
+  public abstract get lastToken(): lexer.Token;
 }
 
 /**
  * Represents a simple AST node that originates from a single token.
  */
 export abstract class SimpleNode extends AstNode {
-  constructor(protected readonly token: tokens.Token) {
+  constructor(protected readonly token: lexer.Token) {
     super();
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.token;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.token;
   }
 }
 
 export enum OperatorType {
   Property,
+  PrefixIncrement,
+  PrefixDecrement,
+  UnaryNegative,
+  UnaryPositive,
+  LogicalNot,
+  PostfixIncrement,
+  PostfixDecrement,
   Multiplication,
   Division,
   Remainder,
@@ -60,13 +67,14 @@ export enum OperatorType {
   AssignMultipliedBy,
   AssignDividedBy,
   AssignRemainderBy,
+  UnexpectedOrError,
 }
 
 /**
  * Represents an operator node parsed from a single token.
  */
 export class Operator extends SimpleNode {
-  constructor(token: tokens.Token, public readonly type: OperatorType) {
+  constructor(token: lexer.Token, public readonly type: OperatorType) {
     super(token);
   }
 
@@ -89,15 +97,15 @@ export abstract class Expression extends Statement {}
  * Represents a simple AST node that is also an expression.
  */
 export abstract class SimpleExpression extends Expression {
-  constructor(protected readonly token: tokens.Token) {
+  constructor(protected readonly token: lexer.Token) {
     super();
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.token;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.token;
   }
 }
@@ -122,11 +130,11 @@ export class PrefixExpression extends OperatorExpression {
     return visitor.visitPrefixExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.operator.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.target.lastToken;
   }
 }
@@ -139,11 +147,11 @@ export class PostfixExpression extends OperatorExpression {
     return visitor.visitPostfixExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.target.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.operator.lastToken;
   }
 }
@@ -164,11 +172,11 @@ export class BinaryExpression extends OperatorExpression {
     return visitor.visitBinaryExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.left.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.right.lastToken;
   }
 }
@@ -188,11 +196,11 @@ export class PropertyExpression extends Expression {
     return visitor.visitPropertyExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.target.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.property.lastToken;
   }
 }
@@ -202,9 +210,9 @@ export class PropertyExpression extends Expression {
  */
 export class ArgumentList extends AstNode {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly args: Expression[],
-    public readonly lastToken: tokens.Token
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
@@ -232,18 +240,18 @@ export class CallExpression extends Expression {
     return visitor.visitCallExpression(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return (this.target || this.name).firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.args.lastToken;
   }
 }
 
 export class ConditionalExpression extends Expression {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly condition: Expression,
     public readonly body: Expression | StatementBlock,
     public readonly elseCondition?: Expression,
@@ -256,16 +264,16 @@ export class ConditionalExpression extends Expression {
     return visitor.visitConditionalExpression(this, context);
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return (this.elseBody || this.body).lastToken;
   }
 }
 
 export class GroupExpression extends Expression {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly expression: Expression,
-    public readonly lastToken: tokens.Token
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
@@ -343,11 +351,11 @@ export class VariableDeclaration extends AstNode {
     return visitor.visitVariableDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.name.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return (this.value || this.type || this.name).lastToken;
   }
 }
@@ -357,9 +365,9 @@ export class VariableDeclaration extends AstNode {
  */
 export class ParameterList extends AstNode {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly params: VariableDeclaration[],
-    public readonly lastToken: tokens.Token
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
@@ -374,9 +382,9 @@ export class ParameterList extends AstNode {
  */
 export class StatementBlock extends AstNode {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly statements: Statement[],
-    public readonly lastToken: tokens.Token
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
@@ -391,7 +399,7 @@ export class StatementBlock extends AstNode {
  */
 export class ReturnStatement extends AstNode {
   constructor(
-    public readonly firstToken: tokens.Token,
+    public readonly firstToken: lexer.Token,
     public readonly expression?: Expression
   ) {
     super();
@@ -401,7 +409,7 @@ export class ReturnStatement extends AstNode {
     return visitor.visitReturnStatement(this, context);
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.expression ? this.expression.lastToken : this.firstToken;
   }
 }
@@ -423,11 +431,11 @@ export class FunctionDeclaration extends AstNode {
     return visitor.visitFunctionDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.name.firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return (this.body || this.returnType || this.params || this.name).lastToken;
   }
 }
@@ -437,10 +445,10 @@ export class FunctionDeclaration extends AstNode {
  */
 export class TypeDeclaration extends AstNode {
   constructor(
-    public readonly modifiers: tokens.Token[],
+    public readonly modifiers: lexer.Token[],
     public readonly name: Identifier,
     public readonly members: Array<FunctionDeclaration | VariableDeclaration>,
-    public readonly lastToken: tokens.Token
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
@@ -449,7 +457,7 @@ export class TypeDeclaration extends AstNode {
     return visitor.visitTypeDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.modifiers.length ? this.modifiers[0] : this.name.firstToken;
   }
 }
@@ -470,11 +478,11 @@ export class ModuleDeclaration extends AstNode {
     return visitor.visitModuleDeclaration(this, context);
   }
 
-  public get firstToken(): tokens.Token {
+  public get firstToken(): lexer.Token {
     return this.declarations[0].firstToken;
   }
 
-  public get lastToken(): tokens.Token {
+  public get lastToken(): lexer.Token {
     return this.declarations[this.declarations.length - 1].lastToken;
   }
 }

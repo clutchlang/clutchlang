@@ -1,12 +1,12 @@
-import { ISourceSpan, StringScanner } from '../agnostic/scanner';
+import { ISourceSpan, StringScanner } from '../../../agnostic/scanner';
 import {
   Characters,
   isDigit,
   isHexadecimal,
   isLetter,
   isWhiteSpace,
-} from '../agnostic/strings';
-import * as tokens from './ast/token';
+} from '../../../agnostic/strings';
+import * as tokens from './token';
 
 function isIdentifier(character: number): boolean {
   return isIdentifierStart(character) || isDigit(character);

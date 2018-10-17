@@ -1,4 +1,4 @@
-import { Token } from '../token';
+import { Token } from '../lexer';
 import * as ast from './nodes';
 
 /**

@@ -1,4 +1,4 @@
-import * as ast_tokens from '../../ast/token';
+import * as ast_tokens from '../../ast/lexer/token';
 import { AstNodeFactory } from '../factory';
 
 /**

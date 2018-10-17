@@ -1,5 +1,5 @@
 import { splitLines, unescapeString } from '../../agnostic/strings';
-import * as tokens from '../ast/token';
+import * as tokens from '../ast/lexer/token';
 import { Expression, Operator } from '../parser';
 import {
   BinaryExpression,

@@ -1,4 +1,4 @@
-import * as tokens from '../../ast/token';
+import * as tokens from '../../ast/lexer/token';
 import { Operator } from '../../parser';
 import { LiteralIdentifier } from '../nodes/expressions';
 import { Expression } from '../nodes/nodes';

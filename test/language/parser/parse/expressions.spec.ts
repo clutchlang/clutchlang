@@ -1,4 +1,4 @@
-import { tokenize } from '../../../../src/language/lexer';
+import { tokenize } from '../../../../src/language/ast/lexer/tokenizer';
 import {
   BinaryExpression,
   ClutchParser,
