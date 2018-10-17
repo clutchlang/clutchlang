@@ -1,26 +1,52 @@
 import * as lexer from '../../lexer';
-import { StaticMessageType } from '../../message/message';
+import { StaticMessageCode } from '../../message/message';
 import * as ast from '../../parser';
-import { AbstractParser } from "./abstract";
+import { AbstractParser } from './abstract';
 
 /**
  * Partially implements parsing just for operators.
  */
 export class OperatorParser extends AbstractParser {
-  public parseOperator(token: lexer.Token, type: ast.OperatorType): ast.Operator {
-    if (type === ast.OperatorType.UnexpectedOrError) {
-      token = new lexer.Token(
-        token.offset,
-        token.type,
-        token.comments,
-        token.lexeme,
-        true,
-      );
-    }
-    return this.factory.createOperator(token, type);
+  /**
+   * Parse and returns a binary operator from @param token.
+   *
+   * If the token provided is not a valid binary operator, an error may be
+   * reported and the operator is replaced with a synthetic one to allow parsing
+   * to continue.
+   */
+  public parseBinaryOperator(
+    token: lexer.Token
+  ): ast.Operator<ast.BinaryOperatorType> {
+    return this.createOperator(token, this.findBinaryOperator(token));
   }
 
-  public findBinaryOperator(token: lexer.Token): ast.OperatorType {
+  /**
+   * Parse and returns a prefix operator from @param token.
+   *
+   * If the token provided is not a valid binary operator, an error may be
+   * reported and the operator is replaced with a synthetic one to allow parsing
+   * to continue.
+   */
+  public parsePrefixOperator(
+    token: lexer.Token
+  ): ast.Operator<ast.PrefixOperatorType> {
+    return this.createOperator(token, this.findPrefixOperator(token));
+  }
+
+  /**
+   * Parse and returns a postfix operator from @param token.
+   *
+   * If the token provided is not a valid binary operator, an error may be
+   * reported and the operator is replaced with a synthetic one to allow parsing
+   * to continue.
+   */
+  public parsePostfixOperator(
+    token: lexer.Token
+  ): ast.Operator<ast.PostfixOperatorType> {
+    return this.createOperator(token, this.findPostfixOperator(token));
+  }
+
+  private findBinaryOperator(token: lexer.Token): ast.BinaryOperatorType {
     switch (token.lexeme) {
       case '.':
         return ast.OperatorType.Property;
@@ -67,11 +93,11 @@ export class OperatorParser extends AbstractParser {
       case '%=':
         return ast.OperatorType.AssignRemainderBy;
       default:
-        return this.unexpectedOperator(token);
+        return this.invalidOperator(token);
     }
   }
 
-  public findPrefixOperator(token: lexer.Token): ast.OperatorType {
+  private findPrefixOperator(token: lexer.Token): ast.PrefixOperatorType {
     switch (token.lexeme) {
       case '++':
         return ast.OperatorType.PrefixIncrement;
@@ -84,23 +110,33 @@ export class OperatorParser extends AbstractParser {
       case '!':
         return ast.OperatorType.LogicalNot;
       default:
-        return this.unexpectedOperator(token);
+        return this.invalidOperator(token);
     }
   }
 
-  public findPostfixOperator(token: lexer.Token): ast.OperatorType {
+  private findPostfixOperator(token: lexer.Token): ast.PostfixOperatorType {
     switch (token.lexeme) {
       case '++':
         return ast.OperatorType.PostfixIncrement;
       case '--':
         return ast.OperatorType.PostfixDecrement;
       default:
-        return this.unexpectedOperator(token);
+        return this.invalidOperator(token);
     }
   }
 
-  private unexpectedOperator(token: lexer.Token): ast.OperatorType {
-    this.reporter.reportToken(token, StaticMessageType.Error, 'Unexpected operator');
-    return ast.OperatorType.UnexpectedOrError;
+  private createOperator<T extends ast.OperatorType>(
+    token: lexer.Token,
+    type: T
+  ): ast.Operator<T> {
+    if (type === ast.OperatorType.InvalidOrError) {
+      token = token.toSyntheticToken();
+    }
+    return this.factory.createOperator(token, type);
+  }
+
+  private invalidOperator(token: lexer.Token): ast.InvalidOperatorType {
+    this.reporter.reportToken(token, StaticMessageCode.INVALID_OPERATOR);
+    return ast.OperatorType.InvalidOrError;
   }
 }

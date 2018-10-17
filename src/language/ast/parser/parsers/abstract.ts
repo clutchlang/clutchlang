@@ -11,7 +11,7 @@ export abstract class AbstractParser {
   constructor(
     protected readonly tokens: lexer.Token[],
     protected readonly reporter: StaticMessageReporter,
-    protected readonly factory = new AstFactory(),
+    protected readonly factory = new AstFactory()
   ) {}
 
   /**

@@ -15,7 +15,7 @@ export class Token {
     public readonly type: ITokenTypes,
     public readonly comments: Token[],
     public readonly lexeme: string,
-    public readonly isSynthetic = false,
+    public readonly isSynthetic = false
   ) {}
 
   /**
@@ -73,13 +73,7 @@ export class Token {
    * Creates a new copy of this token.
    */
   public toSyntheticToken(lexeme: string = this.lexeme): Token {
-    return new Token(
-      this.offset,
-      this.type,
-      this.comments,
-      lexeme,
-      true,
-    );
+    return new Token(this.offset, this.type, this.comments, lexeme, true);
   }
 }
 

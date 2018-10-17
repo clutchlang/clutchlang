@@ -71,10 +71,62 @@ export enum OperatorType {
 }
 
 /**
+ * Unexpected operator type.
+ */
+export type UnexpectedOperatorType = OperatorType.UnexpectedOrError;
+
+/**
+ * Valid binary operator types.
+ */
+export type BinaryOperatorType =
+  | OperatorType.Property
+  | OperatorType.Division
+  | OperatorType.Multiplication
+  | OperatorType.Remainder
+  | OperatorType.Addition
+  | OperatorType.Subtraction
+  | OperatorType.LessThan
+  | OperatorType.LessThanOrEqual
+  | OperatorType.GreaterThan
+  | OperatorType.GreaterThanOrEqual
+  | OperatorType.Equality
+  | OperatorType.Inequality
+  | OperatorType.Identity
+  | OperatorType.Unidentity
+  | OperatorType.LogicalAnd
+  | OperatorType.LogicalOr
+  | OperatorType.Assign
+  | OperatorType.AssignIncreasedBy
+  | OperatorType.AssignDecreasedBy
+  | OperatorType.AssignMultipliedBy
+  | OperatorType.AssignDividedBy
+  | OperatorType.AssignRemainderBy
+  | OperatorType.UnexpectedOrError;
+
+/**
+ * Valid prefix operator types.
+ */
+export type PrefixOperatorType =
+  | OperatorType.PrefixIncrement
+  | OperatorType.PrefixDecrement
+  | OperatorType.UnaryNegative
+  | OperatorType.UnaryPositive
+  | OperatorType.LogicalNot
+  | OperatorType.UnexpectedOrError;
+
+/**
+ * Valid postfix operator types.
+ */
+export type PostfixOperatorType =
+  | OperatorType.PostfixDecrement
+  | OperatorType.PostfixIncrement
+  | OperatorType.UnexpectedOrError;
+
+/**
  * Represents an operator node parsed from a single token.
  */
-export class Operator extends SimpleNode {
-  constructor(token: lexer.Token, public readonly type: OperatorType) {
+export class Operator<T extends OperatorType> extends SimpleNode {
+  constructor(token: lexer.Token, public readonly type: T) {
     super(token);
   }
 
@@ -113,9 +165,11 @@ export abstract class SimpleExpression extends Expression {
 /**
  * Represents an expression that utilizes an operator.
  */
-export abstract class OperatorExpression extends Expression {
+export abstract class OperatorExpression<
+  T extends OperatorType
+> extends Expression {
   constructor(
-    public readonly operator: Operator,
+    public readonly operator: Operator<T>,
     public readonly target: Expression
   ) {
     super();
@@ -125,7 +179,7 @@ export abstract class OperatorExpression extends Expression {
 /**
  * Represents an expression in the form of `<OP><EXPR>`.
  */
-export class PrefixExpression extends OperatorExpression {
+export class PrefixExpression extends OperatorExpression<PrefixOperatorType> {
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
     return visitor.visitPrefixExpression(this, context);
   }
@@ -142,7 +196,7 @@ export class PrefixExpression extends OperatorExpression {
 /**
  * Represents an expression in the form of `<EXPR><OP>`.
  */
-export class PostfixExpression extends OperatorExpression {
+export class PostfixExpression extends OperatorExpression<PostfixOperatorType> {
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
     return visitor.visitPostfixExpression(this, context);
   }
@@ -159,9 +213,9 @@ export class PostfixExpression extends OperatorExpression {
 /**
  * Represents an expression in the form of `<EXPR><OP><EXPR>`.
  */
-export class BinaryExpression extends OperatorExpression {
+export class BinaryExpression extends OperatorExpression<BinaryOperatorType> {
   constructor(
-    operator: Operator,
+    operator: Operator<BinaryOperatorType>,
     public readonly left: Expression,
     public readonly right: Expression
   ) {
@@ -515,7 +569,7 @@ export abstract class AstVisitor<R, C> {
     node: ModuleDeclaration,
     context?: C
   ): R;
-  public abstract visitOperator(node: Operator, context?: C): R;
+  public abstract visitOperator(node: Operator<OperatorType>, context?: C): R;
   public abstract visitParameterList(node: ParameterList, context?: C): R;
   public abstract visitPrefixExpression(node: PrefixExpression, context?: C): R;
   public abstract visitPostfixExpression(

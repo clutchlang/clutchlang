@@ -1,4 +1,4 @@
-import { ISourceSpan, StringScanner } from '../../../agnostic/scanner';
+import { StringScanner } from '../../../agnostic/scanner';
 import {
   Characters,
   isDigit,
@@ -21,7 +21,7 @@ function isIdentifierStart(character: number): boolean {
  */
 export function tokenize(
   program: string,
-  onError?: ErrorReporter
+  onError?: InvalidTokenReporter
 ): tokens.Token[] {
   return new ClutchLexer().scanProgram(new StringScanner(program), onError);
 }
@@ -29,7 +29,7 @@ export function tokenize(
 /**
  * Reports a @param message at the provided @param span.
  */
-export type ErrorReporter = (span: ISourceSpan, error: string) => void;
+export type InvalidTokenReporter = (offset: number, length: number) => void;
 
 /**
  * A language-level lexer that yields tokens understood by the grammar.
@@ -51,15 +51,16 @@ export class ClutchLexer {
   };
 
   private program!: StringScanner;
-  private onError!: ErrorReporter;
+  private onError!: InvalidTokenReporter;
   private position!: number;
   private lastComments: tokens.Token[] = [];
 
   public scanProgram(
     program: StringScanner,
-    onError: ErrorReporter = (span, message) => {
+    onError: InvalidTokenReporter = (offset, length) => {
+      const span = this.program.source.span(offset, offset + length);
       throw new SyntaxError(
-        `${message} "${span.text}" at ${span.line}:${span.column}`
+        `Invalid token "${span.text}" at ${span.line}:${span.column}`
       );
     }
   ): tokens.Token[] {
@@ -183,9 +184,7 @@ export class ClutchLexer {
         if (isIdentifierStart(character)) {
           return this.scanIdentifierOrKeyword();
         }
-        this.reportError(
-          `Unexpected character "${String.fromCharCode(character)}"`
-        );
+        this.reportError();
     }
     return;
   }
@@ -203,7 +202,7 @@ export class ClutchLexer {
       }
       this.program.advance();
     }
-    this.reportError('Unterminated string');
+    this.reportError();
     this.position++;
     return this.createToken(tokens.$String);
   }
@@ -365,7 +364,7 @@ export class ClutchLexer {
   /**
    * Reports a lexical @param error occurring at @param offset.
    */
-  private reportError(error: string, offset = this.position): void {
-    this.onError(this.program.source.span(offset, offset + 1), error);
+  private reportError(offset = this.position, length = 1): void {
+    this.onError(offset, length);
   }
 }

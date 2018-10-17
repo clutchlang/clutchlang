@@ -1,7 +1,7 @@
 // tslint:disable:no-magic-numbers
 // tslint:disable:object-literal-sort-keys
 
-import * as lexer from '../../src/language/ast/lexer';
+import * as lexer from '../../../src/language/ast/lexer';
 
 /**
  * A structural representation of @see Token without an offset.
