@@ -55,6 +55,11 @@ export class StaticMessageCode {
     StaticMessageSeverity.Error
   );
 
+  public static readonly SYNTAX_EXPECTED_THEN = new StaticMessageCode(
+    'SYNTAX_EXPECTED_THEN',
+    StaticMessageSeverity.Error
+  );
+
   private constructor(
     public readonly name: string,
     public readonly severity: StaticMessageSeverity

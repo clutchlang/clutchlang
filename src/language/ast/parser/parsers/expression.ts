@@ -24,6 +24,38 @@ export class ExpressionParser extends OperatorParser {
    * to continue.
    */
   public parseExpression(): ast.Expression {
+    return this.parseConditional();
+  }
+
+  private parseConditional():
+    | ast.ConditionalExpression
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    if (this.match(lexer.$If)) {
+      const ifToken = this.previous();
+      const ifCondition = this.parseExpression();
+      const thenToken = this.advance();
+      if (thenToken.type !== lexer.$Then) {
+        this.reporter.reportToken(
+          thenToken,
+          StaticMessageCode.SYNTAX_EXPECTED_THEN
+        );
+      }
+      const thenBody = this.parseExpression();
+      const elseToken = this.match(lexer.$Else) ? this.previous() : undefined;
+      const elseBody = elseToken ? this.parseExpression() : undefined;
+      return this.factory.createConditionalExpression(
+        ifToken,
+        ifCondition,
+        thenBody,
+        elseBody
+      );
+    }
     return this.parseLogicalOr();
   }
 
@@ -37,7 +69,7 @@ export class ExpressionParser extends OperatorParser {
     | Literals {
     return this.parseBinaryHelper(
       () => this.parseLogicalAnd(),
-      lexer.$PipePipe,
+      lexer.$PipePipe
     );
   }
 
@@ -49,10 +81,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
-    return this.parseBinaryHelper(
-      () => this.parseEquality(),
-      lexer.$AndAnd,
-    );
+    return this.parseBinaryHelper(() => this.parseEquality(), lexer.$AndAnd);
   }
 
   private parseEquality():
@@ -68,7 +97,7 @@ export class ExpressionParser extends OperatorParser {
       lexer.$EqualsEquals,
       lexer.$ExclaimEquals,
       lexer.$EqualsEqualsEquals,
-      lexer.$ExclaimEqualsEquals,
+      lexer.$ExclaimEqualsEquals
     );
   }
 
@@ -85,7 +114,7 @@ export class ExpressionParser extends OperatorParser {
       lexer.$LeftAngle,
       lexer.$RightAngle,
       lexer.$LeftAngleEquals,
-      lexer.$RightAngleEquals,
+      lexer.$RightAngleEquals
     );
   }
 
@@ -100,7 +129,7 @@ export class ExpressionParser extends OperatorParser {
     return this.parseBinaryHelper(
       () => this.parseAdditive(),
       lexer.$LeftAngleLeftAngle,
-      lexer.$RightAngleRightAngle,
+      lexer.$RightAngleRightAngle
     );
   }
 
@@ -115,7 +144,7 @@ export class ExpressionParser extends OperatorParser {
     return this.parseBinaryHelper(
       () => this.parseMultiplicative(),
       lexer.$Plus,
-      lexer.$Dash,
+      lexer.$Dash
     );
   }
 
@@ -131,7 +160,7 @@ export class ExpressionParser extends OperatorParser {
       () => this.parsePrefixExpression(),
       lexer.$Star,
       lexer.$Slash,
-      lexer.$Percent,
+      lexer.$Percent
     );
   }
 
@@ -142,11 +171,11 @@ export class ExpressionParser extends OperatorParser {
     let expr = parseNext();
     while (this.match(...kinds)) {
       const operator = this.parseBinaryOperator(this.previous());
-      expr = this.factory.createBinaryExpression(
+      expr = (this.factory.createBinaryExpression(
         operator,
         expr,
-        parseNext(),
-      ) as unknown as E;
+        parseNext()
+      ) as unknown) as E;
     }
     return expr;
   }

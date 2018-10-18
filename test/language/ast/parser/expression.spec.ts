@@ -24,7 +24,26 @@ function parseExpression<E extends ast.Expression>(text: string): E {
   return parser.parseExpression() as E;
 }
 
-describe('parseBinaryOperator', () => {
+describe('parseConditional', () => {
+  test('should parse a conditional', () => {
+    const e = parseExpression<ast.ConditionalExpression>('if a then b');
+    expect((e.condition as ast.Identifier).name).toEqual('a');
+    expect((e.body as ast.Identifier).name).toEqual('b');
+  });
+
+  test('should parse a conditional with else', () => {
+    const e = parseExpression<ast.ConditionalExpression>('if a then b else c');
+    expect((e.condition as ast.Identifier).name).toEqual('a');
+    expect((e.body as ast.Identifier).name).toEqual('b');
+    expect((e.elseBody as ast.Identifier).name).toEqual('c');
+  });
+
+  test('should fail when "then" is missing', () => {
+    expect(() => parseExpression('if a')).toThrowError(StaticMessage);
+  });
+});
+
+describe('parseBinaryExpression', () => {
   new Map<string, ast.BinaryOperatorType>([
     ['*', ast.OperatorType.Multiplication],
     ['/', ast.OperatorType.Division],

@@ -309,7 +309,6 @@ export class ConditionalExpression extends Expression {
     public readonly firstToken: lexer.Token,
     public readonly condition: Expression,
     public readonly body: Expression | StatementBlock,
-    public readonly elseCondition?: Expression,
     public readonly elseBody?: Expression | StatementBlock
   ) {
     super();
