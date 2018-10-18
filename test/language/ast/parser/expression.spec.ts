@@ -62,6 +62,12 @@ describe('parseBinaryExpression', () => {
     ['!==', ast.OperatorType.Unidentity],
     ['&&', ast.OperatorType.LogicalAnd],
     ['||', ast.OperatorType.LogicalOr],
+    ['=', ast.OperatorType.Assign],
+    ['+=', ast.OperatorType.AssignIncreasedBy],
+    ['-=', ast.OperatorType.AssignDecreasedBy],
+    ['*=', ast.OperatorType.AssignMultipliedBy],
+    ['/=', ast.OperatorType.AssignDividedBy],
+    ['%=', ast.OperatorType.AssignRemainderBy],
   ]).forEach((operator, text) => {
     test(`should parse "a ${text} b`, () => {
       const e = parseExpression<ast.BinaryExpression>(`a ${text} b`);

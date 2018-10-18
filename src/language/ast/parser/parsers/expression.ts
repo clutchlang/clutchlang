@@ -24,7 +24,27 @@ export class ExpressionParser extends OperatorParser {
    * to continue.
    */
   public parseExpression(): ast.Expression {
-    return this.parseConditional();
+    return this.parseAssignment();
+  }
+
+  private parseAssignment():
+    | ast.ConditionalExpression
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseConditional(),
+      lexer.$Equals,
+      lexer.$PlusEquals,
+      lexer.$DashEquals,
+      lexer.$StarEquals,
+      lexer.$SlashEquals,
+      lexer.$PercentEquals,
+    );
   }
 
   private parseConditional():
