@@ -24,7 +24,131 @@ export class ExpressionParser extends OperatorParser {
    * to continue.
    */
   public parseExpression(): ast.Expression {
-    return this.parsePrefixExpression();
+    return this.parseLogicalOr();
+  }
+
+  private parseLogicalOr():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseLogicalAnd(),
+      lexer.$PipePipe,
+    );
+  }
+
+  private parseLogicalAnd():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseEquality(),
+      lexer.$AndAnd,
+    );
+  }
+
+  private parseEquality():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseComparison(),
+      lexer.$EqualsEquals,
+      lexer.$ExclaimEquals,
+      lexer.$EqualsEqualsEquals,
+      lexer.$ExclaimEqualsEquals,
+    );
+  }
+
+  private parseComparison():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseBitwiseShift(),
+      lexer.$LeftAngle,
+      lexer.$RightAngle,
+      lexer.$LeftAngleEquals,
+      lexer.$RightAngleEquals,
+    );
+  }
+
+  private parseBitwiseShift():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseAdditive(),
+      lexer.$LeftAngleLeftAngle,
+      lexer.$RightAngleRightAngle,
+    );
+  }
+
+  private parseAdditive():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parseMultiplicative(),
+      lexer.$Plus,
+      lexer.$Dash,
+    );
+  }
+
+  private parseMultiplicative():
+    | ast.BinaryExpression
+    | ast.PrefixExpression
+    | ast.PostfixExpression
+    | ast.PropertyExpression<ast.Expression>
+    | ast.CallExpression<ast.Expression>
+    | ast.GroupExpression<ast.Expression>
+    | Literals {
+    return this.parseBinaryHelper(
+      () => this.parsePrefixExpression(),
+      lexer.$Star,
+      lexer.$Slash,
+      lexer.$Percent,
+    );
+  }
+
+  private parseBinaryHelper<E extends ast.Expression>(
+    parseNext: () => E,
+    ...kinds: lexer.ITokenTypes[]
+  ): E {
+    let expr = parseNext();
+    while (this.match(...kinds)) {
+      const operator = this.parseBinaryOperator(this.previous());
+      expr = this.factory.createBinaryExpression(
+        operator,
+        expr,
+        parseNext(),
+      ) as unknown as E;
+    }
+    return expr;
   }
 
   private parsePrefixExpression():

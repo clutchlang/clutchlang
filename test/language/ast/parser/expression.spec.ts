@@ -24,6 +24,33 @@ function parseExpression<E extends ast.Expression>(text: string): E {
   return parser.parseExpression() as E;
 }
 
+describe('parseBinaryOperator', () => {
+  new Map<string, ast.BinaryOperatorType>([
+    ['*', ast.OperatorType.Multiplication],
+    ['/', ast.OperatorType.Division],
+    ['%', ast.OperatorType.Remainder],
+    ['+', ast.OperatorType.Addition],
+    ['-', ast.OperatorType.Subtraction],
+    ['<<', ast.OperatorType.BitwiseShiftLeft],
+    ['>>', ast.OperatorType.BitwiseShiftRight],
+    ['<', ast.OperatorType.LessThan],
+    ['>', ast.OperatorType.GreaterThan],
+    ['<=', ast.OperatorType.LessThanOrEqual],
+    ['>=', ast.OperatorType.GreaterThanOrEqual],
+    ['==', ast.OperatorType.Equality],
+    ['!=', ast.OperatorType.Inequality],
+    ['===', ast.OperatorType.Identity],
+    ['!==', ast.OperatorType.Unidentity],
+    ['&&', ast.OperatorType.LogicalAnd],
+    ['||', ast.OperatorType.LogicalOr],
+  ]).forEach((operator, text) => {
+    test(`should parse "a ${text} b`, () => {
+      const e = parseExpression<ast.BinaryExpression>(`a ${text} b`);
+      expect(e.operator.type).toEqual(operator);
+    });
+  });
+});
+
 describe('parsePrefixOperator', () => {
   new Map<string, ast.PrefixOperatorType>([
     ['-', ast.OperatorType.UnaryNegative],

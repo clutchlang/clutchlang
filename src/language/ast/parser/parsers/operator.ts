@@ -63,6 +63,10 @@ export class OperatorParser extends AbstractParser {
         return ast.OperatorType.Addition;
       case '-':
         return ast.OperatorType.Subtraction;
+      case '>>':
+        return ast.OperatorType.BitwiseShiftRight;
+      case '<<':
+        return ast.OperatorType.BitwiseShiftLeft;
       case '<':
         return ast.OperatorType.LessThan;
       case '>':

@@ -49,6 +49,8 @@ export enum OperatorType {
   Multiplication,
   Division,
   Remainder,
+  BitwiseShiftLeft,
+  BitwiseShiftRight,
   Addition,
   Subtraction,
   LessThan,
@@ -85,6 +87,8 @@ export type BinaryOperatorType =
   | OperatorType.Remainder
   | OperatorType.Addition
   | OperatorType.Subtraction
+  | OperatorType.BitwiseShiftLeft
+  | OperatorType.BitwiseShiftRight
   | OperatorType.LessThan
   | OperatorType.LessThanOrEqual
   | OperatorType.GreaterThan
