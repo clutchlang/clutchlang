@@ -15,7 +15,7 @@ export class Token {
     public readonly type: ITokenTypes,
     public readonly comments: Token[],
     public readonly lexeme: string,
-    public readonly isSynthetic = false
+    public readonly isErrorRecovery = false
   ) {}
 
   /**
@@ -70,9 +70,9 @@ export class Token {
   }
 
   /**
-   * Creates a new copy of this token.
+   * Creates a new copy of this token that expresses an error has occurred.
    */
-  public toSyntheticToken(lexeme: string = this.lexeme): Token {
+  public toErrorToken(lexeme: string = 'ಠ_ಠ'): Token {
     return new Token(this.offset, this.type, this.comments, lexeme, true);
   }
 }
@@ -191,7 +191,7 @@ export interface IPairTokenType extends ITokenType {
  */
 export interface ISymbolTokenType extends ITokenType {
   readonly kind: 'symbol';
-  readonly lexeme: '->' | ':' | '//';
+  readonly lexeme: '->' | ':' | '//' | ',';
 }
 
 // Every exported top-level field in this file is intentionally prefixed with $.
@@ -471,6 +471,11 @@ export const $RightCurly: IPairTokenType = {
 
 // Symbols
 ////////////////////////////////////////////////////////////////////////////////
+
+export const $Comma: ISymbolTokenType = {
+  kind: 'symbol',
+  lexeme: ',',
+};
 
 export const $DashRightAngle: ISymbolTokenType = {
   kind: 'symbol',

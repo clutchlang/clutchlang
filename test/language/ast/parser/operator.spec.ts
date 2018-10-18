@@ -11,10 +11,15 @@ function parseOperator<T extends ast.OperatorType>(
   text: string,
   parse: (parser: ast.OperatorParser, token: lexer.Token) => ast.Operator<T>
 ): T {
+  // TODO: Move the following block into a common test-infra area.
   const source = new SourceFile(text, 'operator.spec.ts');
   const reporter = new StaticMessageReporter(source);
   const tokens = lexer.tokenize(text, (offset, length) => {
-    reporter.reportOffset(offset, length, StaticMessageCode.UNEXPECTED_TOKEN);
+    reporter.reportOffset(
+      offset,
+      length,
+      StaticMessageCode.SYNTAX_UNEXPECTED_TOKEN
+    );
   });
   const parser = new ast.OperatorParser(tokens, reporter);
   return parse(parser, tokens[0]).type;

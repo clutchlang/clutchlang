@@ -5,36 +5,39 @@ import * as ast from './nodes';
  * Indirection interface for creating AST nodes.
  */
 export class AstFactory {
-  public createOperator(token: Token, type: ast.OperatorType): ast.Operator {
+  public createOperator<T extends ast.OperatorType>(
+    token: Token,
+    type: T
+  ): ast.Operator<T> {
     return new ast.Operator(token, type);
   }
 
   public createPrefixExpression(
-    operator: ast.Operator,
+    operator: ast.Operator<ast.PrefixOperatorType>,
     target: ast.Expression
   ): ast.PrefixExpression {
     return new ast.PrefixExpression(operator, target);
   }
 
   public createPostfixExpression(
-    operator: ast.Operator,
+    operator: ast.Operator<ast.PostfixOperatorType>,
     target: ast.Expression
   ): ast.PostfixExpression {
     return new ast.PostfixExpression(operator, target);
   }
 
   public createBinaryExpression(
-    operator: ast.Operator,
+    operator: ast.Operator<ast.BinaryOperatorType>,
     left: ast.Expression,
     right: ast.Expression
   ): ast.BinaryExpression {
     return new ast.BinaryExpression(operator, left, right);
   }
 
-  public createPropertyExpression(
-    target: ast.Expression,
+  public createPropertyExpression<T extends ast.Expression>(
+    target: T,
     property: ast.Identifier
-  ): ast.PropertyExpression {
+  ): ast.PropertyExpression<T> {
     return new ast.PropertyExpression(target, property);
   }
 
@@ -46,11 +49,11 @@ export class AstFactory {
     return new ast.ArgumentList(first, args, last);
   }
 
-  public createCallExpression(
+  public createCallExpression<T extends ast.Expression>(
     name: ast.Identifier,
     args: ast.ArgumentList,
-    target?: ast.Expression
-  ): ast.CallExpression {
+    target?: T
+  ): ast.CallExpression<T> {
     return new ast.CallExpression(name, args, target);
   }
 
@@ -70,11 +73,11 @@ export class AstFactory {
     );
   }
 
-  public createGroupExpression(
+  public createGroupExpression<E extends ast.Expression>(
     first: Token,
-    expression: ast.Expression,
+    expression: E,
     last: Token
-  ): ast.GroupExpression {
+  ): ast.GroupExpression<E> {
     return new ast.GroupExpression(first, expression, last);
   }
 

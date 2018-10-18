@@ -5,6 +5,9 @@ import { AbstractParser } from './abstract';
 
 /**
  * Partially implements parsing just for operators.
+ *
+ * Exists soley to be standalone testable, as well as extended by the
+ * expression parser, which needs the capability to parse operators.
  */
 export class OperatorParser extends AbstractParser {
   /**
@@ -130,13 +133,13 @@ export class OperatorParser extends AbstractParser {
     type: T
   ): ast.Operator<T> {
     if (type === ast.OperatorType.InvalidOrError) {
-      token = token.toSyntheticToken();
+      token = token.toErrorToken();
     }
     return this.factory.createOperator(token, type);
   }
 
   private invalidOperator(token: lexer.Token): ast.InvalidOperatorType {
-    this.reporter.reportToken(token, StaticMessageCode.INVALID_OPERATOR);
+    this.reporter.reportToken(token, StaticMessageCode.SYNTAX_INVALID_OPERATOR);
     return ast.OperatorType.InvalidOrError;
   }
 }

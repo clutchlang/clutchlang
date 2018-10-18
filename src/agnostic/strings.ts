@@ -48,6 +48,7 @@ export const enum Characters {
   $TILDE = 126,
   $PERCENT = 37,
   $COLON = 58,
+  $COMMA = 44,
 
   // Misc
   $CR = 13,

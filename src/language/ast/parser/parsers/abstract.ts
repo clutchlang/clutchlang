@@ -6,13 +6,20 @@ import { AstFactory } from '../factory';
  * Base parser implementation including only helper functionality.
  */
 export abstract class AbstractParser {
-  protected position = 0;
+  private position = 0;
 
   constructor(
-    protected readonly tokens: lexer.Token[],
+    private readonly tokens: lexer.Token[],
     protected readonly reporter: StaticMessageReporter,
     protected readonly factory = new AstFactory()
   ) {}
+
+  /**
+   * Returns whether the next token is of type @param type.
+   */
+  protected check(type: lexer.ITokenTypes): boolean {
+    return this.hasNext ? this.peek().type === type : false;
+  }
 
   /**
    * Returns whether at least one more token remains for parsing.
@@ -29,32 +36,32 @@ export abstract class AbstractParser {
   }
 
   /**
-   * Returns whether any of the provided @param kinds are seen in order.
+   * Returns the next token.
    */
-  protected match(...kinds: lexer.ITokenTypes[]): boolean {
-    return kinds.some(e => {
+  protected advance(): lexer.Token {
+    this.position++;
+    return this.peek(-1);
+  }
+
+  /**
+   * Returns the previously scanned token.
+   */
+  protected previous(): lexer.Token {
+    return this.peek(-1);
+  }
+
+  /**
+   * Returns whether if any of the following @param types are matched.
+   *
+   * If true is returned, this position was also advanced by one.
+   */
+  protected match(...types: lexer.ITokenTypes[]): boolean {
+    return types.some(e => {
       if (this.check(e)) {
-        this.advance();
+        this.position++;
         return true;
       }
       return false;
     });
-  }
-
-  /**
-   * Returns whether the next token is of type @param type.
-   */
-  protected check(type: lexer.ITokenTypes): boolean {
-    return this.hasNext ? this.peek().type === type : false;
-  }
-
-  /**
-   * Returns the next token.
-   */
-  protected advance(): lexer.Token {
-    if (this.hasNext) {
-      this.position++;
-    }
-    return this.peek(-1);
   }
 }

@@ -30,13 +30,28 @@ export enum StaticMessageSeverity {
 }
 
 export class StaticMessageCode {
-  public static readonly INVALID_OPERATOR = new StaticMessageCode(
-    'INVALID_OPERATOR',
+  public static readonly SYNTAX_INVALID_OPERATOR = new StaticMessageCode(
+    'SYNTAX_INVALID_OPERATOR',
     StaticMessageSeverity.Error
   );
 
-  public static readonly UNEXPECTED_TOKEN = new StaticMessageCode(
-    'UNEXPECTED_TOKEN',
+  public static readonly SYNTAX_UNEXPECTED_TOKEN = new StaticMessageCode(
+    'SYNTAX_UNEXPECTED_TOKEN',
+    StaticMessageSeverity.Error
+  );
+
+  public static readonly SYNTAX_EXPECTED_IDENTIFIER = new StaticMessageCode(
+    'SYNTAX_EXPECTED_IDENTIFIER',
+    StaticMessageSeverity.Error
+  );
+
+  public static readonly SYNTAX_EXPECTED_PARENTHESES = new StaticMessageCode(
+    'SYNTAX_EXPECTED_PARENTHESES',
+    StaticMessageSeverity.Error
+  );
+
+  public static readonly SYNTAX_EXPECTED_COMMA = new StaticMessageCode(
+    'SYNTAX_EXPECTED_COMMA',
     StaticMessageSeverity.Error
   );
 

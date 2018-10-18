@@ -96,7 +96,7 @@ it('should tokenize function declaration', () => {
 it('should tokenize external type declaration', () => {
   const scanned = simpleTokenize(`
     external type Foo {
-      bar()
+      bar(a, b)
     }
   `);
   expect(scanned).toMatchObject([
@@ -123,6 +123,18 @@ it('should tokenize external type declaration', () => {
     {
       text: '(',
       type: lexer.$LeftParen,
+    },
+    {
+      text: 'a',
+      type: lexer.$Identifier,
+    },
+    {
+      text: ',',
+      type: lexer.$Comma,
+    },
+    {
+      text: 'b',
+      type: lexer.$Identifier,
     },
     {
       text: ')',

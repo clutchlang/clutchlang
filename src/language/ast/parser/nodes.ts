@@ -67,13 +67,13 @@ export enum OperatorType {
   AssignMultipliedBy,
   AssignDividedBy,
   AssignRemainderBy,
-  UnexpectedOrError,
+  InvalidOrError,
 }
 
 /**
  * Unexpected operator type.
  */
-export type UnexpectedOperatorType = OperatorType.UnexpectedOrError;
+export type InvalidOperatorType = OperatorType.InvalidOrError;
 
 /**
  * Valid binary operator types.
@@ -101,7 +101,7 @@ export type BinaryOperatorType =
   | OperatorType.AssignMultipliedBy
   | OperatorType.AssignDividedBy
   | OperatorType.AssignRemainderBy
-  | OperatorType.UnexpectedOrError;
+  | OperatorType.InvalidOrError;
 
 /**
  * Valid prefix operator types.
@@ -112,7 +112,7 @@ export type PrefixOperatorType =
   | OperatorType.UnaryNegative
   | OperatorType.UnaryPositive
   | OperatorType.LogicalNot
-  | OperatorType.UnexpectedOrError;
+  | OperatorType.InvalidOrError;
 
 /**
  * Valid postfix operator types.
@@ -120,7 +120,7 @@ export type PrefixOperatorType =
 export type PostfixOperatorType =
   | OperatorType.PostfixDecrement
   | OperatorType.PostfixIncrement
-  | OperatorType.UnexpectedOrError;
+  | OperatorType.InvalidOrError;
 
 /**
  * Represents an operator node parsed from a single token.
@@ -238,11 +238,8 @@ export class BinaryExpression extends OperatorExpression<BinaryOperatorType> {
 /**
  * Represents an expression in the form of `<TARGET>.<PROPERTY>`.
  */
-export class PropertyExpression extends Expression {
-  constructor(
-    public readonly target: Expression,
-    public readonly property: Identifier
-  ) {
+export class PropertyExpression<T extends Expression> extends Expression {
+  constructor(public readonly target: T, public readonly property: Identifier) {
     super();
   }
 
@@ -281,11 +278,11 @@ export class ArgumentList extends AstNode {
  *
  * May _optionally_ contain a @member target.
  */
-export class CallExpression extends Expression {
+export class CallExpression<T extends Expression> extends Expression {
   constructor(
     public readonly name: Identifier,
     public readonly args: ArgumentList,
-    public readonly target?: Expression
+    public readonly target?: T
   ) {
     super();
   }
@@ -323,10 +320,10 @@ export class ConditionalExpression extends Expression {
   }
 }
 
-export class GroupExpression extends Expression {
+export class GroupExpression<E extends Expression> extends Expression {
   constructor(
     public readonly firstToken: lexer.Token,
-    public readonly expression: Expression,
+    public readonly expression: E,
     public readonly lastToken: lexer.Token
   ) {
     super();
@@ -551,7 +548,10 @@ export class ModuleDeclaration extends AstNode {
 export abstract class AstVisitor<R, C> {
   public abstract visitArgumentList(node: ArgumentList, context?: C): R;
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
-  public abstract visitCallExpression(node: CallExpression, context?: C): R;
+  public abstract visitCallExpression(
+    node: CallExpression<Expression>,
+    context?: C
+  ): R;
   public abstract visitConditionalExpression(
     node: ConditionalExpression,
     context?: C
@@ -560,7 +560,10 @@ export abstract class AstVisitor<R, C> {
     node: FunctionDeclaration,
     context?: C
   ): R;
-  public abstract visitGroupExpression(node: GroupExpression, context?: C): R;
+  public abstract visitGroupExpression(
+    node: GroupExpression<Expression>,
+    context?: C
+  ): R;
   public abstract visitIdentifier(node: Identifier, context?: C): R;
   public abstract visitLiteralBoolean(node: LiteralBoolean, context?: C): R;
   public abstract visitLiteralNumber(node: LiteralNumber, context?: C): R;
@@ -577,7 +580,7 @@ export abstract class AstVisitor<R, C> {
     context?: C
   ): R;
   public abstract visitPropertyExpression(
-    node: PropertyExpression,
+    node: PropertyExpression<Expression>,
     context?: C
   ): R;
   public abstract visitReturnStatement(node: ReturnStatement, context?: C): R;

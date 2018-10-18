@@ -91,6 +91,8 @@ export class ClutchLexer {
         return this.createToken(tokens.$RightCurly);
       case Characters.$COLON: // ":"
         return this.createToken(tokens.$Colon);
+      case Characters.$COMMA:
+        return this.createToken(tokens.$Comma);
       case Characters.$PERIOD: // "."
         return this.createToken(tokens.$Period);
       case Characters.$PLUS: // "+" or "+=" or "++"
