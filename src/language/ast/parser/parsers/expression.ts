@@ -27,6 +27,16 @@ export class ExpressionParser extends OperatorParser {
     return this.parseAssignment();
   }
 
+  /**
+   * Parses an identifier, or reports an error and returns a synthetic identifier.
+   */
+  protected parseIdentifier(): ast.Identifier {
+    if (this.match(lexer.$Identifier)) {
+      return this.factory.createIdentifier(this.previous());
+    }
+    return this.fatalExpectedIdentifier(this.advance());
+  }
+
   private parseAssignment():
     | ast.ConditionalExpression
     | ast.BinaryExpression
@@ -347,16 +357,6 @@ export class ExpressionParser extends OperatorParser {
       return this.factory.createLiteralBoolean(this.previous());
     }
     return this.parseIdentifier();
-  }
-
-  /**
-   * Parses an identifier, or reports an error and returns a synthetic identifier.
-   */
-  private parseIdentifier(): ast.Identifier {
-    if (this.match(lexer.$Identifier)) {
-      return this.factory.createIdentifier(this.previous());
-    }
-    return this.fatalExpectedIdentifier(this.advance());
   }
 
   private fatalExpectedIdentifier(token: lexer.Token): ast.Identifier {
