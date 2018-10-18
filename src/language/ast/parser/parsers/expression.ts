@@ -43,7 +43,7 @@ export class ExpressionParser extends OperatorParser {
       lexer.$DashEquals,
       lexer.$StarEquals,
       lexer.$SlashEquals,
-      lexer.$PercentEquals,
+      lexer.$PercentEquals
     );
   }
 
