@@ -43,7 +43,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -63,7 +63,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     if (this.match(lexer.$If)) {
@@ -94,7 +94,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -108,7 +108,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(() => this.parseEquality(), lexer.$AndAnd);
@@ -119,7 +119,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -136,7 +136,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -153,7 +153,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -168,7 +168,7 @@ export class ExpressionParser extends OperatorParser {
     | ast.PrefixExpression
     | ast.PostfixExpression
     | ast.PropertyExpression<ast.Expression>
-    | ast.CallExpression
+    | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     return this.parseBinaryHelper(
@@ -270,7 +270,7 @@ export class ExpressionParser extends OperatorParser {
     return parseNext();
   }
 
-  private parsePropertyOrCall():
+  private parseFunctionCall():
     | ast.PropertyExpression<ast.Expression>
     | ast.CallExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
@@ -279,33 +279,11 @@ export class ExpressionParser extends OperatorParser {
       | ast.PropertyExpression<ast.Expression>
       | ast.CallExpression<ast.Expression>
       | ast.GroupExpression<ast.Expression>
-      | Literals = this.parseGroup();
-    while (this.hasNext && this.match(lexer.$Period)) {
-      const name = this.parseIdentifier();
-      if (this.check(lexer.$LeftParen)) {
-        const args = this.parseArgumentList();
-        expr = this.factory.createCallExpression(name, args, expr);
-      } else {
-        expr = this.factory.createPropertyExpression(expr, name);
-      }
-    }
-    return expr;
-  }
-
-  private parseFunctionCall(): 
-  | ast.PropertyExpression<ast.Expression>
-  | ast.CallExpression<ast.Expression>
-  | ast.GroupExpression<ast.Expression>
-  | Literals {
-    let expr: 
-       ast.PropertyExpression<ast.Expression>
-      | ast.CallExpression<ast.Expression>
-      | ast.GroupExpression<ast.Expression>
       | Literals = this.parseMemberAccess();
     // tslint:disable-next-line:no-constant-condition
     while (true) {
       if (this.check(lexer.$LeftParen)) {
-        expr = this.finishFunctionCall();
+        expr = this.finishFunctionCall(expr);
       } else {
         break;
       }
@@ -313,14 +291,9 @@ export class ExpressionParser extends OperatorParser {
     return expr;
   }
 
-  private finishFunctionCall(): ast.CallExpression<ast.Expression> {
-    const args = this.parseArgumentList();
-    return this.factory.createCallExpression(
-
-    );
-  }
-
-  private parseArgumentList(): ast.ArgumentList {
+  private finishFunctionCall(
+    target: ast.Expression
+  ): ast.CallExpression<ast.Expression> {
     let leftParen = this.advance();
     if (leftParen.type !== lexer.$LeftParen) {
       this.reporter.reportToken(
@@ -351,17 +324,17 @@ export class ExpressionParser extends OperatorParser {
       );
       rightParen = rightParen.toErrorToken(')');
     }
-    return this.factory.createArgumentList(leftParen, args, rightParen);
+    return this.factory.createCallExpression(target, args, rightParen);
   }
 
-  private parseMemberAccess(): 
+  private parseMemberAccess():
     | ast.PropertyExpression<ast.Expression>
     | ast.GroupExpression<ast.Expression>
     | Literals {
     let expr:
-    | ast.PropertyExpression<ast.Expression>
-    | ast.GroupExpression<ast.Expression>
-    | Literals = this.parseGroup();
+      | ast.PropertyExpression<ast.Expression>
+      | ast.GroupExpression<ast.Expression>
+      | Literals = this.parseGroup();
     while (this.hasNext && this.match(lexer.$Period)) {
       const name = this.parseIdentifier();
       expr = this.factory.createPropertyExpression(expr, name);

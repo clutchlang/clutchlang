@@ -1,6 +1,6 @@
 import * as lexer from '../../lexer';
 import * as ast from '../../parser';
-import { ExpressionParser } from "./expression";
+import { ExpressionParser } from './expression';
 
 /**
  * Partially implements parsing for statements.
@@ -22,7 +22,7 @@ export class StatementParser extends ExpressionParser {
   private parseReturn(keyword: lexer.Token): ast.ReturnStatement {
     return this.factory.createReturnStatement(
       keyword,
-      this.hasNext ? this.parseExpression() : undefined,
+      this.hasNext ? this.parseExpression() : undefined
     );
   }
 
@@ -30,11 +30,9 @@ export class StatementParser extends ExpressionParser {
     // TODO: Add support for modifiers (i.e. "const").
     const name = this.parseIdentifier();
     const type = this.match(lexer.$Colon) ? this.parseIdentifier() : undefined;
-    const value = this.match(lexer.$Equals) ? this.parseExpression() : undefined;
-    return this.factory.createVariableDeclaration(
-      name,
-      type,
-      value,
-    );
+    const value = this.match(lexer.$Equals)
+      ? this.parseExpression()
+      : undefined;
+    return this.factory.createVariableDeclaration(name, type, value);
   }
 }

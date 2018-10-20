@@ -41,12 +41,12 @@ export class AstFactory {
     return new ast.PropertyExpression(target, property);
   }
 
-  public createCallExpressio(
-    first: Token,
+  public createCallExpression<E extends ast.Expression>(
+    target: E,
     args: ast.Expression[],
-    last: Token,
-  ): ast.CallExpression {
-    return new ast.CallExpression(first, args, last);
+    last: Token
+  ): ast.CallExpression<E> {
+    return new ast.CallExpression(target, args, last);
   }
 
   public createConditionalExpression(
@@ -55,12 +55,7 @@ export class AstFactory {
     body: ast.Expression | ast.StatementBlock,
     elseBody?: ast.Expression | ast.StatementBlock
   ): ast.ConditionalExpression {
-    return new ast.ConditionalExpression(
-      first,
-      condition,
-      body,
-      elseBody
-    );
+    return new ast.ConditionalExpression(first, condition, body, elseBody);
   }
 
   public createGroupExpression<E extends ast.Expression>(

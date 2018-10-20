@@ -128,38 +128,41 @@ describe('parsePropertyOrCall', () => {
   });
 
   test('should parse a function call with no arguments', () => {
-    const e = parseExpression<ast.CallExpression<ast.Identifier>>('a.b()');
-    expect(e.target!.name).toEqual('a');
-    expect(e.name.name).toEqual('b');
-    expect(e.args.args).toHaveLength(0);
+    const e = parseExpression<ast.CallExpression<ast.Identifier>>('a()');
+    expect(e.target.name).toEqual('a');
+    expect(e.args).toHaveLength(0);
   });
 
   test('should parse a function call with 1 argument', () => {
-    const e = parseExpression<ast.CallExpression<ast.Identifier>>('a.b(c)');
-    expect(e.target!.name).toEqual('a');
-    expect(e.name.name).toEqual('b');
-    expect(e.args.args).toHaveLength(1);
-    expect((e.args.args[0] as ast.Identifier).name).toEqual('c');
+    const e = parseExpression<
+      ast.CallExpression<ast.PropertyExpression<ast.Identifier>>
+    >('a.b(c)');
+    expect(e.target.target.name).toEqual('a');
+    expect(e.target.property.name).toEqual('b');
+    expect(e.args).toHaveLength(1);
+    expect((e.args[0] as ast.Identifier).name).toEqual('c');
   });
 
   test('should parse a function call with 2 arguments', () => {
-    const e = parseExpression<ast.CallExpression<ast.Identifier>>('a.b(c, d)');
-    expect(e.target!.name).toEqual('a');
-    expect(e.name.name).toEqual('b');
-    expect(e.args.args).toHaveLength(2);
-    expect((e.args.args[0] as ast.Identifier).name).toEqual('c');
-    expect((e.args.args[1] as ast.Identifier).name).toEqual('d');
+    const e = parseExpression<
+      ast.CallExpression<ast.PropertyExpression<ast.Identifier>>
+    >('a.b(c, d)');
+    expect(e.target.target.name).toEqual('a');
+    expect(e.target.property.name).toEqual('b');
+    expect(e.args).toHaveLength(2);
+    expect((e.args[0] as ast.Identifier).name).toEqual('c');
+    expect((e.args[1] as ast.Identifier).name).toEqual('d');
   });
 
   test('should parse a function call with a trailing comma', () => {
-    const e = parseExpression<ast.CallExpression<ast.Identifier>>(
-      'a.b(c, d, )'
-    );
-    expect(e.target!.name).toEqual('a');
-    expect(e.name.name).toEqual('b');
-    expect(e.args.args).toHaveLength(2);
-    expect((e.args.args[0] as ast.Identifier).name).toEqual('c');
-    expect((e.args.args[1] as ast.Identifier).name).toEqual('d');
+    const e = parseExpression<
+      ast.CallExpression<ast.PropertyExpression<ast.Identifier>>
+    >('a.b(c, d, )');
+    expect(e.target.target.name).toEqual('a');
+    expect(e.target.property.name).toEqual('b');
+    expect(e.args).toHaveLength(2);
+    expect((e.args[0] as ast.Identifier).name).toEqual('c');
+    expect((e.args[1] as ast.Identifier).name).toEqual('d');
   });
 
   test('should fail parsing a function call with a missing end', () => {
@@ -168,15 +171,6 @@ describe('parsePropertyOrCall', () => {
 
   test('should fail parsing a function call with a missing comma', () => {
     expect(() => parseExpression('a.b(c d)')).toThrowError(StaticMessage);
-  });
-
-  test('should parse a combination of property and function calls', () => {
-    const e = parseExpression<
-      ast.CallExpression<ast.PropertyExpression<ast.Identifier>>
-    >('a.b.c()');
-    expect(e.name.name).toEqual('c');
-    expect(e.target!.property.name).toEqual('b');
-    expect(e.target!.target.name).toEqual('a');
   });
 });
 

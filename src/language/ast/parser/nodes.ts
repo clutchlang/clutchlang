@@ -265,17 +265,21 @@ export class PropertyExpression<T extends Expression> extends Expression {
  *
  * May _optionally_ contain a @member target.
  */
-export class CallExpression extends Expression {
+export class CallExpression<E extends Expression> extends Expression {
   constructor(
-    public readonly firstToken: lexer.Token,
+    public readonly target: E,
     public readonly args: Expression[],
-    public readonly lastToken: lexer.Token,
+    public readonly lastToken: lexer.Token
   ) {
     super();
   }
 
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
     return visitor.visitCallExpression(this, context);
+  }
+
+  public get firstToken(): lexer.Token {
+    return this.target.firstToken;
   }
 }
 
@@ -526,7 +530,7 @@ export class ModuleDeclaration extends AstNode {
 export abstract class AstVisitor<R, C> {
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
   public abstract visitCallExpression(
-    node: CallExpression,
+    node: CallExpression<Expression>,
     context?: C
   ): R;
   public abstract visitConditionalExpression(
