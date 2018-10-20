@@ -374,6 +374,7 @@ export class LiteralString extends SimpleExpression {
 export class VariableDeclaration extends AstNode {
   constructor(
     public readonly name: Identifier,
+    public readonly isConst: boolean,
     public readonly type?: Identifier,
     public readonly value?: Expression
   ) {

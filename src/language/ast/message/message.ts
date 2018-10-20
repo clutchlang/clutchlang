@@ -60,6 +60,11 @@ export class StaticMessageCode {
     StaticMessageSeverity.Error
   );
 
+  public static readonly TOO_MANY_MODIFIERS = new StaticMessageCode(
+    'TOO_MANY_MODIFIERS',
+    StaticMessageSeverity.Error
+  );
+
   private constructor(
     public readonly name: string,
     public readonly severity: StaticMessageSeverity

@@ -84,10 +84,11 @@ export class AstFactory {
 
   public createVariableDeclaration(
     name: ast.Identifier,
+    isConst: boolean,
     type?: ast.Identifier,
     value?: ast.Expression
   ): ast.VariableDeclaration {
-    return new ast.VariableDeclaration(name, type, value);
+    return new ast.VariableDeclaration(name, isConst, type, value);
   }
 
   public createParameterList(

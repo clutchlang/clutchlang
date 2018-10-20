@@ -1,4 +1,5 @@
 import * as lexer from '../../lexer';
+import { StaticMessageCode } from '../../message/message';
 import * as ast from '../../parser';
 import { ExpressionParser } from './expression';
 
@@ -27,12 +28,32 @@ export class StatementParser extends ExpressionParser {
   }
 
   private parseVariable(_: lexer.Token): ast.VariableDeclaration {
-    // TODO: Add support for modifiers (i.e. "const").
+    const allModifiers: lexer.Token[] = [];
+    while (this.match(lexer.$Const)) {
+      allModifiers.push(this.previous());
+    }
+    function hasModifier(keyword: lexer.IKeywordTokenType): boolean {
+      for (const modifier of allModifiers) {
+        if (modifier.lexeme === keyword.lexeme) {
+          return true;
+        }
+      }
+      return false;
+    }
     const name = this.parseIdentifier();
     const type = this.match(lexer.$Colon) ? this.parseIdentifier() : undefined;
     const value = this.match(lexer.$Equals)
       ? this.parseExpression()
       : undefined;
-    return this.factory.createVariableDeclaration(name, type, value);
+    const astNode = this.factory.createVariableDeclaration(
+      name,
+      hasModifier(lexer.$Const),
+      type,
+      value
+    );
+    if (allModifiers.length > 1) {
+      this.reporter.reportNode(astNode, StaticMessageCode.TOO_MANY_MODIFIERS);
+    }
+    return astNode;
   }
 }
