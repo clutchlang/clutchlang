@@ -261,46 +261,21 @@ export class PropertyExpression<T extends Expression> extends Expression {
 }
 
 /**
- * Represents a list of arguments passed to a function call.
- */
-export class ArgumentList extends AstNode {
-  constructor(
-    public readonly firstToken: lexer.Token,
-    public readonly args: Expression[],
-    public readonly lastToken: lexer.Token
-  ) {
-    super();
-  }
-
-  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
-    return visitor.visitArgumentList(this, context);
-  }
-}
-
-/**
  * Represents an expression for a function call.
  *
  * May _optionally_ contain a @member target.
  */
-export class CallExpression<T extends Expression> extends Expression {
+export class CallExpression extends Expression {
   constructor(
-    public readonly name: Identifier,
-    public readonly args: ArgumentList,
-    public readonly target?: T
+    public readonly firstToken: lexer.Token,
+    public readonly args: Expression[],
+    public readonly lastToken: lexer.Token,
   ) {
     super();
   }
 
   public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
     return visitor.visitCallExpression(this, context);
-  }
-
-  public get firstToken(): lexer.Token {
-    return (this.target || this.name).firstToken;
-  }
-
-  public get lastToken(): lexer.Token {
-    return this.args.lastToken;
   }
 }
 
@@ -549,10 +524,9 @@ export class ModuleDeclaration extends AstNode {
  * a computed value.
  */
 export abstract class AstVisitor<R, C> {
-  public abstract visitArgumentList(node: ArgumentList, context?: C): R;
   public abstract visitBinaryExpression(node: BinaryExpression, context?: C): R;
   public abstract visitCallExpression(
-    node: CallExpression<Expression>,
+    node: CallExpression,
     context?: C
   ): R;
   public abstract visitConditionalExpression(
