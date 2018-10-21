@@ -51,3 +51,18 @@ test('should print expressions', () => {
     }
   `).accept(new PrintTreeVisitor())).toMatchSnapshot();
 });
+
+test('should print other nodes', () => {
+  expect(parseModuleRoot(`
+    type Foo {
+      bar -> {
+        return true
+      }
+      baz -> {
+        return
+      }
+    }
+
+    let x: String = 'Hello'
+  `).accept(new PrintTreeVisitor())).toMatchSnapshot();
+});

@@ -66,3 +66,44 @@ Modules:
   "indents": "",
 }
 `;
+
+exports[`should print other nodes 1`] = `
+StringBuffer {
+  "buffer": "ModuleRoot:
+Modules:
+  ModuleDeclaration:
+  Declarations:
+    TypeDeclaration:
+    Name:
+      Identifier {Foo}:
+    External: false
+    Members:
+      FunctionDeclaration:
+      Name:
+        Identifier {bar}:
+      External: false
+      Body:
+        StatementBlock:
+        Statements:
+          ReturnStatement:
+          Expression:
+            LiteralBoolean {true}:
+      FunctionDeclaration:
+      Name:
+        Identifier {baz}:
+      External: false
+      Body:
+        StatementBlock:
+        Statements:
+          ReturnStatement:
+    VariableDeclaration:
+    Name:
+      Identifier {x}:
+    Type:
+      Identifier {String}:
+    Value:
+      LiteralString {Hello}:
+",
+  "indents": "",
+}
+`;
