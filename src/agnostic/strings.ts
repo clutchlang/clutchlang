@@ -138,11 +138,6 @@ export function splitLines(text: string): string[] {
   return lines;
 }
 
-// TODO: Actually implement.
-export function unescapeString(raw: string): string {
-  return raw.replace('\\n', '\n');
-}
-
 /**
  * Aids in incrementally writing a string, including proper indentation.
  */
@@ -153,10 +148,6 @@ export class StringBuffer {
 
   public write(object: unknown): void {
     this.buffer += `${object}`;
-  }
-
-  public writeIndented(object: unknown = ''): void {
-    this.buffer += `${this.indents}${object}`;
   }
 
   public writeAll(objects: Iterable<unknown>, seperator = '') {

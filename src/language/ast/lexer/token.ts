@@ -73,6 +73,7 @@ export class Token {
    * Creates a new copy of this token that expresses an error has occurred.
    */
   public toErrorToken(lexeme: string = 'ಠ_ಠ'): Token {
+    /* istanbul ignore next */
     return new Token(this.offset, this.type, this.comments, lexeme, true);
   }
 }
