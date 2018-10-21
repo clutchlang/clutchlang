@@ -11,7 +11,7 @@ import * as ast from '../../../../src/language/ast/parser';
 
 function parseStatement<E extends ast.Statement>(text: string): E {
   // TODO: Move the following block into a common test-infra area.
-  const source = new SourceFile(text, 'expression.spec.ts');
+  const source = new SourceFile(text, 'statement.spec.ts');
   const reporter = new StaticMessageReporter(source);
   const tokens = lexer.tokenize(text, (offset, length) => {
     reporter.reportOffset(

@@ -60,7 +60,9 @@ export class StatementParser extends ExpressionParser {
   private parseReturn(keyword: lexer.Token): ast.ReturnStatement {
     return this.factory.createReturnStatement(
       keyword,
-      this.hasNext ? this.parseExpression() : undefined
+      this.hasNext && !this.check(lexer.$RightCurly)
+        ? this.parseExpression()
+        : undefined
     );
   }
 }
