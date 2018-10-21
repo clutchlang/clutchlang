@@ -25,7 +25,8 @@ function parseModuleRoot(text: string): ast.ModuleRoot {
 }
 
 test('should print expressions', () => {
-  expect(parseModuleRoot(`
+  expect(
+    parseModuleRoot(`
     main -> {
       // Binary
       1 + 1
@@ -49,11 +50,13 @@ test('should print expressions', () => {
       a.b
 
     }
-  `).accept(new PrintTreeVisitor())).toMatchSnapshot();
+  `).accept(new PrintTreeVisitor())
+  ).toMatchSnapshot();
 });
 
 test('should print other nodes', () => {
-  expect(parseModuleRoot(`
+  expect(
+    parseModuleRoot(`
     type Foo {
       bar -> {
         return true
@@ -64,5 +67,6 @@ test('should print other nodes', () => {
     }
 
     let x: String = 'Hello'
-  `).accept(new PrintTreeVisitor())).toMatchSnapshot();
+  `).accept(new PrintTreeVisitor())
+  ).toMatchSnapshot();
 });

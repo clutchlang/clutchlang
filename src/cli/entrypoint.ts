@@ -1,8 +1,12 @@
 import * as fs from 'fs';
+import { SourceFile } from '../agnostic/scanner';
 import { tokenize } from '../language/ast/lexer/tokenizer';
-import { ClutchParser } from '../language/parser/parser';
-import { PrintTreeVisitor } from '../language/parser/visitors/printer';
-import { SimpleJsTranspiler } from '../transpiler/transpiler';
+import {
+  StaticMessageCode,
+  StaticMessageReporter,
+} from '../language/ast/message';
+import { ModuleParser } from '../language/ast/parser';
+import { PrintTreeVisitor } from '../language/debug/printer';
 
 export interface IOptions {
   format: 'parse' | 'js';
@@ -53,8 +57,7 @@ export function parseOptions(args: string[]): IOptions {
  * Runs the CLI using the provided @param options.
  */
 export function run(options: IOptions): void {
-  const visitor =
-    options.format === 'parse' ? PrintTreeVisitor : SimpleJsTranspiler;
+  const visitor = PrintTreeVisitor;
   if (options.worker) {
     process.stdin.setEncoding('utf8');
     let buffer = '';
@@ -62,11 +65,19 @@ export function run(options: IOptions): void {
       buffer += chunk;
       if (buffer.endsWith('\n\n')) {
         try {
-          const tokens = tokenize(buffer);
-          const output = new ClutchParser(tokens)
-            .parseFileRoot()
+          const source = new SourceFile(buffer);
+          const reporter = new StaticMessageReporter(source);
+          const tokens = tokenize(buffer, (offset, length) => {
+            reporter.reportOffset(
+              offset,
+              length,
+              StaticMessageCode.SYNTAX_UNEXPECTED_TOKEN
+            );
+          });
+          const output = new ModuleParser(tokens, reporter)
+            .parseModuleRoot()
             .accept(new visitor());
-          process.stdout.write(output.toString());
+          process.stdout.write(output!.toString());
           process.stdout.write('\n');
         } catch (e) {
           if (e instanceof SyntaxError) {
@@ -91,15 +102,23 @@ export function run(options: IOptions): void {
       process.exit(1);
     }
     const input = fs.readFileSync(options.input!, 'utf8');
-    const tokens = tokenize(input);
-    const output = new ClutchParser(tokens)
-      .parseFileRoot()
+    const source = new SourceFile(input);
+    const reporter = new StaticMessageReporter(source);
+    const tokens = tokenize(input, (offset, length) => {
+      reporter.reportOffset(
+        offset,
+        length,
+        StaticMessageCode.SYNTAX_UNEXPECTED_TOKEN
+      );
+    });
+    const output = new ModuleParser(tokens, reporter)
+      .parseModuleRoot()
       .accept(new visitor());
     if (options.format === 'parse') {
       process.stdout.write(`${output}\n`);
       return;
     }
-    const data = output.toString();
+    const data = output!.toString();
     fs.writeFileSync(options.output!, data);
     process.stdout.write(`Wrote ${data.length} bytes to ${options.output}.\n`);
   }
