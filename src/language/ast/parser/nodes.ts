@@ -454,9 +454,10 @@ export class ReturnStatement extends AstNode {
 export class FunctionDeclaration extends AstNode {
   constructor(
     public readonly name: Identifier,
+    public readonly isExternal: boolean,
     public readonly params?: ParameterList,
-    public readonly body?: Expression | StatementBlock,
-    public readonly returnType?: Identifier
+    public readonly returnType?: Identifier,
+    public readonly body?: Expression | StatementBlock
   ) {
     super();
   }
@@ -479,8 +480,8 @@ export class FunctionDeclaration extends AstNode {
  */
 export class TypeDeclaration extends AstNode {
   constructor(
-    public readonly modifiers: lexer.Token[],
     public readonly name: Identifier,
+    public readonly isExternal: boolean,
     public readonly members: Array<FunctionDeclaration | VariableDeclaration>,
     public readonly lastToken: lexer.Token
   ) {
@@ -492,12 +493,12 @@ export class TypeDeclaration extends AstNode {
   }
 
   public get firstToken(): lexer.Token {
-    return this.modifiers.length ? this.modifiers[0] : this.name.firstToken;
+    return this.name.firstToken;
   }
 }
 
 /**
- *
+ * Represents a module.
  */
 export class ModuleDeclaration extends AstNode {
   constructor(
@@ -518,6 +519,27 @@ export class ModuleDeclaration extends AstNode {
 
   public get lastToken(): lexer.Token {
     return this.declarations[this.declarations.length - 1].lastToken;
+  }
+}
+
+/**
+ * Represents multiple modules.
+ */
+export class ModuleRoot extends AstNode {
+  constructor(public readonly modules: ModuleDeclaration[]) {
+    super();
+  }
+
+  public accept<R, C>(visitor: AstVisitor<R, C>, context?: C): R | undefined {
+    return visitor.visitModuleRoot(this, context);
+  }
+
+  public get firstToken(): lexer.Token {
+    return this.modules[0].firstToken;
+  }
+
+  public get lastToken(): lexer.Token {
+    return this.modules[this.modules.length - 1].lastToken;
   }
 }
 
@@ -554,6 +576,7 @@ export abstract class AstVisitor<R, C> {
     node: ModuleDeclaration,
     context?: C
   ): R;
+  public abstract visitModuleRoot(node: ModuleRoot, context?: C): R;
   public abstract visitOperator(node: Operator<OperatorType>, context?: C): R;
   public abstract visitParameterList(node: ParameterList, context?: C): R;
   public abstract visitPrefixExpression(node: PrefixExpression, context?: C): R;

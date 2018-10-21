@@ -20,14 +20,10 @@ export class StatementParser extends ExpressionParser {
     return this.parseExpression();
   }
 
-  private parseReturn(keyword: lexer.Token): ast.ReturnStatement {
-    return this.factory.createReturnStatement(
-      keyword,
-      this.hasNext ? this.parseExpression() : undefined
-    );
-  }
-
-  private parseVariable(_: lexer.Token): ast.VariableDeclaration {
+  protected parseVariable(
+    _?: lexer.Token,
+    allowValues = true
+  ): ast.VariableDeclaration {
     const allModifiers: lexer.Token[] = [];
     while (this.match(lexer.$Const)) {
       allModifiers.push(this.previous());
@@ -42,9 +38,10 @@ export class StatementParser extends ExpressionParser {
     }
     const name = this.parseIdentifier();
     const type = this.match(lexer.$Colon) ? this.parseIdentifier() : undefined;
-    const value = this.match(lexer.$Equals)
-      ? this.parseExpression()
-      : undefined;
+    const value =
+      allowValues && this.match(lexer.$Equals)
+        ? this.parseExpression()
+        : undefined;
     const astNode = this.factory.createVariableDeclaration(
       name,
       hasModifier(lexer.$Const),
@@ -52,8 +49,18 @@ export class StatementParser extends ExpressionParser {
       value
     );
     if (allModifiers.length > 1) {
-      this.reporter.reportNode(astNode, StaticMessageCode.TOO_MANY_MODIFIERS);
+      this.reporter.reportNode(
+        astNode,
+        StaticMessageCode.SYNTAX_TOO_MANY_MODIFIERS
+      );
     }
     return astNode;
+  }
+
+  private parseReturn(keyword: lexer.Token): ast.ReturnStatement {
+    return this.factory.createReturnStatement(
+      keyword,
+      this.hasNext ? this.parseExpression() : undefined
+    );
   }
 }

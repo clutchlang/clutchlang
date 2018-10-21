@@ -116,11 +116,18 @@ export class AstFactory {
 
   public createFunctionDeclaration(
     name: ast.Identifier,
+    isExternal: boolean,
     params?: ast.ParameterList,
-    body?: ast.Expression | ast.StatementBlock,
-    returnType?: ast.Identifier
+    returnType?: ast.Identifier,
+    body?: ast.Expression | ast.StatementBlock
   ): ast.FunctionDeclaration {
-    return new ast.FunctionDeclaration(name, params, body, returnType);
+    return new ast.FunctionDeclaration(
+      name,
+      isExternal,
+      params,
+      returnType,
+      body
+    );
   }
 
   public createModuleDeclaration(
@@ -129,5 +136,18 @@ export class AstFactory {
     >
   ): ast.ModuleDeclaration {
     return new ast.ModuleDeclaration(declarations);
+  }
+
+  public createModuleRoot(modules: ast.ModuleDeclaration[]): ast.ModuleRoot {
+    return new ast.ModuleRoot(modules);
+  }
+
+  public createTypeDeclaration(
+    name: ast.Identifier,
+    isExternal: boolean,
+    members: Array<ast.FunctionDeclaration | ast.VariableDeclaration>,
+    last: Token
+  ): ast.TypeDeclaration {
+    return new ast.TypeDeclaration(name, isExternal, members, last);
   }
 }

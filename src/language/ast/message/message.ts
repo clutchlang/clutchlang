@@ -60,8 +60,18 @@ export class StaticMessageCode {
     StaticMessageSeverity.Error
   );
 
-  public static readonly TOO_MANY_MODIFIERS = new StaticMessageCode(
-    'TOO_MANY_MODIFIERS',
+  public static readonly SYNTAX_EXPECTED_CURLY = new StaticMessageCode(
+    'SYNTAX_EXPECTED_CURLY',
+    StaticMessageSeverity.Error
+  );
+
+  public static readonly SYNTAX_TOO_MANY_MODIFIERS = new StaticMessageCode(
+    'SYNTAX_TOO_MANY_MODIFIERS',
+    StaticMessageSeverity.Error
+  );
+
+  public static readonly SYNTAX_INVALID_MODIFIER = new StaticMessageCode(
+    'SYNTAX_INVALID_MODIFIER',
     StaticMessageSeverity.Error
   );
 
