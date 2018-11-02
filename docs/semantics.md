@@ -4,7 +4,28 @@ make the examples understandable.
 
 ## Types
 
-... TBD ...
+The type system contains the following type _kinds_:
+
+* `Built-In`: A type directly provided by the language.
+* `Core`:     A type directly provided by the SDK. It _may_ be `external`.
+* `External`: A type provided by a user or system-defined class or structure.
+
+### Built-In
+
+| Name          | Description                                                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `Nothing`     | The _bottom_ type. Nothing is of this type, and nothing can be assigned to this type, nor can this type be assigned to another.  |
+| `Something`   | The _top_ type. Everything is of this type, and anything can be assigned to this type, and this type can be cast to another.     |
+
+### External
+
+... defined by a `type` definition, currently:
+
+```
+external type Boolean {}
+external type Number {}
+external type String {}
+```
 
 ## Methods
 
