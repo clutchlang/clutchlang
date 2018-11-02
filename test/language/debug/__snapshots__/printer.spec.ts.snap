@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should print expressions 1`] = `
+StringBuffer {
+  "buffer": "ModuleRoot:
+Modules:
+  ModuleDeclaration:
+  Declarations:
+    FunctionDeclaration:
+    Name:
+      Identifier {main}:
+    External: false
+    Body:
+      StatementBlock:
+      Statements:
+        BinaryExpression:
+        Left:
+          LiteralNumber {1}:
+        Operator:
+          Operator {13: \\"+\\"}:
+        Right:
+          LiteralNumber {1}:
+        CallExpression:
+        Target:
+          Identifier {call}:
+        Arguments:
+        ConditionalExpression:
+        If:
+          Identifier {a}:
+        Then:
+          Identifier {b}:
+        Else:
+          CallExpression:
+          Target:
+            Identifier {c}:
+          Arguments:
+            BinaryExpression:
+            Left:
+              LiteralNumber {1}:
+            Operator:
+              Operator {13: \\"+\\"}:
+            Right:
+              LiteralNumber {1}:
+        Identifier {fooBar}:
+        LiteralBoolean {true}:
+        LiteralBoolean {false}:
+        LiteralNumber {42}:
+        BinaryExpression:
+        Left:
+          LiteralString {Hello World}:
+        Operator:
+          Operator {14: \\"-\\"}:
+        Right:
+          LiteralNumber {1}:
+        PostfixExpression:
+        Target:
+          Identifier {n}:
+        Operator:
+          Operator {6: \\"++\\"}:
+        PropertyExpression:
+        Target:
+          Identifier {a}:
+        Property:
+          Identifier {b}:
+",
+  "indents": "",
+}
+`;
+
+exports[`should print other nodes 1`] = `
+StringBuffer {
+  "buffer": "ModuleRoot:
+Modules:
+  ModuleDeclaration:
+  Declarations:
+    TypeDeclaration:
+    Name:
+      Identifier {Foo}:
+    External: false
+    Members:
+      FunctionDeclaration:
+      Name:
+        Identifier {bar}:
+      External: false
+      Body:
+        StatementBlock:
+        Statements:
+          ReturnStatement:
+          Expression:
+            LiteralBoolean {true}:
+      FunctionDeclaration:
+      Name:
+        Identifier {baz}:
+      External: false
+      Body:
+        StatementBlock:
+        Statements:
+          ReturnStatement:
+    VariableDeclaration:
+    Name:
+      Identifier {x}:
+    Type:
+      Identifier {String}:
+    Value:
+      LiteralString {Hello}:
+",
+  "indents": "",
+}
+`;
