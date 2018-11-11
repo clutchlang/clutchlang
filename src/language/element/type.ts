@@ -12,11 +12,11 @@ export abstract class Type {
 
 /**
  * A type that is synthetic to the language and cannot be constructed elsewhere.
- * 
+ *
  * Built-in types do not have a `type` definition, and are meant to be used in
  * precise areas where having a specialized type is important to static analysis
  * or type inference.
- * 
+ *
  * All known built-in types are:
  * - @see Nothing
  * - @see Something
@@ -39,7 +39,7 @@ export class BuiltInType extends Type {
 
 /**
  * A type that is _external_ to the language, that is, may be defined elsewhere.
- * 
+ *
  * External types are canonicalized based on two properties:
  * - @member name, or the name of the type, such as `Foo`.
  * - @member source, or the source module of the type. A blank source is legal
@@ -50,7 +50,7 @@ export class BuiltInType extends Type {
  * - @see Boolean
  * - @see Number
  * - @see String
- * 
+ *
  * However, all external types can be declared using `external type` notation:
  * ```
  * external type Foo {
