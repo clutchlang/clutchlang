@@ -12,6 +12,14 @@ export abstract class Type {
 
 /**
  * A type that is synthetic to the language and cannot be constructed elsewhere.
+ * 
+ * Built-in types do not have a `type` definition, and are meant to be used in
+ * precise areas where having a specialized type is important to static analysis
+ * or type inference.
+ * 
+ * All known built-in types are:
+ * - @see Nothing
+ * - @see Something
  */
 export class BuiltInType extends Type {
   /**
@@ -30,21 +38,39 @@ export class BuiltInType extends Type {
 }
 
 /**
- * A type that is external to the language.
+ * A type that is _external_ to the language, that is, may be defined elsewhere.
+ * 
+ * External types are canonicalized based on two properties:
+ * - @member name, or the name of the type, such as `Foo`.
+ * - @member source, or the source module of the type. A blank source is legal
+ *   when there is no import required to locate the external type, such as the
+ *   top-level `String` type in the JavaScript SDK.
+ *
+ * For convenience, some external types are predefined in the SDK:
+ * - @see Boolean
+ * - @see Number
+ * - @see String
+ * 
+ * However, all external types can be declared using `external type` notation:
+ * ```
+ * external type Foo {
+ *   // ...
+ * }
+ * ```
  */
 export class ExternalType extends Type {
   /**
-   * Represents the top-level `Boolean` system type.
+   * Represents the top-level `Boolean` SDK type.
    */
   public static readonly Boolean = new ExternalType('Boolean');
 
   /**
-   * Represents the top-level `Number` system type.
+   * Represents the top-level `Number` SDK type.
    */
   public static readonly Number = new ExternalType('Number');
 
   /**
-   * Represents the top-level `String` system type.
+   * Represents the top-level `String` SDK type.
    */
   public static readonly String = new ExternalType('String');
 
