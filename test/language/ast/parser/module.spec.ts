@@ -1,32 +1,12 @@
 // tslint:disable:no-magic-numbers
 
-import { SourceFile } from '../../../../src/agnostic/scanner';
-import * as lexer from '../../../../src/language/ast/lexer';
-import {
-  StaticMessage,
-  StaticMessageCode,
-  StaticMessageReporter,
-} from '../../../../src/language/ast/message';
+import { StaticMessage } from '../../../../src/language/ast/message';
 import * as ast from '../../../../src/language/ast/parser';
-
-function parseModuleRoot(text: string): ast.ModuleRoot {
-  // TODO: Move the following block into a common test-infra area.
-  const source = new SourceFile(text, 'module.spec.ts');
-  const reporter = new StaticMessageReporter(source);
-  const tokens = lexer.tokenize(text, (offset, length) => {
-    reporter.reportOffset(
-      offset,
-      length,
-      StaticMessageCode.SYNTAX_UNEXPECTED_TOKEN
-    );
-  });
-  const parser = new ast.ModuleParser(tokens, reporter);
-  return parser.parseModuleRoot();
-}
+import { parseFile } from '../../utilts';
 
 describe('parseFunctionDeclaration', () => {
   test('should parse a simple function declaration', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       main: void -> {}
     `).modules[0].declarations[0] as ast.FunctionDeclaration;
     expect(d.isExternal).toEqual(false);
@@ -37,7 +17,7 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should parse a function declaration with no params', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       main() -> {}
     `).modules[0].declarations[0] as ast.FunctionDeclaration;
     expect(d.isExternal).toEqual(false);
@@ -48,7 +28,7 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should parse a function declaration with 1 param', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       identity(n) -> n
     `).modules[0].declarations[0] as ast.FunctionDeclaration;
     expect(d.name.name).toEqual('identity');
@@ -59,7 +39,7 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should parse a function declaration with types', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       a(b: Foo, c: Foo,): Foo -> b
     `).modules[0].declarations[0] as ast.FunctionDeclaration;
     expect(d.params!.params).toHaveLength(2);
@@ -73,7 +53,7 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should parse a function declaration with statements', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       main -> {
         print('Hello')
         print('World')
@@ -85,7 +65,7 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should parse external functions', () => {
-    const d = parseModuleRoot(`
+    const d = parseFile(`
       external xFn
     `).modules[0].declarations[0] as ast.FunctionDeclaration;
     expect(d.name.name).toEqual('xFn');
@@ -93,15 +73,13 @@ describe('parseFunctionDeclaration', () => {
   });
 
   test('should fail parsing external functions with a body', () => {
-    expect(() => parseModuleRoot('external xFn => 1')).toThrowError(
-      StaticMessage
-    );
+    expect(() => parseFile('external xFn => 1')).toThrowError(StaticMessage);
   });
 });
 
 describe('parseTypeDeclaration', () => {
   test('should parse an empty type', () => {
-    const t = parseModuleRoot(`
+    const t = parseFile(`
       type Foo {}
     `).modules[0].declarations[0] as ast.TypeDeclaration;
     expect(t.name.name).toEqual('Foo');
@@ -110,7 +88,7 @@ describe('parseTypeDeclaration', () => {
   });
 
   test('should parse an empty external type', () => {
-    const t = parseModuleRoot(`
+    const t = parseFile(`
       external type Foo {}
     `).modules[0].declarations[0] as ast.TypeDeclaration;
     expect(t.name.name).toEqual('Foo');
@@ -119,7 +97,7 @@ describe('parseTypeDeclaration', () => {
   });
 
   test('should parse a type with members', () => {
-    const t = parseModuleRoot(`
+    const t = parseFile(`
       type Foo {
         returnsBar -> 'Bar'
       }

@@ -1,7 +1,23 @@
 /**
+ * Represents a statically analyazed node.
+ *
+ * Elements sometimes but do not always link back to a parsed AST node, and can
+ * be either synthetic or a higher-level construct that does not exist purely in
+ * source code.
+ */
+export abstract class ElementNode {
+  // NOTE: This class exists in "types.ts", not "nodes.ts" to avoid circularity.
+}
+
+/**
  * A type within the type system.
  */
 export abstract class Type {
+  /**
+   * Origin of the type within the element tree, if any.
+   */
+  public abstract get element(): ElementNode | undefined;
+
   /**
    * Returns whether this type is exactly the same as @param other.
    */
@@ -31,6 +47,11 @@ export class BuiltInType extends Type {
    * Represents the _top_ type.
    */
   public static readonly Something = new BuiltInType();
+
+  /**
+   * Built-in types do not have elements.
+   */
+  public element = undefined;
 
   private constructor() {
     super();
@@ -79,6 +100,10 @@ export class ExternalType extends Type {
     public readonly source?: string
   ) {
     super();
+  }
+
+  public get element(): ElementNode | undefined {
+    return undefined;
   }
 
   public isExact(other: Type): boolean {
