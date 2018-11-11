@@ -1,4 +1,4 @@
-import { BuiltInType, ExternalType } from '../../../src/language/element/type';
+import { BuiltInType, ExternalType } from '../../../src/language/element/types';
 
 test('should support exactness for built-ins', () => {
   expect(BuiltInType.Nothing.isExact(BuiltInType.Nothing)).toEqual(true);
